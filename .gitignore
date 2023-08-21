@@ -1,3 +1,10 @@
-/.idea
-./out
-*.iml
+# Ignore everything:
+*
+
+# Don't ignore:
+
+# Source files
+!*.java
+
+# Report files
+!*.pdf
