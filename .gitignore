@@ -8,3 +8,6 @@
 
 # Report files
 !*.pdf
+
+# Even in subdirectories
+!*/
