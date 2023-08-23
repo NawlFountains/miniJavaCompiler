@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 
 public interface FileManager {
     char getNextCharacter() throws EOFException;
-    void selectCurrentFile(String path) throws FileNotFoundException;
-    int currentLineNumber();
+    void openFile(String path) throws FileNotFoundException;
+    void closeCurrentFile() throws FileNotFoundException;
+    int getCurrentLineNumber();
+    int getCurrentColumnNumber();
 }
