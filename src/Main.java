@@ -1,5 +1,6 @@
 import filemanager.FileManager;
 import filemanager.ImpFileManager;
+import lexical.LexicalAnalyzer;
 
 public class Main {
     public void notifyError() {
@@ -11,14 +12,14 @@ public class Main {
         try {
 //            manager.openFile(filePath);
             manager.openFile("G:\\Other computers\\PC Casa\\UNS\\Cursando\\Compiladores\\Practica\\Proyecto\\miniJavaCompiler\\resources\\sinErrores\\lexSinErrores01.java");
-            for (int i = 0; i < 16 ; i++) {
-
-                char c = manager.getNextCharacter();
-                System.out.println(c+" at line "+manager.getCurrentLineNumber()+" column "+manager.getCurrentColumnNumber());
+//            LexicalAnalyzer analyzer = new LexicalAnalyzer(manager);
+            while (!manager.isEOF()) {
+                System.out.println(manager.getNextCharacter());
+//                System.out.println(analyzer.nextToken().toString());
             }
             manager.closeCurrentFile();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Exception found :"+e.getMessage());
         }
 
     }

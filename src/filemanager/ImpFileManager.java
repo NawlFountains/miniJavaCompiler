@@ -6,26 +6,27 @@ import java.nio.Buffer;
 public class ImpFileManager implements FileManager{
     int currentLineNumber;
     int currentColumnNumber;
-    String currentBufferedLine;
+    String currentBufferedLine = " ";
 
     FileReader fileReader;
     BufferedReader bufferedReader;
 
     public ImpFileManager() {
     }
-    public char getNextCharacter() throws EOFException {
+    public char getNextCharacter() {
         char nextChar;
-        try {
             if (currentColumnNumber+1 == currentBufferedLine.length()) {
                 currentColumnNumber = 0;
                 readNewLine();
             } else {
                 currentColumnNumber++;
             }
-            nextChar = currentBufferedLine.charAt(currentColumnNumber);
-        } catch (Exception e) {
-            throw new EOFException("Unexpected End of file");
-        }
+            if (currentBufferedLine == null) {
+                nextChar = ' ';
+            } else {
+                //TODO fix this patch
+                nextChar = currentBufferedLine.charAt(currentColumnNumber);
+            }
         return nextChar;
     }
 
@@ -58,8 +59,19 @@ public class ImpFileManager implements FileManager{
         return currentColumnNumber;
     }
 
-    private void readNewLine() throws IOException {
-        currentBufferedLine = bufferedReader.readLine();
+    public String getCurrentLine() { return currentBufferedLine; }
+    public boolean isEOF() {
+        boolean toReturn = false;
+        if (currentBufferedLine == null)
+            toReturn = true;
+        return toReturn;
+    }
+    private void readNewLine() {
+        try {
+            currentBufferedLine = bufferedReader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         currentLineNumber++;
     }
 }

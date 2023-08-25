@@ -1,7 +1,7 @@
 package lexical;
 
 public class LexicalException extends Exception{
-    public LexicalException(String lexeme, String lineNumber) {
+    public LexicalException(String lexeme, int lineNumber) {
         super("[Error:"+lexeme+"|"+lineNumber+"]");
     }
 }
