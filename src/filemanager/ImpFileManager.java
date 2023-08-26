@@ -1,43 +1,50 @@
 package filemanager;
 
 import java.io.*;
-import java.nio.Buffer;
 
 public class ImpFileManager implements FileManager{
     int currentLineNumber;
     int currentColumnNumber;
     String currentBufferedLine = " ";
-
+    boolean jumpedLine = false;
+    boolean endOfFile = false;
+    String path;
     FileReader fileReader;
     BufferedReader bufferedReader;
 
     public ImpFileManager() {
     }
     public char getNextCharacter() {
-        char nextChar;
-            if (currentColumnNumber+1 == currentBufferedLine.length()) {
-                currentColumnNumber = 0;
-                readNewLine();
+        char currentChar = ' ';
+        if (jumpedLine) {
+            currentLineNumber++;
+            currentColumnNumber = 1;
+            jumpedLine = false;
+            currentBufferedLine = "";
+        }
+        try {
+            currentChar = (char) bufferedReader.read();
+            currentBufferedLine = currentBufferedLine + currentChar;
+            if (currentChar == (char) -1)
+                endOfFile = true;
+            if (currentChar == '\n'){
+                jumpedLine = true;
             } else {
                 currentColumnNumber++;
             }
-            if (currentBufferedLine == null) {
-                nextChar = ' ';
-            } else {
-                //TODO fix this patch
-                nextChar = currentBufferedLine.charAt(currentColumnNumber);
-            }
-        return nextChar;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return currentChar;
     }
-
     public void openFile(String path) throws FileNotFoundException {
         try {
+            this.path = path;
             fileReader = new FileReader(path);
             bufferedReader = new BufferedReader(fileReader);
 
-            readNewLine();
-            currentLineNumber = 0;
-            currentColumnNumber = 0;
+            currentLineNumber = 1;
+            currentColumnNumber = 1;
         } catch (Exception e) {
             throw new FileNotFoundException("File "+path+" couldn't be found");
         }
@@ -59,19 +66,23 @@ public class ImpFileManager implements FileManager{
         return currentColumnNumber;
     }
 
-    public String getCurrentLine() { return currentBufferedLine; }
-    public boolean isEOF() {
-        boolean toReturn = false;
-        if (currentBufferedLine == null)
-            toReturn = true;
-        return toReturn;
-    }
-    private void readNewLine() {
+    public String getLine(int lineNumber) {
+        String lineToReturn = "";
         try {
-            currentBufferedLine = bufferedReader.readLine();
+            FileReader auxiliaryFileReader = new FileReader(path);
+            BufferedReader auxiliaryBuffer = new BufferedReader(auxiliaryFileReader);
+            for (int i=1; i < lineNumber; i++) {
+                auxiliaryBuffer.readLine();
+            }
+            lineToReturn = auxiliaryBuffer.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        currentLineNumber++;
+
+        return lineToReturn;
     }
+    public boolean isEOF() {
+        return endOfFile;
+    }
+
 }

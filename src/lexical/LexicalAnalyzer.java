@@ -20,9 +20,26 @@ public class LexicalAnalyzer {
     }
 
     private void loadReservedWords() {
+        reservedWords.add("class");
+        reservedWords.add("public");
+        reservedWords.add("void");
         reservedWords.add("if");
+        reservedWords.add("this");
+        reservedWords.add("interface");
+        reservedWords.add("static");
+        reservedWords.add("boolean");
         reservedWords.add("else");
-        //TODO add reserved words
+        reservedWords.add("new");
+        reservedWords.add("extends");
+        reservedWords.add("implements");
+        reservedWords.add("char");
+        reservedWords.add("while");
+        reservedWords.add("null");
+        reservedWords.add("int");
+        reservedWords.add("return");
+        reservedWords.add("true");
+        reservedWords.add("false");
+        reservedWords.add("var");
     }
 
     public Token nextToken() throws LexicalException{
@@ -43,18 +60,27 @@ public class LexicalAnalyzer {
             updateLexeme();
             nextCharacter();
             return intLiteralState();
+        } else if (currentChar == '"') {
+            updateLexeme();
+            nextCharacter();
+            return stringStarterState();
+        } else if (currentChar == '\'') {
+            updateLexeme();
+            nextCharacter();
+            return charLiteralStarterState();
         } else if (isPunctuation(currentChar)) {
             updateLexeme();
             nextCharacter();
             return punctuationState();
-        } else if (isSingleArithmeticOperator(currentChar)) {
+        } else if (currentChar == '/') {
             updateLexeme();
-            if (currentChar == '/') {
-                return possibleComment();
-            } else {
-                nextCharacter();
-                return defaultOperatorStates();
-            }
+            nextCharacter();
+            return possibleComment();
+        } else if (isSingleArithmeticOperator(currentChar)) {
+            //TODO overlapping with /
+            updateLexeme();
+            nextCharacter();
+            return defaultOperatorStates();
         } else if (isCompoundArithmeticOperator(currentChar)) {
             updateLexeme();
             nextCharacter();
@@ -71,28 +97,34 @@ public class LexicalAnalyzer {
             updateLexeme();
             nextCharacter();
             return charLiteralStarterState();
-        } else if (Character.isWhitespace(currentChar)) {
-            //TODO remember to jump whitespaces, enters, etc
+        } else if (Character.isWhitespace(currentChar) || currentChar == '\n') {
             nextCharacter();
             return initialState();
+        } else if (currentChar == (char) -1) {
+            return endOfFileState();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(""+currentChar, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un simbolo valido");
         }
     }
-    private Token possibleComment() {
+    private Token possibleComment() throws LexicalException {
         if (currentChar == '/') {
             int currentLine = fileManager.getCurrentLineNumber();
             while (currentLine == fileManager.getCurrentLineNumber()) {
                 nextCharacter();
-                //TODO capture if endOfFile
             }
+            return nextToken();
         } else if (currentChar == '*') {
             char prevChar = ' ';
-            while (prevChar != '*' && currentChar != '/') {
+            while (prevChar != '*' || currentChar != '/') {
                 prevChar = currentChar;
                 nextCharacter();
-                //TODO capture if endOfFile
+                if (fileManager.isEOF()) {
+                    //TODO should we put in lexeme here? also number and oclumn doesnt work because EOF is one enter under
+                    throw new LexicalException("",fileManager.getCurrentLineNumber(),fileManager.getCurrentColumnNumber(),"comentario multilinea nunca cerrado");
+                }
             }
+            nextCharacter();
+            return nextToken();
         }
         return defaultOperatorStates();
     }
@@ -113,7 +145,7 @@ public class LexicalAnalyzer {
     }
 
     Token punctuationState() {
-        return new Token(getPunctuationId(currentChar),lexeme, fileManager.getCurrentLineNumber());
+        return new Token(getPunctuationId(),lexeme, fileManager.getCurrentLineNumber());
     }
 
     Token endOfFileState () {
@@ -121,7 +153,7 @@ public class LexicalAnalyzer {
     }
 
     Token idClassState() {
-        if (Character.isLetterOrDigit(currentChar)) {
+        if (Character.isLetterOrDigit(currentChar) || currentChar == '_') {
             updateLexeme();
             nextCharacter();
             return idClassState();
@@ -131,7 +163,7 @@ public class LexicalAnalyzer {
     }
 
     Token idMetVarState() {
-        if (Character.isLetterOrDigit(currentChar) && !isReservedWord(lexeme)) {
+        if ((Character.isLetterOrDigit(currentChar) || currentChar == '_') && !isReservedWord(lexeme)) {
             updateLexeme();
             nextCharacter();
             return idMetVarState();
@@ -143,26 +175,29 @@ public class LexicalAnalyzer {
         }
     }
 
-    Token intLiteralState() throws LexicalException {
+    Token intLiteralState() {
         if (Character.isDigit(currentChar) && lexeme.length() < MAX_INT_LENGTH) {
             updateLexeme();
             nextCharacter();
             return intLiteralState();
-        } else if (lexeme.length() >= MAX_INT_LENGTH) {
-            //TODO throw exception about
-            return null;
         } else {
-            throw new LexicalException(lexeme,fileManager.getCurrentLineNumber());
+            return new Token("intLiteral",lexeme,fileManager.getCurrentLineNumber());
         }
     }
 
     Token charLiteralStarterState() throws LexicalException {
-        if (currentChar != '\\' || currentChar != '\'' ) {
+        if (currentChar != '\\' && currentChar != '\'' ) {
             updateLexeme();
             nextCharacter();
             return charLiteralFinishingState();
-        } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+        } else if (currentChar == '\\'){
+            updateLexeme();
+            nextCharacter();
+            updateLexeme();
+            nextCharacter();
+            return charLiteralFinishingState();
+        }else {
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter valido");
         }
     }
     Token charLiteralFinishingState() throws LexicalException {
@@ -171,7 +206,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return new Token("charLiteral",lexeme, fileManager.getCurrentLineNumber());
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"esperado cierre de caracter");
         }
     }
 
@@ -194,7 +229,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return defaultOperatorStates();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un operador logico valido");
         }
     }
 
@@ -204,12 +239,12 @@ public class LexicalAnalyzer {
             nextCharacter();
             return defaultOperatorStates();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un operador logico valido");
         }
     }
 
     Token stringStarterState() throws LexicalException {
-        if (currentChar != '\n' && currentChar != '\'' && currentChar != '\\' && currentChar != '"') {
+        if (currentChar != '\n' && currentChar != '\'' && currentChar != '\\' && currentChar != '"' && currentChar != (char) 13) {
             updateLexeme();
             nextCharacter();
             return stringStarterState();
@@ -222,7 +257,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return stringFinishingState();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter valido para un String o nunca se cierra el String");
         }
     }
 
@@ -232,7 +267,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return stringStarterState();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber());
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter de escape valido para un String");
         }
     }
 
@@ -247,9 +282,9 @@ public class LexicalAnalyzer {
             toReturn = true;
         return toReturn;
     }
-    private String getPunctuationId(char c) {
+    private String getPunctuationId() {
         String id = null;
-        switch (c) {
+        switch (lexeme.charAt(0)) {
             case '(':
                 id = "openPar";
                 break;

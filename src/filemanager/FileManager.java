@@ -1,6 +1,5 @@
 package filemanager;
 
-import java.io.EOFException;
 import java.io.FileNotFoundException;
 
 public interface FileManager {
@@ -9,6 +8,6 @@ public interface FileManager {
     void closeCurrentFile() throws FileNotFoundException;
     int getCurrentLineNumber();
     int getCurrentColumnNumber();
-    String getCurrentLine();
+    String getLine(int lineNumber);
     boolean isEOF();
 }
