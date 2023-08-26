@@ -22,16 +22,15 @@ public class Main {
 
     public static void main(String[] args) {
         boolean errorOccur = false;
-//        String filePath = args[0];
+        String filePath = args[0];
         try {
-//            manager.openFile(filePath);
-            manager.openFile("resources\\conErrores\\dummyLexError.java");
+            manager.openFile(filePath);
             LexicalAnalyzer analyzer = new LexicalAnalyzer(manager);
             while (!manager.isEOF()) {
                 System.out.println(analyzer.nextToken().toString());
             }
             if (!errorOccur) {
-                System.out.println(successfulExecutionMsg);
+                System.out.println("\n"+successfulExecutionMsg);
             }
             manager.closeCurrentFile();
         }

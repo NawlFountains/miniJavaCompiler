@@ -11,7 +11,9 @@ public class LexicalAnalyzer {
     private FileManager fileManager;
     private String lexeme;
     private char currentChar;
-    private int MAX_INT_LENGTH = 9;
+    private final int MAX_INT_LENGTH = 9;
+    private final float MIN_FLOAT_VALUE = 1.40e-45f;
+    private final float MAX_FLOAT_VALUE = 3.4028235e38f;
 
     public LexicalAnalyzer(FileManager fileManager) throws FileNotFoundException {
         this.fileManager = fileManager;
@@ -68,6 +70,10 @@ public class LexicalAnalyzer {
             updateLexeme();
             nextCharacter();
             return charLiteralStarterState();
+        } else if (currentChar == '.') {
+            updateLexeme();
+            nextCharacter();
+            return possibleFloatState();
         } else if (isPunctuation(currentChar)) {
             updateLexeme();
             nextCharacter();
@@ -77,7 +83,6 @@ public class LexicalAnalyzer {
             nextCharacter();
             return possibleComment();
         } else if (isSingleArithmeticOperator(currentChar)) {
-            //TODO overlapping with /
             updateLexeme();
             nextCharacter();
             return defaultOperatorStates();
@@ -105,6 +110,71 @@ public class LexicalAnalyzer {
         } else {
             throw new LexicalException(""+currentChar, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un simbolo valido");
         }
+    }
+
+    private Token possibleFloatState() throws LexicalException {
+        if (Character.isDigit(currentChar)) {
+            updateLexeme();
+            nextCharacter();
+            return decFloatAfterPeriod();
+        } else {
+            return new Token(getPunctuationId(),lexeme,fileManager.getCurrentLineNumber());
+        }
+    }
+
+    private Token decFloatAfterExponent() throws LexicalException{
+        if (Character.isDigit(currentChar)) {
+            updateLexeme();
+            nextCharacter();
+            return decFloatAfterExponent();
+        } else {
+            if (isInFloatRange(lexeme)) {
+                return new Token("decFloatLiteral",lexeme,fileManager.getCurrentLineNumber());
+            } else {
+                throw new LexicalException(lexeme,fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber()," excede el rango de valor para un float");
+            }
+        }
+    }
+    private Token decFloatAfterPeriod() throws LexicalException {
+        if (Character.isDigit(currentChar)) {
+            updateLexeme();
+            nextCharacter();
+            return decFloatAfterPeriod();
+        } else if (currentChar == 'e' || currentChar == 'E') {
+            updateLexeme();
+            nextCharacter();
+            return decFloatReadingExponentSignState();
+        } else {
+            return new Token("decFloatLiteral",lexeme,fileManager.getCurrentLineNumber());
+        }
+    }
+    private Token decFloatReadingExponentSignState() throws LexicalException{
+        if (currentChar == '+' || currentChar == '-') {
+            updateLexeme();
+            nextCharacter();
+            return decFloatReadingExponentFirstDigitState();
+        } else if (Character.isDigit(currentChar)) {
+            return decFloatAfterExponent();
+        } else {
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"falta especificar el exponente del float");
+        }
+    }
+    private Token decFloatReadingExponentFirstDigitState() throws LexicalException {
+        if (Character.isDigit(currentChar)) {
+            updateLexeme();
+            nextCharacter();
+            return decFloatAfterExponent();
+        } else {
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(), "se necesita especificar con digitos el exponente");
+        }
+    }
+    private boolean isInFloatRange(String stringFloat) {
+        float floatToTest = Float.parseFloat(stringFloat);
+        boolean inRange = false;
+        if (MIN_FLOAT_VALUE <= floatToTest && floatToTest  <= MAX_FLOAT_VALUE) {
+            inRange = true;
+        }
+        return inRange;
     }
     private Token possibleComment() throws LexicalException {
         if (currentChar == '/') {
@@ -138,7 +208,7 @@ public class LexicalAnalyzer {
 
     private boolean isSingleArithmeticOperator(char c) {
         boolean toReturn = false;
-        if ( c == '%' || c == '/' || c == '*'){
+        if ( c == '%' || c == '*'){
             toReturn = true;
         }
         return toReturn;
@@ -168,18 +238,31 @@ public class LexicalAnalyzer {
             nextCharacter();
             return idMetVarState();
         } else if (isReservedWord(lexeme)) {
-            //TODO evaluar si es una comun, booleano o null
-            return new Token("resWord",lexeme, fileManager.getCurrentLineNumber());
+            String id = "resWord";
+            if (lexeme == null) {
+                id = "litNull";
+            } else if (lexeme == "true" || lexeme == "false") {
+                id = "litBoolean";
+            }
+            return new Token(id,lexeme, fileManager.getCurrentLineNumber());
         } else {
             return new Token("idMetVar",lexeme,fileManager.getCurrentLineNumber());
         }
     }
 
-    Token intLiteralState() {
+    Token intLiteralState() throws LexicalException {
         if (Character.isDigit(currentChar) && lexeme.length() < MAX_INT_LENGTH) {
             updateLexeme();
             nextCharacter();
             return intLiteralState();
+        } else if (currentChar == '.'){
+            updateLexeme();
+            nextCharacter();
+            return decFloatAfterPeriod();
+        } else if (currentChar == 'e' || currentChar == 'E'){
+            updateLexeme();
+            nextCharacter();
+            return decFloatReadingExponentSignState();
         } else {
             return new Token("intLiteral",lexeme,fileManager.getCurrentLineNumber());
         }
@@ -277,7 +360,6 @@ public class LexicalAnalyzer {
 
     private boolean isPunctuation(char c) {
         boolean toReturn = false;
-        //TODO could store them in an array or list and ask if it contains it
         if ( c == '(' || c == ')' || c =='{' || c =='}' || c ==';' || c ==',' || c =='.')
             toReturn = true;
         return toReturn;

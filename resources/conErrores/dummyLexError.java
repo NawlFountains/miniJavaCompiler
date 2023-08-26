@@ -1,9 +1,9 @@
-
+///[Error:'\'|6]
 
 
 
 //Comentario con espacio
-(}( p A / 
+(}( p A /.,;'\' 
 /* Comentario multi
 
    linea */
