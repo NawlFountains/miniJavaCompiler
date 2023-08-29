@@ -243,7 +243,7 @@ public class LexicalAnalyzer {
             return idMetVarState();
         } else if (isReservedWord(lexeme)) {
             String id = "resWord";
-            if (lexeme == "null") {
+            if (lexeme.contains("null")) {
                 id = "litNull";
             } else if (lexeme.contains("true") || lexeme.contains("false")) {
                 id = "litBoolean";
@@ -331,7 +331,7 @@ public class LexicalAnalyzer {
     }
 
     Token stringStarterState() throws LexicalException {
-        if (currentChar != '\n' && currentChar != '\\' && currentChar != '"' && currentChar != (char) 13) {
+        if (currentChar != '\n' && currentChar != '\\' && currentChar != '"' && currentChar != (char) 13 && currentChar != (char) -1){
             updateLexeme();
             nextCharacter();
             return stringStarterState();
@@ -397,6 +397,15 @@ public class LexicalAnalyzer {
     private String getOperatorId(String op) {
         String id = null;
         switch (op) {
+            case "=":
+                id = "assign";
+                break;
+            case "+=":
+                id = "assignAdd";
+                break;
+            case "-=":
+                id = "assignSub";
+                break;
             case "+":
                 id = "opAdd";
                 break;
