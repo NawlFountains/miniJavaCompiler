@@ -243,9 +243,9 @@ public class LexicalAnalyzer {
             return idMetVarState();
         } else if (isReservedWord(lexeme)) {
             String id = "resWord";
-            if (lexeme == null) {
+            if (lexeme == "null") {
                 id = "litNull";
-            } else if (lexeme == "true" || lexeme == "false") {
+            } else if (lexeme.contains("true") || lexeme.contains("false")) {
                 id = "litBoolean";
             }
             return new Token(id,lexeme, fileManager.getCurrentLineNumber());

@@ -6,3 +6,4 @@
 true false 3.e-10
 "Testing \"" '\''
 'X' '#' if(eLse
+falsy truey null
