@@ -12,7 +12,7 @@ public class Main {
         System.out.println("Error lexico en linea "+e.getLineNumber()+" columna "+e.getColumnNumber()+" : "+e.getInvalidLexeme()+" "+e.getDescription());
         System.out.println("Detalle: "+manager.getLine(e.getLineNumber()));
 
-        for (int i = 0 ; i < manager.getCurrentColumnNumber()+7; i++) {
+        for (int i = 0 ; i < e.getColumnNumber()+7; i++) {
             arrowSpace = arrowSpace+" ";
         }
 
@@ -21,25 +21,28 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        boolean errorOccur = false;
-        String filePath = args[0];
         try {
-            manager.openFile(filePath);
-            LexicalAnalyzer analyzer = new LexicalAnalyzer(manager);
-            while (!manager.isEOF()) {
-                System.out.println(analyzer.nextToken().toString());
-            }
-            if (!errorOccur) {
-                System.out.println("\n"+successfulExecutionMsg);
-            }
-            manager.closeCurrentFile();
-        }
-        catch (LexicalException e) {
-            notifyError(e);
-        }
-        catch (Exception e) {
+                String filePath = args[0];
+                boolean errorOccur = false;
+                manager = new ImpFileManager();
+                manager.openFile(filePath);
+                LexicalAnalyzer analyzer = new LexicalAnalyzer(manager);
+                while (!manager.isEOF()) {
+                    try {
+                        System.out.println(analyzer.nextToken().toString());
+                    } catch (LexicalException e) {
+                        notifyError(e);
+                        errorOccur = true;
+                    }
+                }
+                if (!errorOccur) {
+                    System.out.println("\n"+successfulExecutionMsg);
+                } else {
+                    errorOccur = false;
+                }
+                manager.closeCurrentFile();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 }

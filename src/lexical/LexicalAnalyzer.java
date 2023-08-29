@@ -108,7 +108,9 @@ public class LexicalAnalyzer {
         } else if (currentChar == (char) -1) {
             return endOfFileState();
         } else {
-            throw new LexicalException(""+currentChar, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un simbolo valido");
+            updateLexeme();
+            nextCharacter();
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber()-1,"no es un simbolo valido");
         }
     }
 
@@ -185,13 +187,15 @@ public class LexicalAnalyzer {
             return nextToken();
         } else if (currentChar == '*') {
             char prevChar = ' ';
+            int lastColumn = 0;
+            updateLexeme();
             while (prevChar != '*' || currentChar != '/') {
                 prevChar = currentChar;
                 nextCharacter();
                 if (fileManager.isEOF()) {
-                    //TODO should we put in lexeme here? also number and oclumn doesnt work because EOF is one enter under
-                    throw new LexicalException("",fileManager.getCurrentLineNumber(),fileManager.getCurrentColumnNumber(),"comentario multilinea nunca cerrado");
+                    throw new LexicalException(lexeme,fileManager.getCurrentLineNumber()-1,lastColumn,"comentario multilinea nunca cerrado");
                 }
+                lastColumn = fileManager.getCurrentColumnNumber();
             }
             nextCharacter();
             return nextToken();
@@ -327,7 +331,7 @@ public class LexicalAnalyzer {
     }
 
     Token stringStarterState() throws LexicalException {
-        if (currentChar != '\n' && currentChar != '\'' && currentChar != '\\' && currentChar != '"' && currentChar != (char) 13) {
+        if (currentChar != '\n' && currentChar != '\\' && currentChar != '"' && currentChar != (char) 13) {
             updateLexeme();
             nextCharacter();
             return stringStarterState();
@@ -345,12 +349,12 @@ public class LexicalAnalyzer {
     }
 
     Token stringEscapeCharState() throws LexicalException {
-        if (currentChar == '"') {
+        if (currentChar != '\n' && currentChar != (char) 13) {
             updateLexeme();
             nextCharacter();
             return stringStarterState();
         } else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter de escape valido para un String");
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(), "no se permite un salto de linea en un String");
         }
     }
 

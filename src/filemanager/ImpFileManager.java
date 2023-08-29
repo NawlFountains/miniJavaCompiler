@@ -36,6 +36,7 @@ public class ImpFileManager implements FileManager{
             throw new RuntimeException(e);
         }
         return currentChar;
+
     }
     public void openFile(String path) throws FileNotFoundException {
         try {
@@ -53,6 +54,7 @@ public class ImpFileManager implements FileManager{
     public void closeCurrentFile() throws FileNotFoundException {
         try {
             fileReader.close();
+            bufferedReader.close();
         } catch (Exception e) {
             throw new FileNotFoundException("Couldn't close current file");
         }
