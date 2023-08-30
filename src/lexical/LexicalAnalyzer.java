@@ -3,11 +3,13 @@ package lexical;
 import filemanager.FileManager;
 
 import java.io.FileNotFoundException;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
 public class LexicalAnalyzer {
-    private List reservedWords = new LinkedList<String>();
+    private Dictionary<String,String> reservedWords = new Hashtable<>();
     private FileManager fileManager;
     private String lexeme;
     private char currentChar;
@@ -22,26 +24,26 @@ public class LexicalAnalyzer {
     }
 
     private void loadReservedWords() {
-        reservedWords.add("class");
-        reservedWords.add("public");
-        reservedWords.add("void");
-        reservedWords.add("if");
-        reservedWords.add("this");
-        reservedWords.add("interface");
-        reservedWords.add("static");
-        reservedWords.add("boolean");
-        reservedWords.add("else");
-        reservedWords.add("new");
-        reservedWords.add("extends");
-        reservedWords.add("implements");
-        reservedWords.add("char");
-        reservedWords.add("while");
-        reservedWords.add("null");
-        reservedWords.add("int");
-        reservedWords.add("return");
-        reservedWords.add("true");
-        reservedWords.add("false");
-        reservedWords.add("var");
+        reservedWords.put("class","rw_class");
+        reservedWords.put("public","rw_public");
+        reservedWords.put("void","rw_void");
+        reservedWords.put("if","rw_if");
+        reservedWords.put("this","rw_this");
+        reservedWords.put("interface","rw_interface");
+        reservedWords.put("static","rw_static");
+        reservedWords.put("boolean","rw_boolean");
+        reservedWords.put("else","rw_else");
+        reservedWords.put("new","rw_new");
+        reservedWords.put("extends","rw_extends");
+        reservedWords.put("implements","rw_implements");
+        reservedWords.put("char","rw_char");
+        reservedWords.put("while","rw_while");
+        reservedWords.put("null","rw_null");
+        reservedWords.put("int","rw_int");
+        reservedWords.put("return","rw_return");
+        reservedWords.put("true","rw_true");
+        reservedWords.put("false","rw_false");
+        reservedWords.put("var","rw_var");
     }
 
     public Token nextToken() throws LexicalException{
@@ -237,17 +239,12 @@ public class LexicalAnalyzer {
     }
 
     Token idMetVarState() {
-        if ((Character.isLetterOrDigit(currentChar) || currentChar == '_') && !isReservedWord(lexeme)) {
+        if ((Character.isLetterOrDigit(currentChar) || currentChar == '_') && reservedWords.get(lexeme) == null) {
             updateLexeme();
             nextCharacter();
             return idMetVarState();
-        } else if (isReservedWord(lexeme)) {
-            String id = "resWord";
-            if (lexeme.contains("null")) {
-                id = "litNull";
-            } else if (lexeme.contains("true") || lexeme.contains("false")) {
-                id = "litBoolean";
-            }
+        } else if (reservedWords.get(lexeme) != null) {
+            String id = reservedWords.get(lexeme);
             return new Token(id,lexeme, fileManager.getCurrentLineNumber());
         } else {
             return new Token("idMetVar",lexeme,fileManager.getCurrentLineNumber());
@@ -450,13 +447,6 @@ public class LexicalAnalyzer {
                 break;
         }
         return id;
-    }
-    private boolean isReservedWord(String word) {
-        boolean toReturn = false;
-        if (reservedWords.contains(word)) {
-            toReturn = true;
-        }
-        return toReturn;
     }
     private void updateLexeme() {
         lexeme += currentChar;
