@@ -17,6 +17,7 @@ public class LexicalAnalyzer {
     private final float MIN_FLOAT_VALUE = 1.40e-45f;
     private final float MAX_FLOAT_VALUE = 3.4028235e38f;
 
+    //TODO fix always giving one column more from error either here or in FileManager
     public LexicalAnalyzer(FileManager fileManager) throws FileNotFoundException {
         this.fileManager = fileManager;
         nextCharacter();
@@ -252,6 +253,7 @@ public class LexicalAnalyzer {
     }
 
     Token intLiteralState() throws LexicalException {
+        //TODO fix , throw error when surpassing MAX_INT_LENGTH
         if (Character.isDigit(currentChar) && lexeme.length() < MAX_INT_LENGTH) {
             updateLexeme();
             nextCharacter();
@@ -270,6 +272,7 @@ public class LexicalAnalyzer {
     }
 
     Token charLiteralStarterState() throws LexicalException {
+        //TODO fix jump line for LexicalException
         if (currentChar != '\\' && currentChar != '\'' ) {
             updateLexeme();
             nextCharacter();
