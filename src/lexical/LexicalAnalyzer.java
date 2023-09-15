@@ -136,7 +136,7 @@ public class LexicalAnalyzer {
             return decFloatAfterExponent();
         } else {
             if (isInFloatRange(lexeme)) {
-                return new Token("decFloatLiteral",lexeme,fileManager.getCurrentLineNumber());
+                return new Token("floatLiteral",lexeme,fileManager.getCurrentLineNumber());
             } else {
                 throw new LexicalException(lexeme,fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber()," excede el rango de valor para un float");
             }
@@ -152,7 +152,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return decFloatReadingExponentSignState();
         } else {
-            return new Token("decFloatLiteral",lexeme,fileManager.getCurrentLineNumber());
+            return new Token("floatLiteral",lexeme,fileManager.getCurrentLineNumber());
         }
     }
     private Token decFloatReadingExponentSignState() throws LexicalException{
@@ -242,7 +242,8 @@ public class LexicalAnalyzer {
     }
 
     Token idMetVarState() {
-        if ((Character.isLetterOrDigit(currentChar) || currentChar == '_') && reservedWords.get(lexeme) == null) {
+        if ((Character.isLetterOrDigit(currentChar) || currentChar == '_') /** with this we cant
+         state idMetVar like classMate or stuff like that : && reservedWords.get(lexeme) == null */) {
             updateLexeme();
             nextCharacter();
             return idMetVarState();

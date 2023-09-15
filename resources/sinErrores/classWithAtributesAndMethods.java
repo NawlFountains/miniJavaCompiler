@@ -3,9 +3,10 @@
 
 class Prueba1{
 
-    int x;
-    float y;
-
+    int x = 4;
+    float y = 3.e10;
+    String str;
+    private AnotherClass c = new Object();
     
     private Prueba1(int x) {
     	this.x = x;
@@ -15,6 +16,7 @@ class Prueba1{
     static  void prueba1(int a) 
     {
         this.b().a = 5; 
+	ClaseEstatica.llamado().concatenacion().llamados();
     
     }
 

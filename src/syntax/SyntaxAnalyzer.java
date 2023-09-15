@@ -46,6 +46,7 @@ public class SyntaxAnalyzer {
         GenericidadOpcional();
         HerenciaOpcional();
         match("openCurl");
+        System.out.println("Por ver lista de miembros");
         ListaMiembros();
         match("closeCurl");
     }
@@ -97,6 +98,7 @@ public class SyntaxAnalyzer {
     }
     void ListaMiembros() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ListaMiembros")) {
+            System.out.println("EN lista miembros");
             Miembro();
             ListaMiembros();
         } else {
@@ -118,14 +120,61 @@ public class SyntaxAnalyzer {
         AtributoMetodoOConstructor();
     }
     void AtributoMetodoOConstructor() throws LexicalException, SyntaxException {
-        if (isCurrentTokenOnFirstSetOf("Constructor")) {
-            Constructor();
-        } else if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodo")) {
+        if (currentToken.getId().contains("rw_static")) {
+            match("rw_static");
             EncabezadoAtributoMetodo();
+        } else if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodoConstructor")) {
+            EncabezadoAtributoMetodoConstructor();
+        }
+//        if (isCurrentTokenOnFirstSetOf("Constructor")) {
+//            Constructor();
+//        } else if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodo")) {
+//            EncabezadoAtributoMetodo();
+//        }
+    }
+
+    private void EncabezadoAtributoMetodoConstructor() throws LexicalException, SyntaxException{
+        if (currentToken.getId().contains("idClase")) {
+            match("idClase");
+            PosibleConstructor();
+        } else if (isCurrentTokenOnFirstSetOf("TipoMiembroSinClase")) {
+            System.out.println("Vemos que es parte de los tipos miembros sin clase");
+            TipoMiembroSinClase();
+            EncabezadoAtributoMetodoTipoDicho();
         }
     }
+
+    private void TipoMiembroSinClase() throws LexicalException, SyntaxException {
+        System.out.println("Primeros de tip oprmiitivo son "+firstSet("TipoPrimitivo").toString());
+        if (isCurrentTokenOnFirstSetOf("TipoPrimitivo")) {
+            TipoPrimitivo();
+        } else if (currentToken.getId().contains("rw_void")) {
+            match("void");
+        }
+    }
+
+    private void PosibleConstructor() throws LexicalException, SyntaxException {
+        if (currentToken.getId().contains("idMetVar")) {
+            match("idMetVar");
+            FinAtributoMetodo();
+        } else if (isCurrentTokenOnFirstSetOf("GeneracidadOpcional")) {
+            GenericidadOpcional();
+            ArgsFormales();
+            Bloque();
+        } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
+            ArgsFormales();
+            Bloque();
+        }
+    }
+
+    private void EncabezadoAtributoMetodoTipoDicho() throws LexicalException, SyntaxException {
+        System.out.println("Ya se tiene el tipo entonces se termina");
+        match("idMetVar");
+        FinAtributoMetodo();
+    }
+
     void EncabezadoAtributoMetodo() throws LexicalException, SyntaxException {
-        EstaticoOpcional();
+//        EstaticoOpcional();
         TipoMiembro();
         match("idMetVar");
         FinAtributoMetodo();
@@ -136,6 +185,7 @@ public class SyntaxAnalyzer {
             InicializacionOpcional();
 
             match("semiColon");
+
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
             ArgsFormales();
             Bloque();
@@ -484,11 +534,13 @@ public class SyntaxAnalyzer {
                 //TODO add empty
                 break;
             case "AtributoMetodoOConstructor":
-                firstSet = firstSet("Constructor");
-                firstSet.addAll(firstSet("EncabezadoAtributoMetodo"));
+//                firstSet = firstSet("Constructor");
+//                firstSet.addAll(firstSet("EncabezadoAtributoMetodo"));
+                firstSet.add("rw_static");
+                firstSet.addAll(firstSet("EncabezadoAtributoMetodoConstructor"));
                 break;
             case "EncabezadoAtributoMetodo":
-                firstSet = firstSet("EstaticoOpcional");
+//                firstSet = firstSet("EstaticoOpcional");
                 firstSet.addAll(firstSet("TipoMiembro"));
                 break;
             case "FinAtributoMetodo":
@@ -674,6 +726,15 @@ public class SyntaxAnalyzer {
                 //TODO add empty
                 break;
             case "EncadenadoOpcional ":
+                firstSet.add("period");
+                break;
+            case "EncabezadoAtributoMetodoConstructor":
+                firstSet.add("idClase");
+                firstSet.addAll(firstSet("TipoMiembroSinClase"));
+                break;
+            case "TipoMiembroSinClase":
+                firstSet.add("rw_void");
+                firstSet.addAll(firstSet("TipoPrimitivo"));
                 break;
         }
         return firstSet;
