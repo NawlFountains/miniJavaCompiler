@@ -12,14 +12,11 @@ public class SyntaxAnalyzer {
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
         this.lexicalAnalyzer = lexicalAnalyzer;
-        currentToken = lexicalAnalyzer.nextToken();
-        Inicial();
     }
 
-    public void startAnalisis() throws LexicalException {
-        while (!currentToken.getId().contains("EOF")) {
-            lexicalAnalyzer.nextToken();
-        }
+    public void startAnalysis() throws LexicalException, SyntaxException {
+        currentToken = lexicalAnalyzer.nextToken();
+        Inicial();
     }
     void Inicial() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ListaClases")) {

@@ -33,7 +33,7 @@ public class Main {
             manager.openFile(filePath);
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
-            syntaxAnalyzer.startAnalisis();
+            syntaxAnalyzer.startAnalysis();
             System.out.println("\n" + successfulExecutionMsg);
             manager.closeCurrentFile();
         } catch (LexicalException e) {
