@@ -27,6 +27,7 @@ public class LexicalAnalyzer {
     private void loadReservedWords() {
         reservedWords.put("class","rw_class");
         reservedWords.put("public","rw_public");
+        reservedWords.put("private","rw_private");
         reservedWords.put("void","rw_void");
         reservedWords.put("if","rw_if");
         reservedWords.put("this","rw_this");
@@ -41,6 +42,7 @@ public class LexicalAnalyzer {
         reservedWords.put("while","rw_while");
         reservedWords.put("null","rw_null");
         reservedWords.put("int","rw_int");
+        reservedWords.put("float","rw_float");
         reservedWords.put("return","rw_return");
         reservedWords.put("true","rw_true");
         reservedWords.put("false","rw_false");

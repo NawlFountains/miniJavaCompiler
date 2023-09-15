@@ -2,6 +2,7 @@ import filemanager.FileManager;
 import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
+import syntax.SyntaxAnalyzer;
 
 public class Main {
     static FileManager manager = new ImpFileManager();
@@ -26,10 +27,11 @@ public class Main {
                 boolean errorOccur = false;
                 manager = new ImpFileManager();
                 manager.openFile(filePath);
-                LexicalAnalyzer analyzer = new LexicalAnalyzer(manager);
+                LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
+                SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
                 while (!manager.isEOF()) {
                     try {
-                        System.out.println(analyzer.nextToken().toString());
+                        System.out.println(lexicalAnalyzer.nextToken().toString());
                     } catch (LexicalException e) {
                         notifyError(e);
                         errorOccur = true;
