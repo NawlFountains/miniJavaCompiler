@@ -71,6 +71,7 @@ public class SyntaxAnalyzer {
     void GenericidadOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("GenericidadOpcional")) {
             match("opLess");
+            match("idClase");
             DeclaracionClases();
             match("opGreater");
         } else {
@@ -136,6 +137,7 @@ public class SyntaxAnalyzer {
     private void EncabezadoAtributoMetodoConstructor() throws LexicalException, SyntaxException{
         if (currentToken.getId().contains("idClase")) {
             match("idClase");
+            GenericidadOpcional();
             PosibleConstructor();
         } else if (isCurrentTokenOnFirstSetOf("TipoMiembroSinClase")) {
             System.out.println("Vemos que es parte de los tipos miembros sin clase");
@@ -157,10 +159,6 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("idMetVar")) {
             match("idMetVar");
             FinAtributoMetodo();
-        } else if (isCurrentTokenOnFirstSetOf("GeneracidadOpcional")) {
-            GenericidadOpcional();
-            ArgsFormales();
-            Bloque();
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
             ArgsFormales();
             Bloque();
@@ -735,6 +733,10 @@ public class SyntaxAnalyzer {
             case "TipoMiembroSinClase":
                 firstSet.add("rw_void");
                 firstSet.addAll(firstSet("TipoPrimitivo"));
+                break;
+            case "PosibleConstructor":
+                firstSet.add("idMetVar");
+                firstSet.addAll(firstSet("ArgsFormales"));
                 break;
         }
         return firstSet;

@@ -6,7 +6,7 @@ class Prueba1{
     int x = 4;
     float y = 3.e10;
     String str;
-    private AnotherClass c = new Object();
+    private AnotherClass<Generics> c = new Object<GenericClass1,GenericClass2>();
     
     private Prueba1(int x) {
     	this.x = x;
@@ -23,6 +23,8 @@ class Prueba1{
     public Prueba1(int y){
 
     }
+    private static int testMethod() {}
+    public Class testClassMethod() {}
     
 }
 
