@@ -3,11 +3,12 @@ import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
 import syntax.SyntaxAnalyzer;
+import syntax.SyntaxException;
 
 public class Main {
     static FileManager manager = new ImpFileManager();
     static String successfulExecutionMsg = "[SinErrores]";
-    public static void notifyError(LexicalException e) {
+    public static void notifyLexicalError(LexicalException e) {
         String arrowSpace = "";
 
         System.out.println("Error lexico en linea "+e.getLineNumber()+" columna "+e.getColumnNumber()+" : "+e.getInvalidLexeme()+" "+e.getDescription());
@@ -20,29 +21,25 @@ public class Main {
         System.out.println(arrowSpace + "^");
         System.out.println(e.getMessage());
     }
+    public static void notifySintacticalError(SyntaxException e) {
+        System.out.println(e.getDescription()+"\n");
+        System.out.println(e.getMessage());
+    }
 
     public static void main(String[] args) {
         try {
-                String filePath = args[0];
-                boolean errorOccur = false;
-                manager = new ImpFileManager();
-                manager.openFile(filePath);
-                LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
-                SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
-                while (!manager.isEOF()) {
-                    try {
-                        System.out.println(lexicalAnalyzer.nextToken().toString());
-                    } catch (LexicalException e) {
-                        notifyError(e);
-                        errorOccur = true;
-                    }
-                }
-                if (!errorOccur) {
-                    System.out.println("\n"+successfulExecutionMsg);
-                } else {
-                    errorOccur = false;
-                }
-                manager.closeCurrentFile();
+            String filePath = args[0];
+            manager = new ImpFileManager();
+            manager.openFile(filePath);
+            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
+            SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
+            syntaxAnalyzer.startAnalisis();
+            System.out.println("\n" + successfulExecutionMsg);
+            manager.closeCurrentFile();
+        } catch (LexicalException e) {
+            notifyLexicalError(e);
+        } catch (SyntaxException e) {
+            notifySintacticalError(e);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

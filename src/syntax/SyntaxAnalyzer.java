@@ -15,6 +15,12 @@ public class SyntaxAnalyzer {
         currentToken = lexicalAnalyzer.nextToken();
         Inicial();
     }
+
+    public void startAnalisis() throws LexicalException {
+        while (!currentToken.getId().contains("EOF")) {
+            lexicalAnalyzer.nextToken();
+        }
+    }
     void Inicial() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ListaClases")) {
             ListaClases();
@@ -357,7 +363,6 @@ public class SyntaxAnalyzer {
     }
     void OperadorBinario() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("OperadorBinario")) {
-            //TODO maybe its wrong
             match(currentToken.getId());
         }
     }
