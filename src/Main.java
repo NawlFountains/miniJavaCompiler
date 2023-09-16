@@ -21,7 +21,7 @@ public class Main {
         System.out.println(arrowSpace + "^");
         System.out.println(e.getMessage());
     }
-    public static void notifySintacticalError(SyntaxException e) {
+    public static void notifySyntacticalError(SyntaxException e) {
         System.out.println(e.getDescription()+"\n");
         System.out.println(e.getMessage());
     }
@@ -39,7 +39,7 @@ public class Main {
         } catch (LexicalException e) {
             notifyLexicalError(e);
         } catch (SyntaxException e) {
-            notifySintacticalError(e);
+            notifySyntacticalError(e);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

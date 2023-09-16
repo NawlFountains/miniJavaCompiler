@@ -9,6 +9,7 @@ import java.util.*;
 public class SyntaxAnalyzer {
     private LexicalAnalyzer lexicalAnalyzer;
     private Token currentToken;
+    private boolean isStaticAccess = false;
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
         this.lexicalAnalyzer = lexicalAnalyzer;
@@ -84,18 +85,18 @@ public class SyntaxAnalyzer {
     void HeredaDe() throws LexicalException, SyntaxException {
         match("rw_extends");
         match("idClase");
-        DeclaracionClases();
+        GenericidadOpcional();
     }
     void ImplementaA() throws LexicalException, SyntaxException {
         match("rw_implements");
         match("idClase");
-        DeclaracionClases();
+        GenericidadOpcional();
     }
     void ExtiendeOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ExtiendeOpcional")) {
             match("rw_extends");
             match("idClase");
-            DeclaracionClases();
+            GenericidadOpcional();
         } else {
 
         }
@@ -154,7 +155,7 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("TipoPrimitivo")) {
             TipoPrimitivo();
         } else if (currentToken.getId().contains("rw_void")) {
-            match("void");
+            match("rw_void");
         }
     }
 
@@ -199,12 +200,6 @@ public class SyntaxAnalyzer {
         match("idMetVar");
         ArgsFormales();
         match("semiColon");
-    }
-    void Constructor() throws LexicalException, SyntaxException {
-        match("idClase");
-        GenericidadOpcional();
-        ArgsFormales();
-        Bloque();;
     }
     void VisibilidadOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("rw_public")) {
@@ -288,10 +283,36 @@ public class SyntaxAnalyzer {
     void Sentencia() throws LexicalException, SyntaxException {
         //TODO check if variable has type
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
-            Expresion();
-            match("semiColon");
+            if (currentToken.getId().contains("idClase")) {
+                //TODO posible declaracino de variables
+                match("idClase");
+                if (currentToken.getId().contains("period")) {
+                    match("period");
+                    match("idMetVar");
+                    ArgsActuales();
+                    isStaticAccess = true;
+                }
+                if (isStaticAccess) {
+                    //Si es acceso termina asi
+                    EncadenadoOpcional();
+                } else {
+                    //Si es declaracion de variable
+                    match("idMetVar");
+                    DeclaracionVariableMultiple();
+                    InicializacionOpcional();
+                }
+                isStaticAccess = false;
+            } else {
+                Expresion();
+                match("semiColon");
+            }
         } else if (isCurrentTokenOnFirstSetOf("VarLocal")) {
             VarLocal();
+            match("semiColon");
+        } else if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
+             //TODO change
+            System.out.println("Se ecncontr que es una tipo para una declaracino de variable");
+            VarLocalConTipoPrimitivo();
             match("semiColon");
         } else if (isCurrentTokenOnFirstSetOf("Return")) {
             Return();
@@ -306,6 +327,16 @@ public class SyntaxAnalyzer {
             match("semiColon");
         }
     }
+
+
+    void VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException {
+        match(currentToken.getId());
+        match("idMetVar");
+        DeclaracionVariableMultiple();
+        InicializacionOpcional();
+    }
+
+
     void VarLocal() throws LexicalException, SyntaxException {
         match("rw_var");
         match("idMetVar");
@@ -436,6 +467,17 @@ public class SyntaxAnalyzer {
         match("idMetVar");
         ArgsActuales();
     }
+
+    void DeclaracionVariableMultiple() throws LexicalException, SyntaxException {
+        if (currentToken.getId().contains("comma")) {
+            match("comma");
+            match("idMetVar");
+            DeclaracionVariableMultiple();
+        } else {
+
+        }
+    }
+
     void ArgsActuales() throws LexicalException, SyntaxException  {
         match("openPar");
         ListaExpsOpcional();
@@ -610,6 +652,7 @@ public class SyntaxAnalyzer {
             case "Sentencia":
                 firstSet = firstSet("Expresion");
                 firstSet.addAll(firstSet("VarLocal"));
+                firstSet.addAll(firstSet("VarLocalConTipoPrimitivo"));
                 firstSet.addAll(firstSet("Return"));
                 firstSet.addAll(firstSet("If"));
                 firstSet.addAll(firstSet("While"));
@@ -739,6 +782,9 @@ public class SyntaxAnalyzer {
             case "PosibleConstructor":
                 firstSet.add("idMetVar");
                 firstSet.addAll(firstSet("ArgsFormales"));
+                break;
+            case "VarLocalConTipoPrimitivo" :
+                firstSet = firstSet("TipoPrimitivo");
                 break;
         }
         return firstSet;
