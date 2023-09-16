@@ -25,8 +25,10 @@ public class SyntaxAnalyzer {
     void ListaClases() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("Clase")) {
             Clase();
+        } else if (isCurrentTokenOnFollowSetOf("ListaClases")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("Listaclases").toString());
         }
     }
     void Clase() throws LexicalException, SyntaxException {
@@ -42,8 +44,10 @@ public class SyntaxAnalyzer {
             match("comma");
             match("idClase");
             DeclaracionClases();
+        } else if (isCurrentTokenOnFollowSetOf("DeclaracionClases")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("DeclaraiconClases").toString());
         }
     }
     void ClaseConcreta() throws LexicalException, SyntaxException {
@@ -70,8 +74,10 @@ public class SyntaxAnalyzer {
             HeredaDe();
         } else if (isCurrentTokenOnFirstSetOf("ImplementaA")) {
             ImplementaA();
+        } else if (isCurrentTokenOnFollowSetOf("HerenciaOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("HerenciaOpcional").toString());
         }
     }
     void GenericidadOpcional() throws LexicalException, SyntaxException {
@@ -80,8 +86,11 @@ public class SyntaxAnalyzer {
             match("idClase");
             DeclaracionClases();
             match("opGreater");
+        } else if (isCurrentTokenOnFollowSetOf("GenericidadOpcional")) {
+
         } else {
-            //TODO followset
+            System.out.println("En genericidad opcional no encontramos que este en el siguiente, el follow set es de "+followSet("GenericidadOpcional").toString());
+            throw new SyntaxException(currentToken, firstSet("GenericidadOpcional").toString());
         }
     }
     void HeredaDe() throws LexicalException, SyntaxException {
@@ -99,8 +108,10 @@ public class SyntaxAnalyzer {
             match("rw_extends");
             match("idClase");
             GenericidadOpcional();
+        } else if (isCurrentTokenOnFollowSetOf("ExtiendeOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ExtiendeOpcional").toString());
         }
     }
     void ListaMiembros() throws LexicalException, SyntaxException {
@@ -108,16 +119,20 @@ public class SyntaxAnalyzer {
             System.out.println("EN lista miembros");
             Miembro();
             ListaMiembros();
+        } else if (isCurrentTokenOnFollowSetOf("ListaMiembros")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ListaMiembros").toString());
         }
     }
     void ListaEncabezados() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoMetodo")) {
             EncabezadoMetodo();
             ListaEncabezados();
+        } else if (isCurrentTokenOnFollowSetOf("ListaEncabezados")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ListaEncabezados").toString());
         }
     }
     void Miembro() throws LexicalException, SyntaxException {
@@ -196,16 +211,20 @@ public class SyntaxAnalyzer {
             match("rw_public");
         } else if (currentToken.getId().contains("rw_private")) {
             match("rw_private");
+        } else if (isCurrentTokenOnFollowSetOf("VisibilidadOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("VisibilidadOpcional").toString());
         }
     }
     void InicializacionOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("assign")) {
             match("assign");
             Expresion();
+        } else if (isCurrentTokenOnFollowSetOf("InicializacionOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("InicializacionOpcional").toString());
         }
     }
     void TipoMiembro() throws LexicalException, SyntaxException {
@@ -236,8 +255,10 @@ public class SyntaxAnalyzer {
     void EstaticoOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("rw_static")) {
             match("rw_static");
+        } else if (isCurrentTokenOnFollowSetOf("EstaticoOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("EstaticoOpcional").toString());
         }
     }
     void ArgsFormales() throws LexicalException, SyntaxException {
@@ -248,8 +269,10 @@ public class SyntaxAnalyzer {
     void ListaArgsFormalesOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ListaArgsFormales")) {
             ListaArgsFormales();
+        } else if (isCurrentTokenOnFollowSetOf("ListaArgsFormalesOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ListaArgsFormalesOpcional").toString());
         }
     }
     void ListaArgsFormales() throws LexicalException, SyntaxException {
@@ -260,8 +283,10 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("comma")) {
             match("comma");
             ListaArgsFormales();
+        } else if (isCurrentTokenOnFollowSetOf("OtroArgFormal")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("OtroArgFormal").toString());
         }
     }
     void ArgFormal() throws LexicalException, SyntaxException {
@@ -277,15 +302,15 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
             Sentencia();
             ListaSentencias();
+        } else if (isCurrentTokenOnFollowSetOf("ListaSentencias")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ListaSentencias").toString());
         }
     }
     void Sentencia() throws LexicalException, SyntaxException {
-        //TODO check if variable has type
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             if (currentToken.getId().contains("idClase")) {
-                //TODO posible declaracino de variables
                 match("idClase");
                 if (currentToken.getId().contains("period")) {
                     match("period");
@@ -311,7 +336,6 @@ public class SyntaxAnalyzer {
             VarLocal();
             match("semiColon");
         } else if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
-             //TODO change
             System.out.println("Se ecncontr que es una tipo para una declaracino de variable");
             VarLocalConTipoPrimitivo();
             match("semiColon");
@@ -351,8 +375,10 @@ public class SyntaxAnalyzer {
     void ExpresionOpcional() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             Expresion();
+        } else if (isCurrentTokenOnFollowSetOf("ExpresionOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ExpresionOpcional").toString());
         }
     }
     void If() throws LexicalException, SyntaxException  {
@@ -367,8 +393,10 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
             Sentencia();
+        } else if (isCurrentTokenOnFollowSetOf("Else")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("Else").toString());
         }
     }
     void While() throws LexicalException, SyntaxException  {
@@ -392,8 +420,11 @@ public class SyntaxAnalyzer {
             OperadorBinario();
             ExpresionBasica();
             RExpresionCompuesta();
+        } else if (isCurrentTokenOnFollowSetOf("RExpresionCompuesta")) {
+
         } else {
-            //TODO followset
+            System.out.println("Folow set of RExC is "+followSet("RExpresionCompuesta"));
+            throw new SyntaxException(currentToken, firstSet("RExpresionCompuesta").toString());
         }
     }
     void OperadorBinario() throws LexicalException, SyntaxException  {
@@ -411,7 +442,6 @@ public class SyntaxAnalyzer {
     }
     void OperadorUnario() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("OperandorUnario")) {
-            //TODO this only has termianl production, so if it's on first then that's the answer
             match(currentToken.getId());
         }
     }
@@ -460,8 +490,10 @@ public class SyntaxAnalyzer {
     void ArgsActualesOpcionales() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             ArgsActuales();
+        } else if (isCurrentTokenOnFollowSetOf("ArgsActualesOpcionales")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ArgsActualesOpcionales").toString());
         }
     }
     void ExpresionParentizada() throws LexicalException, SyntaxException  {
@@ -481,8 +513,10 @@ public class SyntaxAnalyzer {
             match("comma");
             match("idMetVar");
             DeclaracionVariableMultiple();
+        } else if (isCurrentTokenOnFollowSetOf("DeclaracionVariableMultiple")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("DeclaracionVariableMultiple").toString());
         }
     }
 
@@ -494,8 +528,10 @@ public class SyntaxAnalyzer {
     void ListaExpsOpcional() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
             ListaExps();
+        } else if (isCurrentTokenOnFollowSetOf("ListaExpsOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ListaExpsOpcional").toString());
         }
     }
     void ListaExps() throws LexicalException, SyntaxException  {
@@ -506,8 +542,10 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("comma")){
             match("comma");
             ListaExps();
+        } else if (isCurrentTokenOnFollowSetOf("ContinuaListaExps")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("ContinuaListaExps").toString());
         }
     }
     void EncadenadoOpcional() throws LexicalException, SyntaxException  {
@@ -516,8 +554,10 @@ public class SyntaxAnalyzer {
             match("idMetVar");
             ArgsActualesOpcionales();
             EncadenadoOpcional();
+        } else if (isCurrentTokenOnFollowSetOf("EncadenadoOpcional")) {
+
         } else {
-            //TODO followset
+            throw new SyntaxException(currentToken, firstSet("EncadenadoOpcional").toString());
         }
     }
 
@@ -536,6 +576,12 @@ public class SyntaxAnalyzer {
             is = true;
         return is;
     }
+    private boolean isCurrentTokenOnFollowSetOf(String noTerminal) {
+        boolean is = false;
+        if (followSet(noTerminal).contains(currentToken.getId()))
+            is = true;
+        return is;
+    }
 
     private Set<String> firstSet(String noTerminal) {
         Set<String> firstSet = new HashSet<String>();
@@ -545,7 +591,6 @@ public class SyntaxAnalyzer {
                 break;
             case "ListaClases":
                 firstSet = firstSet("Clase");
-                //TODO add empty
                 break;
             case "Clase":
                 firstSet = firstSet("ClaseConcreta");
@@ -553,7 +598,6 @@ public class SyntaxAnalyzer {
                 break;
             case "DeclaracionClases":
                 firstSet.add("comma");
-                //TODO add empty
                 break;
             case "ClaseConcreta":
                 firstSet.add("rw_class");
@@ -564,7 +608,6 @@ public class SyntaxAnalyzer {
             case "HerenciaOpcional":
                 firstSet = firstSet("HeredaDe");
                 firstSet.addAll(firstSet("ImplementaA"));
-                //TODO add empty
                 break;
             case "GenericidadOpcional":
                 firstSet.add("opLess");
@@ -578,16 +621,13 @@ public class SyntaxAnalyzer {
                 break;
             case "ListaMiembros":
                 firstSet = firstSet("Miembro");
-                //TODO add empty
                 break;
             case "ListaEncabezados":
                 firstSet = firstSet("EncabezadoMetodo");
-                //TODO add empty
                 break;
             case "Miembro":
                 firstSet = firstSet("VisibilidadOpcional");
                 firstSet.addAll(firstSet("AtributoMetodoOConstructor"));
-                //TODO add empty
                 break;
             case "AtributoMetodoOConstructor":
                 firstSet.add("rw_static");
@@ -624,11 +664,9 @@ public class SyntaxAnalyzer {
             case "VisibilidadOpcional":
                 firstSet.add("rw_public");
                 firstSet.add("rw_private");
-                //TODO add empty
                 break;
             case "InicializacionOpcional":
                 firstSet.add("assign");
-                //TODO add empty
                 break;
             case "TipoMiembro":
                 firstSet = firstSet("Tipo");
@@ -642,25 +680,22 @@ public class SyntaxAnalyzer {
                 firstSet.add("rw_boolean");
                 firstSet.add("rw_char");
                 firstSet.add("rw_int");
-                firstSet.add("rw_float"); //TODO optional
+                firstSet.add("rw_float");
                 break;
             case "EstaticoOpcional":
                 firstSet.add("rw_static");
-                //TODO add empty
                 break;
             case "ArgsFormales":
                 firstSet.add("openPar");
                 break;
             case "ListaArgsFormalesOpcional":
                 firstSet = firstSet("ListaArgsFormales");
-                //TODO add empty
                 break;
             case "ListaArgsFormales":
                 firstSet = firstSet("ArgFormal");
                 break;
             case "OtroArgFormal":
                 firstSet.add("comma");
-                //TODO add empty
                 break;
             case "ArgFormal":
                 firstSet = firstSet("Tipo");
@@ -670,7 +705,6 @@ public class SyntaxAnalyzer {
                 break;
             case "ListaSentencias":
                 firstSet = firstSet("Sentencia");
-                //TODO add empty
                 break;
             case "Sentencia":
                 firstSet = firstSet("Expresion");
@@ -696,7 +730,6 @@ public class SyntaxAnalyzer {
                 break;
             case "ExpresionOpcional":
                 firstSet = firstSet("Expresion");
-                //TODO add empty
                 break;
             case "If":
                 firstSet.add("rw_if");
@@ -715,7 +748,6 @@ public class SyntaxAnalyzer {
                 break;
             case "RExpresionCompuesta":
                 firstSet = firstSet("OperadorBinario");
-                //TODO add empty
                 break;
             case "OperadorBinario":
                 firstSet.add("opOr");
@@ -774,13 +806,11 @@ public class SyntaxAnalyzer {
                 break;
             case "ArgsActualesOpcionales":
                 firstSet = firstSet("ArgsActuales");
-                //TODO add empty
                 break;
             case "ExpresionParentizada":
                 firstSet.add("openPar");
                 break;
             case "AccesoMetodoEstatico":
-                //TODO potiential optional
                 firstSet.add("idClase");
                 break;
             case "ArgsActuales":
@@ -788,19 +818,86 @@ public class SyntaxAnalyzer {
                 break;
             case "ListaExpsOpcional":
                 firstSet = firstSet("ListaExps");
-                //TODO add empty
                 break;
             case "ListaExps":
                 firstSet = firstSet("Expresion");
                 break;
             case "ContinuaListaExps":
                 firstSet.add("comma");
-                //TODO add empty
                 break;
             case "EncadenadoOpcional":
                 firstSet.add("period");
                 break;
         }
         return firstSet;
+    }
+    private Set<String> followSet(String noTerminal) {
+        Set<String> followSet = new HashSet<String>();
+        switch (noTerminal) {
+            case "ListaClase":
+                break;
+            case "DeclaracionClases":
+                followSet.add("opGreater");
+                followSet.add("idClase");
+                break;
+            case "ExtiendeOpcional":
+            case "HerenciaOpcional":
+                followSet.add("openCurl");
+                break;
+            case "ListaEncabezados":
+            case "ListaMiembros":
+            case "ListaSentencias":
+                followSet.add("closeCurl");
+                break;
+            case "GenericidadOpcional":
+                followSet.addAll(firstSet("HerenciaOpcional"));
+                followSet.add("openPar");
+                followSet.add("openCurl");
+                followSet.add("idMetVar");
+                break;
+            case "VisibilidadOpcional":
+                followSet.addAll(firstSet("AtributoMetodoOConstructor"));
+                followSet.addAll(followSet("EstaticoOpcional"));
+                break;
+            case "InicializacionOpcional":
+                followSet.add("semiColon");
+                followSet.add("closePar");
+                followSet.add("comma");
+            case "ExpresionOpcional":
+                //TODO see
+                followSet.add("semiColon");
+                break;
+            case "EstaticoOpcional":
+                followSet.addAll(firstSet("TipoMiembro"));
+                break;
+            case "OtroArgFormal":
+            case "ListaArgsFormalesOpcional":
+            case "ListaExpsOpcional":
+            case "ContinuaListaExps":
+                followSet.add("closePar");
+                break;
+            case "DeclaracionVariableMultiple":
+            case "RExpresionCompuesta":
+                followSet.addAll(firstSet("OperadorBinario"));
+                followSet.addAll(firstSet("InicializacionOpcional"));
+                followSet.addAll(followSet("InicializacionOpcional"));
+                break;
+            case "Else":
+                followSet.addAll(firstSet("Sentencia"));
+                break;
+            case "ArgsActualesOpcionales":
+                followSet.addAll(firstSet("EncadenadoOpcional"));
+                followSet.addAll(followSet("EncadenadoOpcional"));
+                break;
+            case "EncadenadoOpcional":
+                followSet.addAll(firstSet("OperadorBinario"));
+                followSet.addAll(firstSet("InicializacionOpcional"));
+                followSet.addAll(followSet("InicializacionOpcional"));
+                followSet.add("closePar");
+                break;
+            default:
+                System.out.println("ERROR NO SE ENCONTRO FOLLOW SET DE "+noTerminal);
+        }
+        return followSet;
     }
 }
