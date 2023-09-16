@@ -17,7 +17,6 @@ public class LexicalAnalyzer {
     private final float MIN_FLOAT_VALUE = 1.40e-45f;
     private final float MAX_FLOAT_VALUE = 3.4028235e38f;
 
-    //TODO fix always giving one column more from error either here or in FileManager
     public LexicalAnalyzer(FileManager fileManager) throws FileNotFoundException {
         this.fileManager = fileManager;
         nextCharacter();
@@ -256,8 +255,7 @@ public class LexicalAnalyzer {
     }
 
     Token intLiteralState() throws LexicalException {
-        //TODO fix , throw error when surpassing MAX_INT_LENGTH
-        if (Character.isDigit(currentChar) && lexeme.length() < MAX_INT_LENGTH) {
+        if (Character.isDigit(currentChar) && lexeme.length() <= MAX_INT_LENGTH) {
             updateLexeme();
             nextCharacter();
             return intLiteralState();
@@ -269,14 +267,15 @@ public class LexicalAnalyzer {
             updateLexeme();
             nextCharacter();
             return decFloatReadingExponentSignState();
+        } else if (lexeme.length() > MAX_INT_LENGTH) {
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no puede tener mas de 9 digitos un entero");
         } else {
             return new Token("intLiteral",lexeme,fileManager.getCurrentLineNumber());
         }
     }
 
     Token charLiteralStarterState() throws LexicalException {
-        //TODO fix jump line for LexicalException
-        if (currentChar != '\\' && currentChar != '\'' ) {
+        if (currentChar != '\\' && currentChar != '\'' && currentChar != '\r' && currentChar != '\n') {
             updateLexeme();
             nextCharacter();
             return charLiteralFinishingState();
@@ -287,7 +286,7 @@ public class LexicalAnalyzer {
             nextCharacter();
             return charLiteralFinishingState();
         }else {
-            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter valido");
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber()+1,"no es un caracter valido");
         }
     }
     Token charLiteralFinishingState() throws LexicalException {
@@ -346,7 +345,9 @@ public class LexicalAnalyzer {
             updateLexeme();
             nextCharacter();
             return stringFinishingState();
-        } else {
+        } else if (currentChar == '\r') {
+            throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber()+1,"no se puede dar un salto de linea en un string");
+        }else {
             throw new LexicalException(lexeme, fileManager.getCurrentLineNumber(), fileManager.getCurrentColumnNumber(),"no es un caracter valido para un String o nunca se cierra el String");
         }
     }

@@ -516,6 +516,8 @@ public class SyntaxAnalyzer {
             match("idMetVar");
             ArgsActualesOpcionales();
             EncadenadoOpcional();
+        } else {
+            //TODO followset
         }
     }
 

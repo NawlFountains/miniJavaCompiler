@@ -18,7 +18,7 @@ public class ImpFileManager implements FileManager{
         char currentChar = ' ';
         if (jumpedLine) {
             currentLineNumber++;
-            currentColumnNumber = 1;
+            currentColumnNumber = 0;
             jumpedLine = false;
             currentBufferedLine = "";
         }
@@ -45,7 +45,7 @@ public class ImpFileManager implements FileManager{
             bufferedReader = new BufferedReader(fileReader);
 
             currentLineNumber = 1;
-            currentColumnNumber = 1;
+            currentColumnNumber = 0;
         } catch (Exception e) {
             throw new FileNotFoundException("File "+path+" couldn't be found");
         }
@@ -65,7 +65,7 @@ public class ImpFileManager implements FileManager{
     }
 
     public int getCurrentColumnNumber() {
-        return currentColumnNumber;
+        return currentColumnNumber-1;
     }
 
     public String getLine(int lineNumber) {

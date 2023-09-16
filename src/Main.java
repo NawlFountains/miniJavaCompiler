@@ -14,7 +14,7 @@ public class Main {
         System.out.println("Error lexico en linea "+e.getLineNumber()+" columna "+e.getColumnNumber()+" : "+e.getInvalidLexeme()+" "+e.getDescription());
         System.out.println("Detalle: "+manager.getLine(e.getLineNumber()));
 
-        for (int i = 0 ; i < e.getColumnNumber()+7; i++) {
+        for (int i = 0 ; i < e.getColumnNumber()+8; i++) {
             arrowSpace = arrowSpace+" ";
         }
 
