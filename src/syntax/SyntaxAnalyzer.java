@@ -238,14 +238,15 @@ public class SyntaxAnalyzer {
         }
     }
     void FinAtributoMetodo() throws LexicalException, SyntaxException {
-        if (isCurrentTokenOnFirstSetOf("InicializacionOpcional") || currentToken.getId().contains("semiColon")) {
+        if (isCurrentTokenOnFirstSetOf("DeclaracionVariableMultiple") ||  currentToken.getId().contains("semiColon")) {
+            DeclaracionVariableMultiple();
             InicializacionOpcional();
             match("semiColon");
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
             ArgsFormales();
             Bloque();
         } else {
-            Set<String> auxToException = firstSet("InicializacionOpcional");
+            Set<String> auxToException = firstSet("DeclaracionVariableMultiple");
             auxToException.addAll(firstSet("ArgsFormales"));
             auxToException.add("semiColon");
             throw new SyntaxException(currentToken,auxToException.toString());
@@ -823,6 +824,7 @@ public class SyntaxAnalyzer {
                 break;
             case "FinAtributoMetodo":
                 firstSet = firstSet("InicializacionOpcional");
+                firstSet.addAll(firstSet("DeclaracionVariableMultiple"));
                 firstSet.add("semiColon");
                 firstSet.addAll(firstSet("ArgsFormales"));
                 break;
@@ -897,6 +899,7 @@ public class SyntaxAnalyzer {
                 firstSet = firstSet("TipoPrimitivo");
                 break;
             case "DeclaracionVariableMultiple":
+                firstSet.add("assign");
                 firstSet.add("comma");
                 break;
             case "Return":

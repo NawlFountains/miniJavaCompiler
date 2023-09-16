@@ -4,7 +4,7 @@
 class Prueba1{
 
     int x = 4;
-    float y = 3.e10;
+    float y,y2,y3 = 3.e10;
     boolean bol = 3 < ( 4 + 4 ) ;
     String str;
     String prt = variableClass.methodSomewhere(param1,param2,param3);
