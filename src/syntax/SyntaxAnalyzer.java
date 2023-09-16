@@ -576,13 +576,21 @@ public class SyntaxAnalyzer {
                 //TODO add empty
                 break;
             case "AtributoMetodoOConstructor":
-//                firstSet = firstSet("Constructor");
-//                firstSet.addAll(firstSet("EncabezadoAtributoMetodo"));
                 firstSet.add("rw_static");
                 firstSet.addAll(firstSet("EncabezadoAtributoMetodoConstructor"));
                 break;
+            case "EncabezadoAtributoMetodoConstructor":
+                firstSet.add("idClase");
+                firstSet.addAll(firstSet("TipoMiembroSinClase"));
+                break;
+            case "EncabezadoAtributoMetodoTipoDicho":
+                firstSet.add("idMetVar");
+                break;
+            case "PosibleConstructor":
+                firstSet.add("idMetVar");
+                firstSet.addAll(firstSet("ArgsFormales"));
+                break;
             case "EncabezadoAtributoMetodo":
-//                firstSet = firstSet("EstaticoOpcional");
                 firstSet.addAll(firstSet("TipoMiembro"));
                 break;
             case "FinAtributoMetodo":
@@ -595,8 +603,9 @@ public class SyntaxAnalyzer {
                 firstSet.addAll(firstSet("EstaticoOpcional"));
                 firstSet.addAll(firstSet("TipoMiembro"));
                 break;
-            case "Constructor":
-                firstSet.add("idClase");
+            case "TipoMiembroSinClase":
+                firstSet.add("rw_void");
+                firstSet.addAll(firstSet("TipoPrimitivo"));
                 break;
             case "VisibilidadOpcional":
                 firstSet.add("rw_public");
@@ -661,6 +670,12 @@ public class SyntaxAnalyzer {
                 break;
             case "VarLocal":
                 firstSet.add("rw_var");
+                break;
+            case "VarLocalConTipoPrimitivo" :
+                firstSet = firstSet("TipoPrimitivo");
+                break;
+            case "DeclaracionVariableMultiple":
+                firstSet.add("comma");
                 break;
             case "Return":
                 firstSet.add("rw_return");
@@ -768,23 +783,8 @@ public class SyntaxAnalyzer {
                 firstSet.add("comma");
                 //TODO add empty
                 break;
-            case "EncadenadoOpcional ":
+            case "EncadenadoOpcional":
                 firstSet.add("period");
-                break;
-            case "EncabezadoAtributoMetodoConstructor":
-                firstSet.add("idClase");
-                firstSet.addAll(firstSet("TipoMiembroSinClase"));
-                break;
-            case "TipoMiembroSinClase":
-                firstSet.add("rw_void");
-                firstSet.addAll(firstSet("TipoPrimitivo"));
-                break;
-            case "PosibleConstructor":
-                firstSet.add("idMetVar");
-                firstSet.addAll(firstSet("ArgsFormales"));
-                break;
-            case "VarLocalConTipoPrimitivo" :
-                firstSet = firstSet("TipoPrimitivo");
                 break;
         }
         return firstSet;
