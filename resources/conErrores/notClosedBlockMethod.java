@@ -1,4 +1,4 @@
 ///[Error:|5]
 
 class Clase {
-	static idMet() {
+	static void idMet() {

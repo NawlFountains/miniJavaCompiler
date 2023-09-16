@@ -20,13 +20,13 @@ public class SyntaxAnalyzer {
         Inicial();
     }
     void Inicial() throws LexicalException, SyntaxException {
-        if (isCurrentTokenOnFirstSetOf("ListaClases")) {
-            ListaClases();
-        }
+        ListaClases();
     }
     void ListaClases() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("Clase")) {
             Clase();
+        } else {
+            //TODO followset
         }
     }
     void Clase() throws LexicalException, SyntaxException {
@@ -42,10 +42,12 @@ public class SyntaxAnalyzer {
             match("comma");
             match("idClase");
             DeclaracionClases();
+        } else {
+            //TODO followset
         }
     }
     void ClaseConcreta() throws LexicalException, SyntaxException {
-        match("rw_class"); //TODO should we put identifier or lexeme
+        match("rw_class");
         match("idClase");
         GenericidadOpcional();
         HerenciaOpcional();
@@ -69,7 +71,7 @@ public class SyntaxAnalyzer {
         } else if (isCurrentTokenOnFirstSetOf("ImplementaA")) {
             ImplementaA();
         } else {
-
+            //TODO followset
         }
     }
     void GenericidadOpcional() throws LexicalException, SyntaxException {
@@ -79,7 +81,7 @@ public class SyntaxAnalyzer {
             DeclaracionClases();
             match("opGreater");
         } else {
-
+            //TODO followset
         }
     }
     void HeredaDe() throws LexicalException, SyntaxException {
@@ -98,7 +100,7 @@ public class SyntaxAnalyzer {
             match("idClase");
             GenericidadOpcional();
         } else {
-
+            //TODO followset
         }
     }
     void ListaMiembros() throws LexicalException, SyntaxException {
@@ -107,7 +109,7 @@ public class SyntaxAnalyzer {
             Miembro();
             ListaMiembros();
         } else {
-
+            //TODO followset
         }
     }
     void ListaEncabezados() throws LexicalException, SyntaxException {
@@ -115,13 +117,11 @@ public class SyntaxAnalyzer {
             EncabezadoMetodo();
             ListaEncabezados();
         } else {
-
+            //TODO followset
         }
     }
     void Miembro() throws LexicalException, SyntaxException {
-        System.out.println("En miembro viendo si tiene visibilidad explicita");
         VisibilidadOpcional();
-        System.out.println("Vemos ahora si es atributo metodo o construcot");
         AtributoMetodoOConstructor();
     }
     void AtributoMetodoOConstructor() throws LexicalException, SyntaxException {
@@ -131,11 +131,6 @@ public class SyntaxAnalyzer {
         } else if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodoConstructor")) {
             EncabezadoAtributoMetodoConstructor();
         }
-//        if (isCurrentTokenOnFirstSetOf("Constructor")) {
-//            Constructor();
-//        } else if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodo")) {
-//            EncabezadoAtributoMetodo();
-//        }
     }
 
     private void EncabezadoAtributoMetodoConstructor() throws LexicalException, SyntaxException{
@@ -170,24 +165,19 @@ public class SyntaxAnalyzer {
     }
 
     private void EncabezadoAtributoMetodoTipoDicho() throws LexicalException, SyntaxException {
-        System.out.println("Ya se tiene el tipo entonces se termina");
         match("idMetVar");
         FinAtributoMetodo();
     }
 
     void EncabezadoAtributoMetodo() throws LexicalException, SyntaxException {
-//        EstaticoOpcional();
         TipoMiembro();
         match("idMetVar");
         FinAtributoMetodo();
     }
     void FinAtributoMetodo() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("InicializacionOpcional") || currentToken.getId().contains("semiColon")) {
-            System.out.println("Por finalizar atributo");
             InicializacionOpcional();
-
             match("semiColon");
-
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
             ArgsFormales();
             Bloque();
@@ -206,12 +196,16 @@ public class SyntaxAnalyzer {
             match("rw_public");
         } else if (currentToken.getId().contains("rw_private")) {
             match("rw_private");
+        } else {
+            //TODO followset
         }
     }
     void InicializacionOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("assign")) {
             match("assign");
             Expresion();
+        } else {
+            //TODO followset
         }
     }
     void TipoMiembro() throws LexicalException, SyntaxException {
@@ -242,6 +236,8 @@ public class SyntaxAnalyzer {
     void EstaticoOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("rw_static")) {
             match("rw_static");
+        } else {
+            //TODO followset
         }
     }
     void ArgsFormales() throws LexicalException, SyntaxException {
@@ -252,6 +248,8 @@ public class SyntaxAnalyzer {
     void ListaArgsFormalesOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ListaArgsFormales")) {
             ListaArgsFormales();
+        } else {
+            //TODO followset
         }
     }
     void ListaArgsFormales() throws LexicalException, SyntaxException {
@@ -262,6 +260,8 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("comma")) {
             match("comma");
             ListaArgsFormales();
+        } else {
+            //TODO followset
         }
     }
     void ArgFormal() throws LexicalException, SyntaxException {
@@ -278,6 +278,7 @@ public class SyntaxAnalyzer {
             Sentencia();
             ListaSentencias();
         } else {
+            //TODO followset
         }
     }
     void Sentencia() throws LexicalException, SyntaxException {
@@ -350,6 +351,8 @@ public class SyntaxAnalyzer {
     void ExpresionOpcional() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             Expresion();
+        } else {
+            //TODO followset
         }
     }
     void If() throws LexicalException, SyntaxException  {
@@ -364,6 +367,8 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
             Sentencia();
+        } else {
+            //TODO followset
         }
     }
     void While() throws LexicalException, SyntaxException  {
@@ -387,6 +392,8 @@ public class SyntaxAnalyzer {
             OperadorBinario();
             ExpresionBasica();
             RExpresionCompuesta();
+        } else {
+            //TODO followset
         }
     }
     void OperadorBinario() throws LexicalException, SyntaxException  {
@@ -417,7 +424,6 @@ public class SyntaxAnalyzer {
     }
     void Literal() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
-            //TODO this only has termianl production, so if it's on first then that's the answer
             match(currentToken.getId());
         }
     }
@@ -454,6 +460,8 @@ public class SyntaxAnalyzer {
     void ArgsActualesOpcionales() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             ArgsActuales();
+        } else {
+            //TODO followset
         }
     }
     void ExpresionParentizada() throws LexicalException, SyntaxException  {
@@ -474,7 +482,7 @@ public class SyntaxAnalyzer {
             match("idMetVar");
             DeclaracionVariableMultiple();
         } else {
-
+            //TODO followset
         }
     }
 
@@ -486,6 +494,8 @@ public class SyntaxAnalyzer {
     void ListaExpsOpcional() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
             ListaExps();
+        } else {
+            //TODO followset
         }
     }
     void ListaExps() throws LexicalException, SyntaxException  {
@@ -496,6 +506,8 @@ public class SyntaxAnalyzer {
         if (currentToken.getId().contains("comma")){
             match("comma");
             ListaExps();
+        } else {
+            //TODO followset
         }
     }
     void EncadenadoOpcional() throws LexicalException, SyntaxException  {
