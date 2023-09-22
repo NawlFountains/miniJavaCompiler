@@ -1,6 +1,6 @@
 ///[Error:>|3]
 
-class Clase<GenericClass> implements Class<> {
+class Clase<GenericClass> extends Class<> {
 	void a,b;
 
 	static void method(param) {
