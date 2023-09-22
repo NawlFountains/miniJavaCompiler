@@ -19,6 +19,7 @@ class Prueba1{
     {
 	float x,y = 3.e1;
 	CustomClass cusC,cusD = new CustomClass<GP>();
+	CustomClass d = new CustomClass<>();
         this.b().a = 5; 
 	ClaseEstatica.llamado().concatenacion().llamados();
     
@@ -31,6 +32,7 @@ class Prueba1{
 	}
 
     }
+    void genericArgForMethod (C<Generic> c) {}
 
     public Prueba1(int y){
 

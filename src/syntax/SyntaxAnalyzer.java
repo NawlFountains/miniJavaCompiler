@@ -108,6 +108,27 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("GenericidadOpcional").toString());
         }
     }
+    void GenericidadVaciaOpcional() throws LexicalException, SyntaxException {
+        if (isCurrentTokenOnFirstSetOf("GenericidadVaciaOpcional")) {
+            match("opLess");
+            DeclaracionClasesOpcional();
+            match("opGreater");
+        } else if (isCurrentTokenOnFollowSetOf("GenericidadVaciaOpcional")) {
+
+        } else {
+            throw new SyntaxException(currentToken, firstSet("GenericidadVaciaOpcional").toString());
+        }
+    }
+    void DeclaracionClasesOpcional() throws LexicalException, SyntaxException {
+        if (isCurrentTokenOnFirstSetOf("DeclaracionClasesOpcional")) {
+            match("idClase");
+            DeclaracionClases();
+        } else if (isCurrentTokenOnFollowSetOf("DeclaracionClasesOpcional")) {
+
+        } else {
+            throw new SyntaxException(currentToken, firstSet("DeclaracionClasesOpcional").toString());
+        }
+    }
     void HeredaDe() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("HeredaDe")) {
             match("rw_extends");
@@ -301,6 +322,7 @@ public class SyntaxAnalyzer {
             TipoPrimitivo();
         } else if (currentToken.getId().contains("idClase")) {
             match("idClase");
+            GenericidadOpcional();
         } else {
             Set<String> auxToException = firstSet("TipoPrimitivo");
             auxToException.add("idClase");
@@ -495,7 +517,9 @@ public class SyntaxAnalyzer {
             match("openPar");
             Expresion();
             match("closePar");
+            System.out.println("Entre a sentencia con "+currentToken.getId());
             Sentencia();
+            System.out.println("Sale de sentencia con "+currentToken.getId());
             Else();
         } else {
             throw new SyntaxException(currentToken, firstSet("If").toString());
@@ -633,7 +657,7 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("AccesoConstructor")) {
             match("rw_new");
             match("idClase");
-            GenericidadOpcional();
+            GenericidadVaciaOpcional();
             ArgsActuales();
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoConstructor").toString());
@@ -774,6 +798,8 @@ public class SyntaxAnalyzer {
             case "DeclaracionClases":
                 firstSet.add("comma");
                 break;
+            case "DeclaracionClasesOpcional":
+                firstSet.add("idClase");
             case "ClaseConcreta":
                 firstSet.add("rw_class");
                 break;
@@ -784,6 +810,7 @@ public class SyntaxAnalyzer {
                 firstSet = firstSet("HeredaDe");
                 firstSet.addAll(firstSet("ImplementaA"));
                 break;
+            case "GenericidadVaciaOpcional":
             case "GenericidadOpcional":
                 firstSet.add("opLess");
                 break;
@@ -937,7 +964,7 @@ public class SyntaxAnalyzer {
                 firstSet.add("opGreaterEq");
                 firstSet.add("opAdd");
                 firstSet.add("opSub");
-                firstSet.add("opProd");
+                firstSet.add("opMul");
                 firstSet.add("opDiv");
                 firstSet.add("opIntDiv");
                 break;
@@ -1011,6 +1038,7 @@ public class SyntaxAnalyzer {
     private Set<String> followSet(String noTerminal) {
         Set<String> followSet = new HashSet<String>();
         switch (noTerminal) {
+            case "DeclaracionClasesOpcional":
             case "DeclaracionClases":
                 followSet.add("opGreater");
                 followSet.add("idClase");
@@ -1024,12 +1052,14 @@ public class SyntaxAnalyzer {
             case "ListaSentencias":
                 followSet.add("closeCurl");
                 break;
+            case "GenericidadVaciaOpcional":
             case "GenericidadOpcional":
                 followSet.addAll(firstSet("HerenciaOpcional"));
                 followSet.add("openPar");
                 followSet.add("openCurl");
                 followSet.add("idMetVar");
                 break;
+
             case "VisibilidadOpcional":
                 followSet.addAll(firstSet("AtributoMetodoOConstructor"));
                 followSet.addAll(followSet("EstaticoOpcional"));
@@ -1059,6 +1089,7 @@ public class SyntaxAnalyzer {
                 break;
             case "Else":
                 followSet.addAll(firstSet("Sentencia"));
+                followSet.add("closeCurl");
                 break;
             case "ArgsActualesOpcionales":
                 followSet.addAll(firstSet("EncadenadoOpcional"));
