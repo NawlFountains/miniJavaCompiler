@@ -6,12 +6,12 @@ import lexical.Token;
 
 import java.util.*;
 
-public class SyntaxAnalyzer {
+public class SyntaxAnalyzerStage2 {
     private LexicalAnalyzer lexicalAnalyzer;
     private Token currentToken;
     private boolean isStaticAccess = false;
 
-    public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
+    public SyntaxAnalyzerStage2(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
         this.lexicalAnalyzer = lexicalAnalyzer;
     }
 

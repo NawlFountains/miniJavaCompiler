@@ -3,6 +3,7 @@ import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
 import syntax.SyntaxAnalyzer;
+import syntax.SyntaxAnalyzerStage2;
 import syntax.SyntaxException;
 
 public class MainEtapa2 {
@@ -32,7 +33,7 @@ public class MainEtapa2 {
             manager = new ImpFileManager();
             manager.openFile(filePath);
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
-            SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
+            SyntaxAnalyzerStage2 syntaxAnalyzer = new SyntaxAnalyzerStage2(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
