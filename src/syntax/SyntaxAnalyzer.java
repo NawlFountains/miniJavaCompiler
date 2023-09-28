@@ -2,7 +2,15 @@ package syntax;
 
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
+import lexical.SemanticException;
 import lexical.Token;
+import semantic.PrimitiveType;
+import semantic.ReferenceType;
+import semantic.SymbolTable;
+import semantic.Type;
+import semantic.entities.ClassST;
+import semantic.entities.InterfaceST;
+import semantic.entities.MethodST;
 
 import java.util.*;
 
@@ -15,18 +23,18 @@ public class SyntaxAnalyzer {
         this.lexicalAnalyzer = lexicalAnalyzer;
     }
 
-    public void startAnalysis() throws LexicalException, SyntaxException {
+    public void startAnalysis() throws LexicalException, SyntaxException, SemanticException {
         currentToken = lexicalAnalyzer.nextToken();
         Inicial();
     }
-    void Inicial() throws LexicalException, SyntaxException {
+    void Inicial() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Inicial")) {
             ListaClases();
         } else {
             throw new SyntaxException(currentToken,firstSet("Inicial").toString());
         }
     }
-    void ListaClases() throws LexicalException, SyntaxException {
+    void ListaClases() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Clase")) {
             Clase();
             ListaClases();
@@ -36,7 +44,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Clase").toString());
         }
     }
-    void Clase() throws LexicalException, SyntaxException {
+    void Clase() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ClaseConcreta")) {
             ClaseConcreta();
         } else if (isCurrentTokenOnFirstSetOf("Interface")) {
@@ -59,39 +67,49 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("DeclaracionClases").toString());
         }
     }
-    void ClaseConcreta() throws LexicalException, SyntaxException {
+    void ClaseConcreta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ClaseConcreta")) {
+            Token classToken = currentToken;
             match("rw_class");
             match("idClase");
+            ClassST clase = new ClassST(classToken.getLexeme());
+            SymbolTable.getInstance().setCurrentClass(clase);
             GenericidadOpcional();
             HerenciaOpcional();
             match("openCurl");
             ListaMiembros();
             match("closeCurl");
+            SymbolTable.getInstance().insertClass(classToken,SymbolTable.getInstance().getCurrentClass());
         } else {
             throw new SyntaxException(currentToken, firstSet("ClaseConcreta").toString());
         }
     }
-    void Interface() throws LexicalException, SyntaxException {
+    void Interface() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Interface")) {
             match("rw_interface");
+            Token interfaceToken = currentToken;
             match ("idClase");
+            InterfaceST i = new InterfaceST(currentToken.getLexeme());
+            SymbolTable.getInstance().setCurrentInterface(i);
             ExtiendeOpcional();
             HerenciaOpcional();
             match("openCurl");
             ListaEncabezados();
             match("closeCurl");
+            SymbolTable.getInstance().insertInterface(interfaceToken,i);
         } else {
             throw new SyntaxException(currentToken, firstSet("Interface").toString());
         }
     }
     void HerenciaOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("HeredaDe")){
-            HeredaDe();
+            Token ancestro = HeredaDe();
+            SymbolTable.getInstance().getCurrentClass().inheritsFrom(ancestro);
         } else if (isCurrentTokenOnFirstSetOf("ImplementaA")) {
-            ImplementaA();
+            Token implementa = ImplementaA();
+            SymbolTable.getInstance().getCurrentClass().implementsFrom(implementa);
         } else if (isCurrentTokenOnFollowSetOf("HerenciaOpcional")) {
-
+            SymbolTable.getInstance().getCurrentClass().inheritsFrom(new Token("idClase","Object",0));
         } else {
             throw new SyntaxException(currentToken, firstSet("HerenciaOpcional").toString());
         }
@@ -129,20 +147,24 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("DeclaracionClasesOpcional").toString());
         }
     }
-    void HeredaDe() throws LexicalException, SyntaxException {
+    Token HeredaDe() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("HeredaDe")) {
             match("rw_extends");
+            Token tokenAncestro = currentToken;
             match("idClase");
             GenericidadOpcional();
+            return tokenAncestro;
         } else {
             throw new SyntaxException(currentToken, firstSet("HeredaDe").toString());
         }
     }
-    void ImplementaA() throws LexicalException, SyntaxException {
+    Token ImplementaA() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ImplementaA")){
             match("rw_implements");
+            Token interfazImplementada = currentToken;
             match("idClase");
             GenericidadOpcional();
+            return interfazImplementada;
         } else {
             throw new SyntaxException(currentToken, firstSet("ImplementaA").toString());
         }
@@ -150,6 +172,8 @@ public class SyntaxAnalyzer {
     void ExtiendeOpcional() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("ExtiendeOpcional")) {
             match("rw_extends");
+            Token interfaceHeredada = currentToken;
+            SymbolTable.getInstance().getCurrentInterface().inheritsFrom(interfaceHeredada);
             match("idClase");
             GenericidadOpcional();
         } else if (isCurrentTokenOnFollowSetOf("ExtiendeOpcional")) {
@@ -168,7 +192,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaMiembros").toString());
         }
     }
-    void ListaEncabezados() throws LexicalException, SyntaxException {
+    void ListaEncabezados() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoMetodo")) {
             EncabezadoMetodo();
             ListaEncabezados();
@@ -273,14 +297,22 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken,auxToException.toString());
         }
     }
-    void EncabezadoMetodo() throws LexicalException, SyntaxException {
+    void EncabezadoMetodo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoMetodo")) {
+            //TODO add a way to return visibilidty
             VisibilidadOpcional();
-            EstaticoOpcional();
-            TipoMiembro();
+            Boolean isStatic = EstaticoOpcional();
+            Type returnType = TipoMiembro();
+            Token methodName = currentToken;
+            MethodST methodHeader = new MethodST(methodName.getLexeme());
+            methodHeader.setReturnType(returnType);
+            methodHeader.setStatic(isStatic);
+            //TODO newMethod.setVisibility();
+            SymbolTable.getInstance().setCurrentMethod(methodHeader);
             match("idMetVar");
             ArgsFormales();
             match("semiColon");
+            SymbolTable.getInstance().getCurrentInterface().insertMethod(currentToken,methodHeader);
         } else {
             throw new SyntaxException(currentToken, firstSet("EncabezadoMetodo").toString());
         }
@@ -306,23 +338,28 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("InicializacionOpcional").toString());
         }
     }
-    void TipoMiembro() throws LexicalException, SyntaxException {
+    Type TipoMiembro() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("Tipo")) {
-            Tipo();
+            return Tipo();
         } else if (currentToken.getId().contains("rw_void")) {
             match("rw_void");
+            //TODO shoul we do it like this?
+            return new PrimitiveType("void");
         } else {
             Set<String> auxToException = firstSet("Tipo");
             auxToException.add("rw_void");
             throw new SyntaxException(currentToken,auxToException.toString());
         }
     }
-    void Tipo() throws LexicalException, SyntaxException {
+    Type Tipo() throws LexicalException, SyntaxException {
+        Token aux = currentToken;
         if (isCurrentTokenOnFirstSetOf("TipoPrimitivo")) {
             TipoPrimitivo();
+            return new PrimitiveType(aux.getLexeme());
         } else if (currentToken.getId().contains("idClase")) {
             match("idClase");
             GenericidadOpcional();
+            return new ReferenceType(aux.getLexeme());
         } else {
             Set<String> auxToException = firstSet("TipoPrimitivo");
             auxToException.add("idClase");
@@ -343,11 +380,12 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken,auxToException.toString());
         }
     }
-    void EstaticoOpcional() throws LexicalException, SyntaxException {
+    boolean EstaticoOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("rw_static")) {
             match("rw_static");
+            return true;
         } else if (isCurrentTokenOnFollowSetOf("EstaticoOpcional")) {
-
+            return false;
         } else {
             throw new SyntaxException(currentToken, firstSet("EstaticoOpcional").toString());
         }

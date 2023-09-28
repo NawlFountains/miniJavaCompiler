@@ -1,4 +1,4 @@
 package semantic;
 
-public class Type {
+public abstract class Type {
 }

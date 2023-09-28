@@ -7,7 +7,8 @@ import java.util.Hashtable;
 
 public class ClassST implements EntityST {
     public String className;
-    public String superClassName;
+    public Token superClass;
+    public Token implementedInterface;
     protected MethodST actualMethod;
     public Hashtable<String,AttributeST> attributes;
     public Hashtable<String,MethodST> methods;
@@ -19,8 +20,13 @@ public class ClassST implements EntityST {
         return className;
     }
 
-    public void inheritsFrom(String superClassName) {
-        this.superClassName = superClassName;
+    public void inheritsFrom(Token superClass) {
+        //TODO check that its a class
+        this.superClass = superClass;
+    }
+    public void implementsFrom(Token implementedInterface) {
+        //TODO check that it its an interface, it cant implement and extends at the same time
+        this.implementedInterface = implementedInterface;
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {

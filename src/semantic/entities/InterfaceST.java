@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 public class InterfaceST implements EntityST {
     protected String interfaceName;
-    protected String superInterfaceName;
+    protected Token superInterface;
     protected MethodST actualMethod;
     protected Hashtable<String,MethodST> methods;
 
@@ -15,8 +15,8 @@ public class InterfaceST implements EntityST {
         this.interfaceName = interfaceName;
     }
 
-    public void inheritsFrom(String superInterfaceName) {
-        this.superInterfaceName = superInterfaceName;
+    public void inheritsFrom(Token superInterface) {
+        this.superInterface = superInterface;
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {

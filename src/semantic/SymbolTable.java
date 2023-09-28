@@ -12,8 +12,9 @@ import java.util.HashMap;
 public class SymbolTable implements EntityST {
     protected HashMap<String,ClassST> classes;
     protected HashMap<String,InterfaceST> interfaces;
-    protected ClassST actualClass;
-    protected InterfaceST actualInterface;
+    protected ClassST currentClass;
+    protected InterfaceST currentInterface;
+    protected MethodST currentMethod;
     public static SymbolTable instance;
     public static SymbolTable getInstance() {
         if (instance == null) {
@@ -32,11 +33,28 @@ public class SymbolTable implements EntityST {
     private void setupPredefinedClasses() {
         //TODO add Object, String and System
     }
+    public void setCurrentClass(ClassST currentClass) {
+        this.currentClass = currentClass;
+    }
+    public ClassST getCurrentClass() {
+        return currentClass;
+    }
+    public void setCurrentInterface(InterfaceST currentInterface) {
+        this.currentInterface = currentInterface;
+    }
+    public InterfaceST getCurrentInterface() {
+        return currentInterface;
+    }
+    public void setCurrentMethod(MethodST currentMethod) {
+        this.currentMethod = currentMethod;
+    }
+    public MethodST getCurrentMethod() {
+        return currentMethod;
+    }
 
     public void insertClass(Token token, ClassST classST) throws SemanticException {
         if (!classOrInterfaceExits(token.getLexeme())) {
             classes.put(token.getLexeme(),classST);
-            actualClass = classST;
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe una declaracion de clase o interfaz con el identificador "+token.getLexeme());
         }
@@ -44,7 +62,7 @@ public class SymbolTable implements EntityST {
     public void insertInterface(Token token,InterfaceST interfaceST) throws SemanticException {
         if (!classOrInterfaceExits(token.getLexeme())) {
             interfaces.put(token.getLexeme(),interfaceST);
-            actualInterface = interfaceST;
+            currentInterface = interfaceST;
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe una declaracion de clase o interfaz con el identificador "+token.getLexeme());
         }
