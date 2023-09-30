@@ -3,6 +3,7 @@ package semantic.entities;
 import lexical.SemanticException;
 import lexical.Token;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 
 public class InterfaceST implements EntityST {
@@ -10,15 +11,20 @@ public class InterfaceST implements EntityST {
     protected Token superInterface;
     protected Token declarationToken;
     protected MethodST actualMethod;
-    protected Hashtable<String,MethodST> methods;
+    protected HashMap<String,MethodST> methods;
 
     public InterfaceST(Token declarationToken,String interfaceName) {
+        System.out.println("Interface "+interfaceName+" created");
         this.declarationToken = declarationToken;
         this.interfaceName = interfaceName;
+        methods = new HashMap<>();
     }
 
     public void inheritsFrom(Token superInterface) {
         this.superInterface = superInterface;
+    }
+    public String getInterfaceName() {
+        return interfaceName;
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {

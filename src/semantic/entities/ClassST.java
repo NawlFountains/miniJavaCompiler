@@ -106,14 +106,13 @@ public class ClassST implements EntityST {
             met.checkDeclarations();
         }
 //        checkOverrideOfParentAttributes();
-        checkOverrideOfParentMethod(this.getClassName());
+//        checkOverrideOfParentMethod(this.getClassName());
     }
     private void checkOverrideOfParentMethod(String className) throws SemanticException {
     }
 
 
     public void consolidate() {
-
     }
     private void circularInheritance(String startClassName, String currentClassName) throws SemanticException {
         System.out.println("Checking circular inheritnace with start "+startClassName+" and current "+currentClassName);

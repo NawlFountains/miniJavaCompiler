@@ -26,7 +26,7 @@ public class ParameterST  implements EntityST {
     @Override
     public void checkDeclarations() throws SemanticException {
         System.out.println("Is "+parameterName+" reference type parameter "+isParameterTypeReference());
-        if (isParameterTypeReference() && SymbolTable.getInstance().getClassWithName(parameterType.toString()) == null) {
+        if (isParameterTypeReference() && SymbolTable.getInstance().getClassWithName(parameterType.toString()) == null && SymbolTable.getInstance().getInterfaceWithName(parameterType.toString()) == null) {
             throw new SemanticException(parameterType.toString(),declarationToken.getLineNumber(),"No esta declarado el tipo "+parameterType.toString()+" que usa el parametro "+declarationToken.getLexeme());
         }
     }

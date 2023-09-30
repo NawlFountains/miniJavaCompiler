@@ -41,8 +41,8 @@ public class Main {
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
-            System.out.println("About to check declarations");
             SymbolTable.getInstance().checkDeclarations();
+            SymbolTable.getInstance().consolidate();
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
             manager.closeCurrentFile();

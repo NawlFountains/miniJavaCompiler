@@ -88,7 +88,7 @@ public class SyntaxAnalyzer {
             match("rw_interface");
             Token interfaceToken = currentToken;
             match ("idClase");
-            InterfaceST i = new InterfaceST(interfaceToken,currentToken.getLexeme());
+            InterfaceST i = new InterfaceST(interfaceToken,interfaceToken.getLexeme());
             SymbolTable.getInstance().setCurrentInterface(i);
             ExtiendeOpcional();
             HerenciaOpcional();

@@ -32,7 +32,7 @@ public class AttributeST implements EntityST {
     @Override
     public void checkDeclarations() throws SemanticException {
         System.out.println("Is attribute "+attributeName+" reference type :"+isTypeReference());
-        if (isTypeReference() && SymbolTable.getInstance().getClassWithName(attributeType.toString()) == null) {
+        if (isTypeReference() && SymbolTable.getInstance().getClassWithName(attributeType.toString()) == null && SymbolTable.getInstance().getInterfaceWithName(attributeType.toString()) == null) {
             throw new SemanticException(attributeType.toString(),declarationToken.getLineNumber(),"No esta definido el tipo "+attributeType.toString()+" para el atributo "+declarationToken.getLexeme());
         }
     }

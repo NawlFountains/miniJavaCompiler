@@ -197,11 +197,11 @@ public class SymbolTable implements EntityST {
     }
     public void checkDeclarations() throws SemanticException {
         for (ClassST c : classes.values()) {
-            System.out.println("Checking declaration for "+c.getClassName());
+            System.out.println("Checking declaration of class "+c.getClassName());
             c.checkDeclarations();
-            System.out.println("Successful declaration for "+c.getClassName());
         }
         for (InterfaceST i : interfaces.values()) {
+            System.out.println("Checking declaration of interface "+i.getInterfaceName());
             i.checkDeclarations();
         }
         if (!hasMainMethod()) {
@@ -215,9 +215,11 @@ public class SymbolTable implements EntityST {
 
     public void consolidate(){
         for (ClassST c : classes.values()) {
+            System.out.println("Consolidating "+c.getClassName());
             c.consolidate();
         }
         for (InterfaceST i : interfaces.values()) {
+            System.out.println("Consolidating interface "+i.getInterfaceName());
             i.consolidate();
         }
     }
