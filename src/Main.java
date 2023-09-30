@@ -28,8 +28,7 @@ public class Main {
         System.out.println(e.getMessage());
     }
     public static void notifySemanticError(SemanticException e) {
-        System.out.println("About to notify a semantic error");
-        System.out.println(e.getDescription()+"\n");
+        System.out.println("Error semantico en linea "+e.getLineNumber()+": "+e.getDescription()+"\n");
         System.out.println(e.getMessage());
     }
 
@@ -42,6 +41,8 @@ public class Main {
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
+            System.out.println("About to check declarations");
+            SymbolTable.getInstance().checkDeclarations();
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
             manager.closeCurrentFile();

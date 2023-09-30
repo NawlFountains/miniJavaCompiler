@@ -38,7 +38,7 @@ public class SyntaxAnalyzer {
             Clase();
             ListaClases();
         } else if (isCurrentTokenOnFollowSetOf("ListaClases")) {
-
+            SymbolTable.getInstance().setEOFToken(currentToken);
         } else {
             throw new SyntaxException(currentToken, firstSet("Clase").toString());
         }
@@ -71,7 +71,7 @@ public class SyntaxAnalyzer {
             match("rw_class");
             Token classToken = currentToken;
             match("idClase");
-            ClassST clase = new ClassST(classToken.getLexeme());
+            ClassST clase = new ClassST(classToken,classToken.getLexeme());
             SymbolTable.getInstance().setCurrentClass(clase);
             GenericidadOpcional();
             HerenciaOpcional();
@@ -88,7 +88,7 @@ public class SyntaxAnalyzer {
             match("rw_interface");
             Token interfaceToken = currentToken;
             match ("idClase");
-            InterfaceST i = new InterfaceST(currentToken.getLexeme());
+            InterfaceST i = new InterfaceST(interfaceToken,currentToken.getLexeme());
             SymbolTable.getInstance().setCurrentInterface(i);
             ExtiendeOpcional();
             HerenciaOpcional();
@@ -100,7 +100,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Interface").toString());
         }
     }
-    void HerenciaOpcional() throws LexicalException, SyntaxException {
+    void HerenciaOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("HeredaDe")){
             Token ancestro = HeredaDe();
             SymbolTable.getInstance().getCurrentClass().inheritsFrom(ancestro);
@@ -296,13 +296,13 @@ public class SyntaxAnalyzer {
             DeclaracionVariableMultiple();
             InicializacionOpcional();
 
-            AttributeST attr = new AttributeST(nameDeclared.getLexeme());
+            AttributeST attr = new AttributeST(nameDeclared,nameDeclared.getLexeme());
             attr.setAttributeType(typeDeclared);
             attr.setStatic(isStatic);
             SymbolTable.getInstance().getCurrentClass().insertAttribute(nameDeclared,attr);
             match("semiColon");
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
-            MethodST method = new MethodST(nameDeclared.getLexeme());
+            MethodST method = new MethodST(nameDeclared,nameDeclared.getLexeme());
             ArgsFormales(method);
             Bloque();
             method.setReturnType(typeDeclared);
@@ -322,7 +322,7 @@ public class SyntaxAnalyzer {
             Boolean isStatic = EstaticoOpcional();
             Type returnType = TipoMiembro();
             Token methodName = currentToken;
-            MethodST methodHeader = new MethodST(methodName.getLexeme());
+            MethodST methodHeader = new MethodST(methodName,methodName.getLexeme());
             methodHeader.setReturnType(returnType);
             methodHeader.setStatic(isStatic);
             SymbolTable.getInstance().setCurrentMethod(methodHeader);
@@ -449,10 +449,10 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("ArgFormal")) {
             Type paramType = Tipo();
             Token decToken = currentToken;
-            ParameterST param = new ParameterST(decToken.getLexeme());
+            ParameterST param = new ParameterST(decToken,decToken.getLexeme());
             param.setParameterType(paramType);
             match("idMetVar");
-            callerRoutine.insertParameter(currentToken,param);
+            callerRoutine.insertParameter(decToken,param);
         } else {
             throw new SyntaxException(currentToken, firstSet("ArgFormal").toString());
         }

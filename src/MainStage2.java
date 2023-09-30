@@ -2,11 +2,10 @@ import filemanager.FileManager;
 import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
-import syntax.SyntaxAnalyzer;
 import syntax.SyntaxAnalyzerStage2;
 import syntax.SyntaxException;
 
-public class MainEtapa2 {
+public class MainStage2 {
     static FileManager manager = new ImpFileManager();
     static String successfulExecutionMsg = "[SinErrores]";
     public static void notifyLexicalError(LexicalException e) {

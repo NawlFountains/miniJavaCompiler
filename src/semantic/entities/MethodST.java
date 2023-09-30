@@ -2,17 +2,22 @@ package semantic.entities;
 
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.ReferenceType;
+import semantic.SymbolTable;
 import semantic.Type;
-
-import java.util.HashMap;
 
 public class MethodST extends RoutineST implements EntityST {
     protected String methodName;
     protected Type returnType;
+    protected Token declarationToken;
     protected boolean isStatic;
-    public MethodST(String methodName) {
+    public MethodST(Token declarationToken,String methodName) {
         super();
+        this.declarationToken = declarationToken;
         this.methodName = methodName;
+    }
+    public Token getDeclarationToken() {
+        return declarationToken;
     }
     public String getMethodName() {
         return methodName;
@@ -33,14 +38,18 @@ public class MethodST extends RoutineST implements EntityST {
         return parameters.get(parameterName) != null;
     }
 
-    @Override
-    public void checkDeclarations() {
-
+    public void checkDeclarations() throws SemanticException {
+        if (returnType.getClass().equals("semantic.ReferenceType")) {
+            checkReturnReferenceType((ReferenceType) returnType);
+        }
+        for (ParameterST p : parameters.values()) {
+            p.checkDeclarations();
+        }
     }
-
-    @Override
-    public void isCorrectlyDeclared() {
-
+    private void checkReturnReferenceType(ReferenceType type) throws SemanticException {
+        if (SymbolTable.getInstance().getClassWithName(type.toString()) == null) {
+            throw new SemanticException(type.toString(),declarationToken.getLineNumber(),"El tipo de retorno "+type.toString()+" no se encuentra declarado");
+        }
     }
 
     @Override

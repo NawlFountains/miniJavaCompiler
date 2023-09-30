@@ -3,7 +3,7 @@ import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
 
-public class MainEtapa1 {
+public class MainStage1 {
     static FileManager manager = new ImpFileManager();
     static String successfulExecutionMsg = "[SinErrores]";
     public static void notifyError(LexicalException e) {

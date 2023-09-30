@@ -8,10 +8,12 @@ import java.util.Hashtable;
 public class InterfaceST implements EntityST {
     protected String interfaceName;
     protected Token superInterface;
+    protected Token declarationToken;
     protected MethodST actualMethod;
     protected Hashtable<String,MethodST> methods;
 
-    public InterfaceST(String interfaceName) {
+    public InterfaceST(Token declarationToken,String interfaceName) {
+        this.declarationToken = declarationToken;
         this.interfaceName = interfaceName;
     }
 
@@ -34,14 +36,13 @@ public class InterfaceST implements EntityST {
     private boolean existMethod(String methodName) {
         return (methods.get(methodName) != null);
     }
-    public void checkDeclarations() {
-        for (MethodST m : methods.values())
+    public void checkDeclarations() throws SemanticException {
+        for (MethodST m : methods.values()){
+            if (m.isStatic) {
+                throw new SemanticException(m.getDeclarationToken().getLexeme(),m.getDeclarationToken().getLineNumber(),"Una interfaz no puede tener un metodo estatico");
+            }
             m.checkDeclarations();
-    }
-
-    public void isCorrectlyDeclared() {
-        for (MethodST m : methods.values())
-            m.isCorrectlyDeclared();
+        }
     }
 
     public void consolidate() {

@@ -17,11 +17,6 @@ public class ConstructorST extends RoutineST implements EntityST {
     }
 
     @Override
-    public void isCorrectlyDeclared() {
-
-    }
-
-    @Override
     public void consolidate() {
 
     }

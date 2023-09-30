@@ -1,12 +1,15 @@
 package semantic.entities;
 
+import lexical.Token;
 import semantic.Type;
 
 public class AttributeST implements EntityST {
     protected String attributeName;
     protected Type attributeType;
     protected Boolean isStatic;
-    public AttributeST(String attributeName) {
+    protected Token declarationToken;
+    public AttributeST(Token token, String attributeName) {
+        this.declarationToken = token;
         this.attributeName = attributeName;
     }
     public void setAttributeType(Type attributeType) {
@@ -26,10 +29,6 @@ public class AttributeST implements EntityST {
 
     }
 
-    @Override
-    public void isCorrectlyDeclared() {
-
-    }
 
     @Override
     public void consolidate() {
