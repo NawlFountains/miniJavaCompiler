@@ -39,7 +39,7 @@ public class MethodST extends RoutineST implements EntityST {
     }
 
     public void checkDeclarations() throws SemanticException {
-        if (returnType.getClass().equals("semantic.ReferenceType")) {
+        if (returnType.getClass().toString().equals("class semantic.ReferenceType")) {
             checkReturnReferenceType((ReferenceType) returnType);
         }
         for (ParameterST p : parameters.values()) {

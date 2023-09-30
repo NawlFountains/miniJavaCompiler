@@ -1,6 +1,8 @@
 package semantic.entities;
 
+import lexical.SemanticException;
 import lexical.Token;
+import semantic.SymbolTable;
 import semantic.Type;
 
 public class AttributeST implements EntityST {
@@ -15,6 +17,9 @@ public class AttributeST implements EntityST {
     public void setAttributeType(Type attributeType) {
         this.attributeType = attributeType;
     }
+    public boolean isTypeReference() {
+        return attributeType.getClass().toString().equals("class semantic.ReferenceType");
+    }
     public Type getAttributeType() {
         return attributeType;
     }
@@ -25,8 +30,11 @@ public class AttributeST implements EntityST {
         return isStatic;
     }
     @Override
-    public void checkDeclarations() {
-
+    public void checkDeclarations() throws SemanticException {
+        System.out.println("Is attribute "+attributeName+" reference type :"+isTypeReference());
+        if (isTypeReference() && SymbolTable.getInstance().getClassWithName(attributeType.toString()) == null) {
+            throw new SemanticException(attributeType.toString(),declarationToken.getLineNumber(),"No esta definido el tipo "+attributeType.toString()+" para el atributo "+declarationToken.getLexeme());
+        }
     }
 
 

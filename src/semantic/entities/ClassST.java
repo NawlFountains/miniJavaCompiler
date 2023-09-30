@@ -66,7 +66,6 @@ public class ClassST implements EntityST {
         if (!existMethod(token.getLexeme())) {
             System.out.println("ABOUT TO INSERT METHOD "+method.getMethodName());
             if (isMethodMain(method)) {
-                System.out.println("IS A MAIN METHOD");
                 SymbolTable.getInstance().addMainMethod(method);
             }
             methods.put(token.getLexeme(),method);
@@ -76,9 +75,6 @@ public class ClassST implements EntityST {
         }
     }
     private boolean isMethodMain(MethodST method) {
-        System.out.println("Checking if "+method.getMethodName()+" is main method");
-        System.out.println(method.getReturnType().toString());
-        System.out.println((method.getMethodName().equals("main"))+" "+(method.getReturnType().toString().equals("void"))+" "+method.isStatic+" "+method.parameters.isEmpty());
         return (method.getMethodName().equals("main")) && (method.getReturnType().toString().equals("void")) && method.isStatic && method.parameters.isEmpty();
     }
     public void insertAttribute(Token token, AttributeST attribute) throws SemanticException {
