@@ -23,6 +23,13 @@ public class SymbolTable implements EntityST {
         return instance;
     }
 
+    public void resetTable() {
+        classes = new HashMap<>();
+        interfaces = new HashMap<>();
+
+        setupPredefinedClasses();
+    }
+
     private SymbolTable() {
         classes = new HashMap<>();
         interfaces = new HashMap<>();

@@ -3,21 +3,34 @@ package semantic.entities;
 import lexical.SemanticException;
 import lexical.Token;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 
 public class ClassST implements EntityST {
-    public String className;
-    public Token superClass;
-    public Token implementedInterface;
+    protected String className;
+    protected Token superClass;
+    protected Token implementedInterface;
     protected MethodST actualMethod;
-    public Hashtable<String,AttributeST> attributes;
-    public Hashtable<String,MethodST> methods;
+    protected HashMap<String,AttributeST> attributes;
+    protected HashMap<String,MethodST> methods;
+    protected ConstructorST constructor;
 
     public ClassST(String className) {
         this.className = className;
+        constructor = null;
+
+        attributes = new HashMap<>();
+        methods = new HashMap<>();
     }
     public String getClassName() {
         return className;
+    }
+    public void setConstructor(Token token,ConstructorST constructor) throws SemanticException {
+        if (this.constructor == null) {
+            this.constructor = constructor;
+        } else {
+            throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede definir mas de un constructor por clase");
+        }
     }
 
     public void inheritsFrom(Token superClass) {
@@ -34,6 +47,13 @@ public class ClassST implements EntityST {
             this.actualMethod = method;
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un metodo en esta clase con la signatura "+token.getLexeme());
+        }
+    }
+    public void insertAttribute(Token token, AttributeST attribute) throws SemanticException {
+        if (!existMethod(token.getLexeme())) {
+            attributes.put(token.getLexeme(),attribute);
+        } else {
+            throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un atributo en esta clase con el identificador "+token.getLexeme());
         }
     }
 

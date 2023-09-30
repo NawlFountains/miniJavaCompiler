@@ -8,10 +8,9 @@ import semantic.PrimitiveType;
 import semantic.ReferenceType;
 import semantic.SymbolTable;
 import semantic.Type;
-import semantic.entities.ClassST;
-import semantic.entities.InterfaceST;
-import semantic.entities.MethodST;
+import semantic.entities.*;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class SyntaxAnalyzer {
@@ -69,8 +68,8 @@ public class SyntaxAnalyzer {
     }
     void ClaseConcreta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ClaseConcreta")) {
-            Token classToken = currentToken;
             match("rw_class");
+            Token classToken = currentToken;
             match("idClase");
             ClassST clase = new ClassST(classToken.getLexeme());
             SymbolTable.getInstance().setCurrentClass(clase);
@@ -182,7 +181,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExtiendeOpcional").toString());
         }
     }
-    void ListaMiembros() throws LexicalException, SyntaxException {
+    void ListaMiembros() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaMiembros")) {
             Miembro();
             ListaMiembros();
@@ -202,7 +201,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaEncabezados").toString());
         }
     }
-    void Miembro() throws LexicalException, SyntaxException {
+    void Miembro() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Miembro")){
             VisibilidadOpcional();
             AtributoMetodoOConstructor();
@@ -210,7 +209,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Miembro").toString());
         }
     }
-    void AtributoMetodoOConstructor() throws LexicalException, SyntaxException {
+    void AtributoMetodoOConstructor() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("rw_static")) {
             match("rw_static");
             EncabezadoAtributoMetodo();
@@ -223,14 +222,16 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void EncabezadoAtributoMetodoConstructor() throws LexicalException, SyntaxException{
+    private void EncabezadoAtributoMetodoConstructor() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("idClase")) {
+            Token decToken = currentToken;
+            Type type = new ReferenceType(decToken.getLexeme());
             match("idClase");
             GenericidadOpcional();
-            PosibleConstructor();
+            PosibleConstructor(decToken,type);
         } else if (isCurrentTokenOnFirstSetOf("TipoMiembroSinClase")) {
-            TipoMiembroSinClase();
-            EncabezadoAtributoMetodoTipoDicho();
+            Type type = TipoMiembroSinClase();
+            EncabezadoAtributoMetodoTipoDicho(type);
         } else {
             Set<String> auxToException = firstSet("TipoMiembroSinClase");
             auxToException.add("idClase");
@@ -238,11 +239,12 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void TipoMiembroSinClase() throws LexicalException, SyntaxException {
+    private Type TipoMiembroSinClase() throws LexicalException, SyntaxException {
         if (isCurrentTokenOnFirstSetOf("TipoPrimitivo")) {
-            TipoPrimitivo();
+            return TipoPrimitivo();
         } else if (currentToken.getId().contains("rw_void")) {
             match("rw_void");
+            return new PrimitiveType("void");
         } else {
             Set<String> auxToException = firstSet("TipoPrimitivo");
             auxToException.add("rw_void");
@@ -250,13 +252,17 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void PosibleConstructor() throws LexicalException, SyntaxException {
+    private void PosibleConstructor(Token declarationToken,Type classType) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("idMetVar")) {
+            Token decToken = currentToken;
             match("idMetVar");
-            FinAtributoMetodo();
+            FinAtributoMetodo(decToken,classType,false);
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
-            ArgsFormales();
+            //this mean is a constructor
+            ConstructorST constructor = new ConstructorST();
+            ArgsFormales(constructor);
             Bloque();
+            SymbolTable.getInstance().getCurrentClass().setConstructor(declarationToken,constructor);
         } else {
             Set<String> auxToException = firstSet("ArgsFormales");
             auxToException.add("idMetVar");
@@ -264,32 +270,45 @@ public class SyntaxAnalyzer {
         }
     }
 
-    private void EncabezadoAtributoMetodoTipoDicho() throws LexicalException, SyntaxException {
+    private void EncabezadoAtributoMetodoTipoDicho(Type type) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodoTipoDicho")) {
+            Token idDec = currentToken;
             match("idMetVar");
-            FinAtributoMetodo();
+            FinAtributoMetodo(idDec,type,false);
         } else {
             throw new SyntaxException(currentToken, firstSet("EncabezadoAtributoMetodoTipoDicho").toString());
         }
     }
 
-    void EncabezadoAtributoMetodo() throws LexicalException, SyntaxException {
+    void EncabezadoAtributoMetodo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoAtributoMetodo")){
-            TipoMiembro();
+            Type type = TipoMiembro();
+            Token methodDeclaration = currentToken;
             match("idMetVar");
-            FinAtributoMetodo();
+            FinAtributoMetodo(methodDeclaration,type,true);
         } else {
             throw new SyntaxException(currentToken, firstSet("EncabezadoAtributoMetodo").toString());
         }
     }
-    void FinAtributoMetodo() throws LexicalException, SyntaxException {
+    void FinAtributoMetodo(Token nameDeclared, Type typeDeclared, Boolean isStatic ) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("DeclaracionVariableMultiple") ||  currentToken.getId().contains("semiColon")) {
+            //TODO should we do optionals?
             DeclaracionVariableMultiple();
             InicializacionOpcional();
+
+            AttributeST attr = new AttributeST(nameDeclared.getLexeme());
+            attr.setAttributeType(typeDeclared);
+            attr.setStatic(isStatic);
+            SymbolTable.getInstance().getCurrentClass().insertAttribute(nameDeclared,attr);
             match("semiColon");
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
-            ArgsFormales();
+            MethodST method = new MethodST(nameDeclared.getLexeme());
+            ArgsFormales(method);
             Bloque();
+            method.setReturnType(typeDeclared);
+            method.setStatic(isStatic);
+            SymbolTable.getInstance().setCurrentMethod(method);
+            SymbolTable.getInstance().getCurrentClass().insertMethod(nameDeclared,method);
         } else {
             Set<String> auxToException = firstSet("DeclaracionVariableMultiple");
             auxToException.addAll(firstSet("ArgsFormales"));
@@ -299,7 +318,6 @@ public class SyntaxAnalyzer {
     }
     void EncabezadoMetodo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("EncabezadoMetodo")) {
-            //TODO add a way to return visibilidty
             VisibilidadOpcional();
             Boolean isStatic = EstaticoOpcional();
             Type returnType = TipoMiembro();
@@ -307,10 +325,9 @@ public class SyntaxAnalyzer {
             MethodST methodHeader = new MethodST(methodName.getLexeme());
             methodHeader.setReturnType(returnType);
             methodHeader.setStatic(isStatic);
-            //TODO newMethod.setVisibility();
             SymbolTable.getInstance().setCurrentMethod(methodHeader);
             match("idMetVar");
-            ArgsFormales();
+            ArgsFormales(methodHeader);
             match("semiColon");
             SymbolTable.getInstance().getCurrentInterface().insertMethod(currentToken,methodHeader);
         } else {
@@ -366,7 +383,8 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken,auxToException.toString());
         }
     }
-    void TipoPrimitivo() throws LexicalException, SyntaxException {
+    Type TipoPrimitivo() throws LexicalException, SyntaxException {
+        Token typeDec = currentToken;
         if (currentToken.getId().contains("rw_boolean")) {
             match("rw_boolean");
         } else if (currentToken.getId().contains("rw_char")) {
@@ -379,6 +397,7 @@ public class SyntaxAnalyzer {
             Set<String> auxToException = firstSet("TipoPrimitivo");
             throw new SyntaxException(currentToken,auxToException.toString());
         }
+        return new PrimitiveType(typeDec.getLexeme());
     }
     boolean EstaticoOpcional() throws LexicalException, SyntaxException {
         if (currentToken.getId().contains("rw_static")) {
@@ -390,46 +409,50 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("EstaticoOpcional").toString());
         }
     }
-    void ArgsFormales() throws LexicalException, SyntaxException {
+    void ArgsFormales(RoutineST callerRoutine) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsFormales")){
             match("openPar");
-            ListaArgsFormalesOpcional();
+            ListaArgsFormalesOpcional(callerRoutine);
             match("closePar");
         } else {
             throw new SyntaxException(currentToken, firstSet("ArgsFormales").toString());
         }
     }
-    void ListaArgsFormalesOpcional() throws LexicalException, SyntaxException {
+    void ListaArgsFormalesOpcional(RoutineST callerRoutine) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaArgsFormales")) {
-            ListaArgsFormales();
+            ListaArgsFormales(callerRoutine);
         } else if (isCurrentTokenOnFollowSetOf("ListaArgsFormalesOpcional")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("ListaArgsFormalesOpcional").toString());
         }
     }
-    void ListaArgsFormales() throws LexicalException, SyntaxException {
+    void ListaArgsFormales(RoutineST callerRoutine) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaArgsFormales")){
-            ArgFormal();
-            OtroArgFormal();
+            ArgFormal(callerRoutine);
+            OtroArgFormal(callerRoutine);
         } else {
             throw new SyntaxException(currentToken, firstSet("ListaArgsFormales").toString());
         }
     }
-    void OtroArgFormal() throws LexicalException, SyntaxException {
+    void OtroArgFormal(RoutineST callerRoutine) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("comma")) {
             match("comma");
-            ListaArgsFormales();
+            ListaArgsFormales(callerRoutine);
         } else if (isCurrentTokenOnFollowSetOf("OtroArgFormal")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("OtroArgFormal").toString());
         }
     }
-    void ArgFormal() throws LexicalException, SyntaxException {
+    void ArgFormal(RoutineST callerRoutine) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgFormal")) {
-            Tipo();
+            Type paramType = Tipo();
+            Token decToken = currentToken;
+            ParameterST param = new ParameterST(decToken.getLexeme());
+            param.setParameterType(paramType);
             match("idMetVar");
+            callerRoutine.insertParameter(currentToken,param);
         } else {
             throw new SyntaxException(currentToken, firstSet("ArgFormal").toString());
         }
@@ -799,6 +822,7 @@ public class SyntaxAnalyzer {
 
 
     private void match(String tokenName) throws LexicalException, SyntaxException {
+        System.out.println("About to match "+currentToken.getLexeme());
         if (tokenName.equals(currentToken.getId())) {
             currentToken = lexicalAnalyzer.nextToken();
         } else {

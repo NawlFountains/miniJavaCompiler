@@ -6,14 +6,12 @@ import semantic.Type;
 
 import java.util.HashMap;
 
-public class MethodST implements EntityST {
+public class MethodST extends RoutineST implements EntityST {
     protected String methodName;
     protected Type returnType;
-    protected ParameterST actualParameter;
     protected boolean isStatic;
-    protected HashMap<String,ParameterST> parameters;
     public MethodST(String methodName) {
-        parameters = new HashMap<>();
+        super();
         this.methodName = methodName;
     }
     public String getMethodName() {
@@ -30,14 +28,6 @@ public class MethodST implements EntityST {
     }
     public boolean isStatic() {
         return isStatic;
-    }
-    public void insertParameter(Token token, ParameterST parameterST) throws SemanticException {
-        if (!existParameter(token.getLexeme())) {
-            parameters.put(token.getLexeme(),parameterST);
-            this.actualParameter = parameterST;
-        } else {
-            throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un parametro en este metodo con el identificador "+token.getLexeme());
-        }
     }
     public boolean existParameter(String parameterName) {
         return parameters.get(parameterName) != null;

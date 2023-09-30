@@ -1,6 +1,16 @@
 package semantic.entities;
 
-public class ConstructorST implements EntityST {
+import lexical.SemanticException;
+import lexical.Token;
+
+import java.util.HashMap;
+
+public class ConstructorST extends RoutineST implements EntityST {
+
+
+    public ConstructorST() {
+        super();
+    }
     @Override
     public void checkDeclarations() {
 

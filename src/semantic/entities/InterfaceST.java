@@ -20,8 +20,12 @@ public class InterfaceST implements EntityST {
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {
-            methods.put(token.getLexeme(),method);
-            this.actualMethod = method;
+            if (!method.isStatic) {
+                methods.put(token.getLexeme(),method);
+                this.actualMethod = method;
+            } else {
+                throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede declarar un metodo estatico en una interfaz ");
+            }
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un metodo en esta interfaz con la signatura "+token.getLexeme());
         }

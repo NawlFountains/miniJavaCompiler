@@ -2,6 +2,8 @@ import filemanager.FileManager;
 import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
+import lexical.SemanticException;
+import semantic.SymbolTable;
 import syntax.SyntaxAnalyzer;
 import syntax.SyntaxException;
 
@@ -25,12 +27,18 @@ public class Main {
         System.out.println(e.getDescription()+"\n");
         System.out.println(e.getMessage());
     }
+    public static void notifySemanticError(SemanticException e) {
+        System.out.println("About to notify a semantic error");
+        System.out.println(e.getDescription()+"\n");
+        System.out.println(e.getMessage());
+    }
 
     public static void main(String[] args) {
         try {
             String filePath = args[0];
             manager = new ImpFileManager();
             manager.openFile(filePath);
+            SymbolTable.getInstance().resetTable();
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
@@ -41,8 +49,11 @@ public class Main {
             notifyLexicalError(e);
         } catch (SyntaxException e) {
             notifySyntacticalError(e);
+        } catch (SemanticException e) {
+            notifySemanticError(e);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println(e.getCause());
         }
     }
 }
