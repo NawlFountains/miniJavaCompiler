@@ -43,7 +43,6 @@ public class Main {
             syntaxAnalyzer.startAnalysis();
             SymbolTable.getInstance().checkDeclarations();
             SymbolTable.getInstance().consolidate();
-            System.out.println("Finishing analysis\n"+SymbolTable.getInstance().toString());
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
             manager.closeCurrentFile();

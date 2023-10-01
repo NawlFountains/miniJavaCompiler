@@ -49,7 +49,6 @@ public class ClassST implements EntityST {
     }
 
     public void inheritsFrom(Token extendedClass) throws SemanticException {
-        //TODO dont overadd Object
         if (lexemeAlreadyOnList(extendedClasses,extendedClass)) {
             //If its already extendend we cant do it again
             throw new SemanticException(extendedClass.getLexeme(),extendedClass.getLineNumber(),"Ya se declaro la herencia de la clase "+extendedClass.getLexeme());
