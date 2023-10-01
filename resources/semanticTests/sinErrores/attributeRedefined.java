@@ -1,4 +1,4 @@
-///[Error:a|8]
+///[SinErrores]
 // 
 class A{
 	String a;

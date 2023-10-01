@@ -1,4 +1,4 @@
-///[Error:x|8]
+///[SinErrores]
 // 
 class A{
 	float x;
