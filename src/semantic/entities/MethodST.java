@@ -9,20 +9,16 @@ import semantic.Type;
 import java.util.HashMap;
 
 public class MethodST extends RoutineST implements EntityST {
-    protected String methodName;
     protected Type returnType;
     protected Token declarationToken;
     protected boolean isStatic;
     public MethodST(Token declarationToken,String methodName) {
-        super();
+        super(methodName);
         this.declarationToken = declarationToken;
-        this.methodName = methodName;
+        this.routineName = methodName;
     }
     public Token getDeclarationToken() {
         return declarationToken;
-    }
-    public String getMethodName() {
-        return methodName;
     }
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
@@ -59,14 +55,14 @@ public class MethodST extends RoutineST implements EntityST {
 
     }
     public String toString() {
-        String toReturn = returnType+" "+methodName+'(';
+        String toReturn = returnType+" "+routineName+'(';
         for (ParameterST p : parameters.values()) {
             toReturn += p.toString()+" ,";
         }
         toReturn += ")";
         return toReturn;
     }
-    public HashMap getParameters() {
-        return parameters;
+    public boolean equals(MethodST method) {
+        return super.equals(method) && returnType.equals(method.getReturnType()) && (isStatic == method.isStatic);
     }
 }

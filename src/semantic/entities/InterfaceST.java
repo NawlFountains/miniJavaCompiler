@@ -2,10 +2,10 @@ package semantic.entities;
 
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.SymbolTable;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 public class InterfaceST implements EntityST {
     protected String interfaceName;
@@ -55,9 +55,22 @@ public class InterfaceST implements EntityST {
         }
     }
 
-    public void consolidate() {
-        for (MethodST m : methods.values())
-            m.consolidate();
+    public void consolidate() throws SemanticException {
+        if (superInterface != null && SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme()) != null) {
+            System.out.println("Has interface time to consolidate");
+            InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme());
+            if (!parentInterface.isConsolidated()) {
+                parentInterface.consolidate();
+            }
+
+            //Check all interface methods are implemented
+            Collection<MethodST> parentMethods = parentInterface.getMethods();
+            for (MethodST m : parentMethods) {
+                checkNotOverrideMethod(m);
+                methods.put(m.getName(),m);
+            }
+        }
+        consolidated = true;
     }
 
     public String toString() {
@@ -73,5 +86,14 @@ public class InterfaceST implements EntityST {
     }
     public Collection<MethodST> getMethods() {
         return methods.values();
+    }
+    private void checkNotOverrideMethod(MethodST method) throws SemanticException {
+        for (MethodST m : methods.values()) {
+            if (m.getName().equals(method.getName())) {
+                if (!m.equals(method)) {
+                    throw new SemanticException(m.getDeclarationToken().getLexeme(),m.getDeclarationToken().getLineNumber(),"El metodo "+method.toString()+" tiene el mismo nombre pero distinta signatura que el metodo que hereda , el cual es "+method.toString());
+                }
+            }
+        }
     }
 }

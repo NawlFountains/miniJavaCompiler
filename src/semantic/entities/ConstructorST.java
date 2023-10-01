@@ -6,11 +6,9 @@ import lexical.Token;
 import java.util.HashMap;
 
 public class ConstructorST extends RoutineST implements EntityST {
-    protected String constructorName;
 
     public ConstructorST(String name) {
-        super();
-        constructorName = name;
+        super(name);
     }
     @Override
     public void checkDeclarations() {
@@ -22,7 +20,7 @@ public class ConstructorST extends RoutineST implements EntityST {
 
     }
     public String toString() {
-        String toReturn = constructorName+'(';
+        String toReturn = routineName+'(';
         for (ParameterST p : parameters.values()) {
             toReturn += p.toString()+" ,";
         }

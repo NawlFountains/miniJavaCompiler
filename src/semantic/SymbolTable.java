@@ -47,7 +47,7 @@ public class SymbolTable implements EntityST {
             Collection<MethodST> methods = createMethodsForSystem();
 
             for (MethodST m : methods) {
-                systemClass.insertMethod(new Token("idMetVar",m.getMethodName(),0),m);
+                systemClass.insertMethod(new Token("idMetVar",m.getName(),0),m);
             }
             systemClass.inheritsFrom(new Token("idClase","Object",0));
             return systemClass;

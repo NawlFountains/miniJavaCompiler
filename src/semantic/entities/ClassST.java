@@ -51,7 +51,7 @@ public class ClassST implements EntityST {
     }
 
     public void inheritsFrom(Token extendedClass) throws SemanticException {
-        if (implementedInterface == null) {
+        if (implementedInterface == null || extendedClass.getLexeme().toString().equals("Object")) {
             this.extendedClass = extendedClass;
         } else {
             throw new SemanticException(extendedClass.getLexeme(),extendedClass.getLineNumber(),"No se puede implementar una interfaz y heredar de otra clase");
@@ -74,7 +74,7 @@ public class ClassST implements EntityST {
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {
-            System.out.println("ABOUT TO INSERT METHOD "+method.getMethodName());
+            System.out.println("ABOUT TO INSERT METHOD "+method.getName());
             if (isMethodMain(method)) {
                 SymbolTable.getInstance().addMainMethod(method);
             }
@@ -85,7 +85,7 @@ public class ClassST implements EntityST {
         }
     }
     private boolean isMethodMain(MethodST method) {
-        return (method.getMethodName().equals("main")) && (method.getReturnType().toString().equals("void")) && method.isStatic && method.parameters.isEmpty();
+        return (method.getName().equals("main")) && (method.getReturnType().toString().equals("void")) && method.isStatic && method.parameters.isEmpty();
     }
     public void insertAttribute(Token token, AttributeST attribute) throws SemanticException {
         if (!existMethod(token.getLexeme())) {
@@ -127,6 +127,24 @@ public class ClassST implements EntityST {
         // BC: we are in Object we dont have a superclass or interface
         if (!className.equals("Object")) {
         // RC: we differ if its a class or an interface
+            if (implementedInterface != null && SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName()) != null) {
+                System.out.println("Has interface time to consolidate");
+                InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName());
+                if (!parentInterface.isConsolidated()) {
+                    parentInterface.consolidate();
+                }
+
+                //Check all interface methods are implemented
+                Collection<MethodST> parentMethods = parentInterface.getMethods();
+                for (MethodST m : parentMethods) {
+                    System.out.println("Checking class "+className+" implements "+m.toString());
+                    if (!checkIfMethodExist(m)) {
+                        System.out.println("It doesnt");
+                        throw new SemanticException(SymbolTable.getInstance().getEOF().getLexeme(),SymbolTable.getInstance().getEOF().getLineNumber(),"Nunca se implementa en la clase "+className+" el metodo "+m.getName()+" de la intefaz "+parentInterface.getInterfaceName());
+                    }
+                    System.out.println("It does");
+                }
+            }
             if (SymbolTable.getInstance().getClassWithName(getParentClassName()) != null) {
                 ClassST parentClass = SymbolTable.getInstance().getClassWithName(getParentClassName());
                 if (!parentClass.isConsolidated()) {
@@ -145,28 +163,11 @@ public class ClassST implements EntityST {
                 for (MethodST m : parentMethods) {
                     //Checks
                     if (!checkIfMethodExist(m)) {
-                        methods.put(m.getMethodName(),m);
+                        methods.put(m.getName(),m);
                     }
                 }
             }
-            if (implementedInterface != null && SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName()) != null) {
-                System.out.println("Has interface time to consolidate");
-                InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName());
-                if (!parentInterface.isConsolidated()) {
-                    parentInterface.consolidate();
-                }
 
-                //Check all interface methods are implemented
-                Collection<MethodST> parentMethods = parentInterface.getMethods();
-                for (MethodST m : parentMethods) {
-                    System.out.println("Checking class "+className+" implements "+m.toString());
-                    if (!checkIfMethodExist(m)) {
-                        System.out.println("It doesnt");
-                        throw new SemanticException(SymbolTable.getInstance().getEOF().getLexeme(),SymbolTable.getInstance().getEOF().getLineNumber(),"Nunca se implementa en la clase "+className+" el metodo "+m.getMethodName()+" de la intefaz "+parentInterface.getInterfaceName());
-                    }
-                    System.out.println("It does");
-                }
-            }
         }
         consolidated = true;
     }
@@ -220,7 +221,7 @@ public class ClassST implements EntityST {
     private boolean checkIfMethodExist(MethodST method) throws SemanticException {
         boolean found = false;
         for (MethodST m : methods.values()) {
-            if (m.getMethodName().equals(method.getMethodName())) {
+            if (m.getName().equals(method.getName())) {
                 if (m.equals(method)) {
                     found = true;
                 } else {
