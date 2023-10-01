@@ -14,6 +14,12 @@ public class AttributeST implements EntityST {
         this.declarationToken = token;
         this.attributeName = attributeName;
     }
+    public String getAttributeName() {
+        return attributeName;
+    }
+    public Token getDeclarationToken() {
+        return declarationToken;
+    }
     public void setAttributeType(Type attributeType) {
         this.attributeType = attributeType;
     }
@@ -34,6 +40,8 @@ public class AttributeST implements EntityST {
         System.out.println("Is attribute "+attributeName+" reference type :"+isTypeReference());
         if (isTypeReference() && SymbolTable.getInstance().getClassWithName(attributeType.toString()) == null && SymbolTable.getInstance().getInterfaceWithName(attributeType.toString()) == null) {
             throw new SemanticException(attributeType.toString(),declarationToken.getLineNumber(),"No esta definido el tipo "+attributeType.toString()+" para el atributo "+declarationToken.getLexeme());
+        } else if (attributeType.toString().equals("void")) {
+            throw new SemanticException("void",declarationToken.getLineNumber(),"No se puede declarar un atributo de tipo void");
         }
     }
 
@@ -41,5 +49,8 @@ public class AttributeST implements EntityST {
     @Override
     public void consolidate() {
 
+    }
+    public String toString() {
+        return attributeType+" "+attributeName;
     }
 }

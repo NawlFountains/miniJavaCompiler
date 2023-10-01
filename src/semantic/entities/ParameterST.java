@@ -35,4 +35,11 @@ public class ParameterST  implements EntityST {
     public void consolidate() {
 
     }
+    public String toString() {
+        String toReturn = parameterType+" "+parameterName;
+        return toReturn;
+    }
+    public boolean equals(ParameterST parameterToCompare) {
+        return parameterType.equals(parameterToCompare.getParameterType());
+    }
 }

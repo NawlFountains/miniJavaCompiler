@@ -2,11 +2,14 @@ package semantic.entities;
 
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.Type;
 
 import java.util.HashMap;
+import java.util.List;
 
-public class RoutineST {
+public abstract class RoutineST {
     protected HashMap<String,ParameterST> parameters;
+    protected List<Type> parametersTypeList;
     protected ParameterST actualParameter;
 
     protected RoutineST() {

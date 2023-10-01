@@ -4,5 +4,5 @@ import lexical.SemanticException;
 
 public interface EntityST {
     void checkDeclarations() throws SemanticException;
-    void consolidate();
+    void consolidate() throws SemanticException;
 }

@@ -259,7 +259,7 @@ public class SyntaxAnalyzer {
             FinAtributoMetodo(decToken,classType,false);
         } else if (isCurrentTokenOnFirstSetOf("ArgsFormales")) {
             //this mean is a constructor
-            ConstructorST constructor = new ConstructorST();
+            ConstructorST constructor = new ConstructorST(declarationToken.getLexeme());
             ArgsFormales(constructor);
             Bloque();
             SymbolTable.getInstance().getCurrentClass().setConstructor(declarationToken,constructor);

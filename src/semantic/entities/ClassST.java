@@ -2,17 +2,21 @@ package semantic.entities;
 
 import lexical.SemanticException;
 import lexical.Token;
+import org.w3c.dom.Attr;
 import semantic.SymbolTable;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ClassST implements EntityST {
-    private static final ConstructorST DEFAULT_CONSTRUCTOR = new ConstructorST();
+    private ConstructorST DEFAULT_CONSTRUCTOR;
     protected String className;
     protected Token declarationToken;
     protected Token implementedInterface;
     protected Token extendedClass;
     protected MethodST actualMethod;
+    protected boolean consolidated;
     protected HashMap<String,AttributeST> attributes;
     protected HashMap<String,MethodST> methods;
     protected ConstructorST constructor;
@@ -20,8 +24,10 @@ public class ClassST implements EntityST {
     public ClassST(Token decToken,String className) {
         this.declarationToken = decToken;
         this.className = className;
+        DEFAULT_CONSTRUCTOR = new ConstructorST(className);
         constructor = DEFAULT_CONSTRUCTOR;
         extendedClass = new Token("idClase","Object",0);
+        consolidated = false;
 
         attributes = new HashMap<>();
         methods = new HashMap<>();
@@ -35,6 +41,7 @@ public class ClassST implements EntityST {
     public Token getExtendedClassToken() {
         return extendedClass;
     }
+    public boolean isConsolidated() { return consolidated;}
     public void setConstructor(Token token,ConstructorST constructor) throws SemanticException {
         if (this.constructor == DEFAULT_CONSTRUCTOR) {
             this.constructor = constructor;
@@ -52,6 +59,9 @@ public class ClassST implements EntityST {
     }
     public String getParentClassName() {
         return extendedClass.getLexeme();
+    }
+    public String getImplementedInterfaceName() {
+        return implementedInterface.getLexeme();
     }
     public void implementsFrom(Token implementedInterface) throws SemanticException {
         System.out.println("ABOUT TO ADD INTERFACE "+implementedInterface.getLexeme());
@@ -105,15 +115,66 @@ public class ClassST implements EntityST {
         for (MethodST met : methods.values()) {
             met.checkDeclarations();
         }
-//        checkOverrideOfParentAttributes();
-//        checkOverrideOfParentMethod(this.getClassName());
+    }
+    public Collection<MethodST> getMethods() {
+        return methods.values();
     }
     private void checkOverrideOfParentMethod(String className) throws SemanticException {
     }
 
 
-    public void consolidate() {
+    public void consolidate() throws SemanticException {
+        // BC: we are in Object we dont have a superclass or interface
+        if (!className.equals("Object")) {
+        // RC: we differ if its a class or an interface
+            if (SymbolTable.getInstance().getClassWithName(getParentClassName()) != null) {
+                ClassST parentClass = SymbolTable.getInstance().getClassWithName(getParentClassName());
+                if (!parentClass.isConsolidated()) {
+                    parentClass.consolidate();
+                }
+                //Bring all parent attributes
+                Collection<AttributeST> parentAttributes = parentClass.getAttributes();
+                for (AttributeST a: parentAttributes) {
+                    if (!checkIfAttributeExists(a)) {
+                        attributes.put(a.getAttributeName(),a);
+                    }
+                }
+
+                //Bring all parent methods
+                Collection<MethodST> parentMethods = parentClass.getMethods();
+                for (MethodST m : parentMethods) {
+                    //Checks
+                    if (!checkIfMethodExist(m)) {
+                        methods.put(m.getMethodName(),m);
+                    }
+                }
+            }
+            if (implementedInterface != null && SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName()) != null) {
+                System.out.println("Has interface time to consolidate");
+                InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName());
+                if (!parentInterface.isConsolidated()) {
+                    parentInterface.consolidate();
+                }
+
+                //Check all interface methods are implemented
+                Collection<MethodST> parentMethods = parentInterface.getMethods();
+                for (MethodST m : parentMethods) {
+                    System.out.println("Checking class "+className+" implements "+m.toString());
+                    if (!checkIfMethodExist(m)) {
+                        System.out.println("It doesnt");
+                        throw new SemanticException(SymbolTable.getInstance().getEOF().getLexeme(),SymbolTable.getInstance().getEOF().getLineNumber(),"Nunca se implementa en la clase "+className+" el metodo "+m.getMethodName()+" de la intefaz "+parentInterface.getInterfaceName());
+                    }
+                    System.out.println("It does");
+                }
+            }
+        }
+        consolidated = true;
     }
+
+    public Collection<AttributeST> getAttributes() {
+        return attributes.values();
+    }
+
     private void circularInheritance(String startClassName, String currentClassName) throws SemanticException {
         System.out.println("Checking circular inheritnace with start "+startClassName+" and current "+currentClassName);
         String parentClassName = SymbolTable.getInstance().getClassWithName(currentClassName).getParentClassName();
@@ -132,8 +193,54 @@ public class ClassST implements EntityST {
                 System.out.println("About to throw exception for parentClass null");
                 throw new SemanticException(parentDeclarationToken.getLexeme(),parentDeclarationToken.getLineNumber(),"No existe la clase de la cual se hereda llamada "+parentDeclarationToken.getLexeme());
             } else {
-                throw new SemanticException(parentDeclarationToken.getLexeme(),parentDeclarationToken.getLineNumber(),"Herencia circular para la clase "+currentClassName);
+                throw new SemanticException(startClassName,SymbolTable.getInstance().getClassWithName(startClassName).getDeclarationToken().getLineNumber(),"Herencia circular para la clase "+startClassName);
             }
         }
+    }
+    public String toString() {
+        String toReturn = "Class Name : "+className+"\n";
+        if (extendedClass != null) {
+            toReturn += "Extends : "+getParentClassName()+"\n";
+        }
+        if (implementedInterface != null) {
+            toReturn += "Implements : "+getImplementedInterfaceName()+"\n";
+        }
+        toReturn += "Attributes\n";
+        for (AttributeST a : attributes.values()) {
+            toReturn += a.toString()+"\n";
+        }
+        toReturn += "Methods\n";
+        for (MethodST m : methods.values()) {
+            toReturn += m.toString()+"\n";
+        }
+        toReturn += "Constructor\n";
+        toReturn += constructor.toString();
+        return toReturn;
+    }
+    private boolean checkIfMethodExist(MethodST method) throws SemanticException {
+        boolean found = false;
+        for (MethodST m : methods.values()) {
+            if (m.getMethodName().equals(method.getMethodName())) {
+                if (m.equals(method)) {
+                    found = true;
+                } else {
+                    throw new SemanticException(m.getDeclarationToken().getLexeme(),m.getDeclarationToken().getLineNumber(),"El metodo "+method.toString()+" tiene el mismo nombre pero distinta signatura que el metodo que hereda "+method.toString());
+                }
+            }
+        }
+        return found;
+    }
+    private boolean checkIfAttributeExists(AttributeST attribute) throws SemanticException {
+        boolean found = false;
+        for (AttributeST a : attributes.values()) {
+            if (a.getAttributeName().equals(attribute.getAttributeName())) {
+                if (a.equals(attribute)) {
+                    found = true;
+                } else {
+                    throw new SemanticException(a.getDeclarationToken().getLexeme(),a.getDeclarationToken().getLineNumber(),"El atributo "+attribute.toString()+" tiene el mismo nombre pero distinto tipo que el atributo que hereda "+attribute.toString());
+                }
+            }
+        }
+        return found;
     }
 }

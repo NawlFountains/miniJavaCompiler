@@ -3,6 +3,7 @@ package semantic.entities;
 import lexical.SemanticException;
 import lexical.Token;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -12,11 +13,13 @@ public class InterfaceST implements EntityST {
     protected Token declarationToken;
     protected MethodST actualMethod;
     protected HashMap<String,MethodST> methods;
+    protected boolean consolidated;
 
     public InterfaceST(Token declarationToken,String interfaceName) {
         System.out.println("Interface "+interfaceName+" created");
         this.declarationToken = declarationToken;
         this.interfaceName = interfaceName;
+        consolidated = false;
         methods = new HashMap<>();
     }
 
@@ -26,6 +29,7 @@ public class InterfaceST implements EntityST {
     public String getInterfaceName() {
         return interfaceName;
     }
+    public boolean isConsolidated() { return consolidated;}
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {
             if (!method.isStatic) {
@@ -54,5 +58,20 @@ public class InterfaceST implements EntityST {
     public void consolidate() {
         for (MethodST m : methods.values())
             m.consolidate();
+    }
+
+    public String toString() {
+        String toReturn = "Interface name : "+interfaceName+"\n";
+        if (superInterface != null) {
+            toReturn += "Extends : "+superInterface.getLexeme()+"\n";
+        }
+        toReturn += "Methods\n";
+        for (MethodST m: methods.values()) {
+            toReturn += m.toString()+"\n";
+        }
+        return toReturn;
+    }
+    public Collection<MethodST> getMethods() {
+        return methods.values();
     }
 }

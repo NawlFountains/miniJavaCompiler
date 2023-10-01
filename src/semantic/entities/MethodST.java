@@ -6,6 +6,8 @@ import semantic.ReferenceType;
 import semantic.SymbolTable;
 import semantic.Type;
 
+import java.util.HashMap;
+
 public class MethodST extends RoutineST implements EntityST {
     protected String methodName;
     protected Type returnType;
@@ -55,5 +57,16 @@ public class MethodST extends RoutineST implements EntityST {
     @Override
     public void consolidate() {
 
+    }
+    public String toString() {
+        String toReturn = returnType+" "+methodName+'(';
+        for (ParameterST p : parameters.values()) {
+            toReturn += p.toString()+" ,";
+        }
+        toReturn += ")";
+        return toReturn;
+    }
+    public HashMap getParameters() {
+        return parameters;
     }
 }

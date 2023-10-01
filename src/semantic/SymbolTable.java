@@ -21,8 +21,7 @@ public class SymbolTable implements EntityST {
     private static class PredefinedClassBuilder {
 
         protected static ClassST getObjectClass() throws SemanticException {
-            //Creation of Object class
-            ClassST objectClass = new ClassST(new Token("idClass","Object",0),"Object");
+            ClassST objectClass = new ClassST(new Token("idClase","Object",0),"Object");
             MethodST debugPrint = new MethodST(new Token("idMetVar","debugPrint",0),"debugPrint");
 
             ParameterST paramForDebug = new ParameterST(new Token("idMetVar","i",0),"i");
@@ -37,18 +36,20 @@ public class SymbolTable implements EntityST {
         }
 
         protected static ClassST getStringClass() throws SemanticException {
-            // TODO should this inherist from object?
-            return new ClassST(new Token("idClass","String",0),"String");
+            ClassST stringClass = new ClassST(new Token("idClase","String",0),"String");
+            stringClass.inheritsFrom(new Token("idClase","Object",0));
+            return stringClass;
         }
 
         protected static ClassST getSystemClass() throws SemanticException {
-            ClassST systemClass = new ClassST(new Token("idClass","System",0),"systemClass");
+            ClassST systemClass = new ClassST(new Token("idClase","System",0),"System");
 
             Collection<MethodST> methods = createMethodsForSystem();
 
             for (MethodST m : methods) {
                 systemClass.insertMethod(new Token("idMetVar",m.getMethodName(),0),m);
             }
+            systemClass.inheritsFrom(new Token("idClase","Object",0));
             return systemClass;
         }
 
@@ -213,7 +214,7 @@ public class SymbolTable implements EntityST {
         return !mainMethods.isEmpty();
     }
 
-    public void consolidate(){
+    public void consolidate() throws SemanticException {
         for (ClassST c : classes.values()) {
             System.out.println("Consolidating "+c.getClassName());
             c.consolidate();
@@ -222,5 +223,19 @@ public class SymbolTable implements EntityST {
             System.out.println("Consolidating interface "+i.getInterfaceName());
             i.consolidate();
         }
+    }
+    public String toString(){
+        String toReturn = "Classes\n";
+        for (ClassST c : classes.values()) {
+         toReturn += c.toString()+"\n";
+        }
+        toReturn += "Interfaces\n";
+        for (InterfaceST i : interfaces.values()) {
+            toReturn += i.toString()+"\n";
+        }
+        return toReturn;
+    }
+    public Token getEOF() {
+        return EOF;
     }
 }
