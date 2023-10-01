@@ -4,12 +4,14 @@ import lexical.SemanticException;
 import lexical.Token;
 import semantic.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class InterfaceST implements EntityST {
     protected String interfaceName;
-    protected Token superInterface;
+    protected List<Token> superInterfaces;
     protected Token declarationToken;
     protected MethodST actualMethod;
     protected HashMap<String,MethodST> methods;
@@ -18,12 +20,17 @@ public class InterfaceST implements EntityST {
     public InterfaceST(Token declarationToken,String interfaceName) {
         this.declarationToken = declarationToken;
         this.interfaceName = interfaceName;
+        superInterfaces = new ArrayList<>();
         consolidated = false;
         methods = new HashMap<>();
     }
 
-    public void inheritsFrom(Token superInterface) {
-        this.superInterface = superInterface;
+    public void inheritsFrom(Token superInterface) throws SemanticException {
+        if (lexemeAlreadyOnList(superInterfaces,superInterface)) {
+            throw new SemanticException(superInterface.getLexeme(),superInterface.getLineNumber(),"Ya se declaro la extension de la interfaz "+superInterface.getLexeme());
+        } else {
+            superInterfaces.add(superInterface);
+        }
     }
     public String getInterfaceName() {
         return interfaceName;
@@ -55,17 +62,21 @@ public class InterfaceST implements EntityST {
     }
 
     public void consolidate() throws SemanticException {
-        if (superInterface != null && SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme()) != null) {
-            InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme());
-            if (!parentInterface.isConsolidated()) {
-                parentInterface.consolidate();
-            }
+        if (!superInterfaces.isEmpty()) {
+            for (Token t: superInterfaces) {
+                if (SymbolTable.getInstance().getInterfaceWithName(t.getLexeme()) != null) {
+                    InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(t.getLexeme());
+                    if (!parentInterface.isConsolidated()) {
+                        parentInterface.consolidate();
+                    }
 
-            //Check all interface methods are implemented
-            Collection<MethodST> parentMethods = parentInterface.getMethods();
-            for (MethodST m : parentMethods) {
-                checkNotOverrideMethod(m);
-                methods.put(m.getName(),m);
+                    //Check all interface methods are implemented
+                    Collection<MethodST> parentMethods = parentInterface.getMethods();
+                    for (MethodST m : parentMethods) {
+                        checkNotOverrideMethod(m);
+                        methods.put(m.getName(),m);
+                    }
+                }
             }
         }
         consolidated = true;
@@ -73,8 +84,8 @@ public class InterfaceST implements EntityST {
 
     public String toString() {
         String toReturn = "Interface name : "+interfaceName+"\n";
-        if (superInterface != null) {
-            toReturn += "Extends : "+superInterface.getLexeme()+"\n";
+        if (!superInterfaces.isEmpty()) {
+                toReturn += "Extends : "+ superInterfaces.toString()+"\n";
         }
         toReturn += "Methods\n";
         for (MethodST m: methods.values()) {
@@ -93,5 +104,15 @@ public class InterfaceST implements EntityST {
                 }
             }
         }
+    }
+    private boolean lexemeAlreadyOnList(List<Token> listOfTokens, Token tokenToFound) {
+        boolean found = false;
+        for (Token t: listOfTokens) {
+            if (t.getLexeme() == tokenToFound.getLexeme()) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 }

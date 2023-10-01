@@ -1,10 +1,5 @@
 package semantic.entities;
 
-import lexical.SemanticException;
-import lexical.Token;
-
-import java.util.HashMap;
-
 public class ConstructorST extends RoutineST implements EntityST {
 
     public ConstructorST(String name) {
@@ -23,6 +18,9 @@ public class ConstructorST extends RoutineST implements EntityST {
         String toReturn = routineName+'(';
         for (ParameterST p : parameters.values()) {
             toReturn += p.toString()+" ,";
+        }
+        if (!parameters.isEmpty()) {
+            toReturn += toReturn.substring(0,toReturn.length()-2);
         }
         toReturn += ")";
         return toReturn;

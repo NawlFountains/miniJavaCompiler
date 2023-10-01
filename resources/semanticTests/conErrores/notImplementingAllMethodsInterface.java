@@ -1,4 +1,4 @@
-///[Error:|11]
+///[Error:method2|5]
 // 
 interface A{
 	int method();

@@ -1,4 +1,4 @@
-///[Error:C|4]
+///[Error:param|4]
 // 
 class A{
 	B method(C param) {

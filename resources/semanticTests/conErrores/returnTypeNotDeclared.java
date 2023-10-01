@@ -1,4 +1,4 @@
-///[Error:C|4]
+///[Error:method|4]
 // 
 class A{
 	C method() {

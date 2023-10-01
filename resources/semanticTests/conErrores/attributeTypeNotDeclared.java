@@ -1,4 +1,4 @@
-///[Error:C|4]
+///[Error:attribute|4]
 // 
 class A{
 	C attribute;

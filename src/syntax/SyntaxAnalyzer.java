@@ -55,11 +55,16 @@ public class SyntaxAnalyzer {
         }
     }
 
-    void DeclaracionClases() throws LexicalException, SyntaxException {
+    void DeclaracionClases(boolean fromInterface) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("DeclaracionClases")) {
             match("comma");
+            Token declaracionClase = currentToken;
             match("idClase");
-            DeclaracionClases();
+            DeclaracionClases(fromInterface);
+            if (fromInterface)
+                SymbolTable.getInstance().getCurrentInterface().inheritsFrom(declaracionClase);
+            else
+                SymbolTable.getInstance().getCurrentClass().implementsFrom(declaracionClase);
         } else if (isCurrentTokenOnFollowSetOf("DeclaracionClases")) {
 
         } else {
@@ -74,7 +79,8 @@ public class SyntaxAnalyzer {
             ClassST clase = new ClassST(classToken,classToken.getLexeme());
             SymbolTable.getInstance().setCurrentClass(clase);
             GenericidadOpcional();
-            HerenciaOpcional();
+            HeredaOpcional();
+            ImplementaOpcional();
             match("openCurl");
             ListaMiembros();
             match("closeCurl");
@@ -112,11 +118,31 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("HerenciaOpcional").toString());
         }
     }
-    void GenericidadOpcional() throws LexicalException, SyntaxException {
+    void ImplementaOpcional() throws LexicalException, SyntaxException, SemanticException {
+        if (isCurrentTokenOnFirstSetOf("ImplementaA")) {
+            Token implementa = ImplementaA();
+            SymbolTable.getInstance().getCurrentClass().implementsFrom(implementa);
+        } else if (isCurrentTokenOnFollowSetOf("ImplementaOpcional")) {
+
+        } else {
+            throw new SyntaxException(currentToken, "rw_implements");
+        }
+    }
+    void HeredaOpcional() throws LexicalException, SyntaxException, SemanticException {
+        if (isCurrentTokenOnFirstSetOf("HeredaDe")){
+            Token ancestro = HeredaDe();
+            SymbolTable.getInstance().getCurrentClass().inheritsFrom(ancestro);
+        } else if (isCurrentTokenOnFollowSetOf("HeredaOpcional")) {
+            SymbolTable.getInstance().getCurrentClass().inheritsFrom(new Token("idClase","Object",0));
+        } else {
+            throw new SyntaxException(currentToken, "rw_extends");
+        }
+    }
+    void GenericidadOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("GenericidadOpcional")) {
             match("opLess");
             match("idClase");
-            DeclaracionClases();
+            DeclaracionClases(false);
             match("opGreater");
         } else if (isCurrentTokenOnFollowSetOf("GenericidadOpcional")) {
 
@@ -124,7 +150,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("GenericidadOpcional").toString());
         }
     }
-    void GenericidadVaciaOpcional() throws LexicalException, SyntaxException {
+    void GenericidadVaciaOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("GenericidadVaciaOpcional")) {
             match("opLess");
             DeclaracionClasesOpcional();
@@ -135,17 +161,17 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("GenericidadVaciaOpcional").toString());
         }
     }
-    void DeclaracionClasesOpcional() throws LexicalException, SyntaxException {
+    void DeclaracionClasesOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("DeclaracionClasesOpcional")) {
             match("idClase");
-            DeclaracionClases();
+            DeclaracionClases(false);
         } else if (isCurrentTokenOnFollowSetOf("DeclaracionClasesOpcional")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("DeclaracionClasesOpcional").toString());
         }
     }
-    Token HeredaDe() throws LexicalException, SyntaxException {
+    Token HeredaDe() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("HeredaDe")) {
             match("rw_extends");
             Token tokenAncestro = currentToken;
@@ -156,24 +182,26 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("HeredaDe").toString());
         }
     }
-    Token ImplementaA() throws LexicalException, SyntaxException {
+    Token ImplementaA() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ImplementaA")){
             match("rw_implements");
             Token interfazImplementada = currentToken;
             match("idClase");
             GenericidadOpcional();
+            DeclaracionClases(false);
             return interfazImplementada;
         } else {
             throw new SyntaxException(currentToken, firstSet("ImplementaA").toString());
         }
     }
-    void ExtiendeOpcional() throws LexicalException, SyntaxException {
+    void ExtiendeOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExtiendeOpcional")) {
             match("rw_extends");
             Token interfaceHeredada = currentToken;
             SymbolTable.getInstance().getCurrentInterface().inheritsFrom(interfaceHeredada);
             match("idClase");
             GenericidadOpcional();
+            DeclaracionClases(true);
         } else if (isCurrentTokenOnFollowSetOf("ExtiendeOpcional")) {
         } else {
             throw new SyntaxException(currentToken, firstSet("ExtiendeOpcional").toString());
@@ -343,7 +371,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("VisibilidadOpcional").toString());
         }
     }
-    void InicializacionOpcional() throws LexicalException, SyntaxException {
+    void InicializacionOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("assign")) {
             match("assign");
             Expresion();
@@ -353,7 +381,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("InicializacionOpcional").toString());
         }
     }
-    Type TipoMiembro() throws LexicalException, SyntaxException {
+    Type TipoMiembro() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Tipo")) {
             return Tipo();
         } else if (currentToken.getId().contains("rw_void")) {
@@ -366,7 +394,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken,auxToException.toString());
         }
     }
-    Type Tipo() throws LexicalException, SyntaxException {
+    Type Tipo() throws LexicalException, SyntaxException, SemanticException {
         Token aux = currentToken;
         if (isCurrentTokenOnFirstSetOf("TipoPrimitivo")) {
             TipoPrimitivo();
@@ -455,7 +483,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ArgFormal").toString());
         }
     }
-    void Bloque() throws LexicalException, SyntaxException {
+    void Bloque() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Bloque")) {
             match("openCurl");
             ListaSentencias();
@@ -464,7 +492,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Bloque").toString());
         }
     }
-    void ListaSentencias() throws LexicalException, SyntaxException {
+    void ListaSentencias() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
             Sentencia();
             ListaSentencias();
@@ -474,7 +502,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaSentencias").toString());
         }
     }
-    void Sentencia() throws LexicalException, SyntaxException {
+    void Sentencia() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             if (currentToken.getId().contains("idClase")) {
                 match("idClase");
@@ -529,7 +557,7 @@ public class SyntaxAnalyzer {
     }
 
 
-    void VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException {
+    void VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
             match(currentToken.getId());
             match("idMetVar");
@@ -541,7 +569,7 @@ public class SyntaxAnalyzer {
     }
 
 
-    void VarLocal() throws LexicalException, SyntaxException {
+    void VarLocal() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocal")) {
             match("rw_var");
             match("idMetVar");
@@ -553,7 +581,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, auxToException.toString());
         }
     }
-    void Return() throws LexicalException, SyntaxException {
+    void Return() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Return")) {
             match("rw_return");
             ExpresionOpcional();
@@ -561,7 +589,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Return").toString());
         }
     }
-    void ExpresionOpcional() throws LexicalException, SyntaxException  {
+    void ExpresionOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             Expresion();
         } else if (isCurrentTokenOnFollowSetOf("ExpresionOpcional")) {
@@ -570,7 +598,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExpresionOpcional").toString());
         }
     }
-    void If() throws LexicalException, SyntaxException  {
+    void If() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("If")) {
             match("rw_if");
             match("openPar");
@@ -582,7 +610,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("If").toString());
         }
     }
-    void Else() throws LexicalException, SyntaxException  {
+    void Else() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
             Sentencia();
@@ -592,7 +620,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Else").toString());
         }
     }
-    void While() throws LexicalException, SyntaxException  {
+    void While() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("While")) {
             match("rw_while");
             match("openPar");
@@ -603,7 +631,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("While").toString());
         }
     }
-    void Expresion() throws LexicalException, SyntaxException  {
+    void Expresion() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             ExpresionCompuesta();
             InicializacionOpcional();
@@ -612,7 +640,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    void ExpresionCompuesta() throws LexicalException, SyntaxException  {
+    void ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionCompuesta")) {
             ExpresionBasica();
             RExpresionCompuesta();
@@ -620,7 +648,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExpresionCompuesta").toString());
         }
     }
-    void RExpresionCompuesta() throws LexicalException, SyntaxException  {
+    void RExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("OperadorBinario")) {
             OperadorBinario();
             ExpresionBasica();
@@ -638,7 +666,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("OperadorBinario").toString());
         }
     }
-    void ExpresionBasica() throws LexicalException, SyntaxException  {
+    void ExpresionBasica() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("OperadorUnario")) {
             OperadorUnario();
             Operando();
@@ -657,7 +685,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("OperadorUnario").toString());
         }
     }
-    void Operando() throws LexicalException, SyntaxException  {
+    void Operando() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
             Literal();
         } else if (isCurrentTokenOnFirstSetOf("Acceso")) {
@@ -675,7 +703,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Literal").toString());
         }
     }
-    void Acceso() throws LexicalException, SyntaxException  {
+    void Acceso() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Acceso")) {
             Primario();
             EncadenadoOpcional();
@@ -683,7 +711,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Acceso").toString());
         }
     }
-    void Primario() throws LexicalException, SyntaxException  {
+    void Primario() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("AccesoThis")) {
             AccesoThis();
         } else if (isCurrentTokenOnFirstSetOf("AccesoMetVar")) {
@@ -710,7 +738,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("AccesoThis").toString());
         }
     }
-    void AccesoConstructor() throws LexicalException, SyntaxException  {
+    void AccesoConstructor() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("AccesoConstructor")) {
             match("rw_new");
             match("idClase");
@@ -720,7 +748,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("AccesoConstructor").toString());
         }
     }
-    void AccesoMetVar() throws LexicalException, SyntaxException  {
+    void AccesoMetVar() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("AccesoMetVar")) {
             match("idMetVar");
             ArgsActualesOpcionales();
@@ -728,7 +756,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("AccesoMetVar").toString());
         }
     }
-    void ArgsActualesOpcionales() throws LexicalException, SyntaxException  {
+    void ArgsActualesOpcionales() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             ArgsActuales();
         } else if (isCurrentTokenOnFollowSetOf("ArgsActualesOpcionales")) {
@@ -737,7 +765,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ArgsActualesOpcionales").toString());
         }
     }
-    void ExpresionParentizada() throws LexicalException, SyntaxException  {
+    void ExpresionParentizada() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionParentizada")) {
             match("openPar");
             Expresion();
@@ -746,7 +774,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExpresionParentizada").toString());
         }
     }
-    void AccesoMetodoEstatico() throws LexicalException, SyntaxException  {
+    void AccesoMetodoEstatico() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("AccesoMetodoEstatico")) {
             match("idClase");
             match("period");
@@ -769,7 +797,7 @@ public class SyntaxAnalyzer {
         }
     }
 
-    void ArgsActuales() throws LexicalException, SyntaxException  {
+    void ArgsActuales() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             match("openPar");
             ListaExpsOpcional();
@@ -778,7 +806,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ArgsActuales").toString());
         }
     }
-    void ListaExpsOpcional() throws LexicalException, SyntaxException  {
+    void ListaExpsOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
             ListaExps();
         } else if (isCurrentTokenOnFollowSetOf("ListaExpsOpcional")) {
@@ -787,7 +815,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaExpsOpcional").toString());
         }
     }
-    void ListaExps() throws LexicalException, SyntaxException  {
+    void ListaExps() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
             Expresion();
             ContinuaListaExps();
@@ -795,7 +823,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaExps").toString());
         }
     }
-    void ContinuaListaExps() throws LexicalException, SyntaxException  {
+    void ContinuaListaExps() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("comma")){
             match("comma");
             ListaExps();
@@ -805,7 +833,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ContinuaListaExps").toString());
         }
     }
-    void EncadenadoOpcional() throws LexicalException, SyntaxException  {
+    void EncadenadoOpcional() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("period")) {
             match("period");
             match("idMetVar");
@@ -1099,10 +1127,15 @@ public class SyntaxAnalyzer {
             case "DeclaracionClases":
                 followSet.add("opGreater");
                 followSet.add("idClase");
+                followSet.add("openCurl");
                 break;
             case "ExtiendeOpcional":
             case "HerenciaOpcional":
                 followSet.add("openCurl");
+                break;
+            case "HeredaOpcional":
+                followSet.add("openCurl");
+                followSet.add("rw_implements");
                 break;
             case "ListaEncabezados":
             case "ListaMiembros":
@@ -1112,6 +1145,7 @@ public class SyntaxAnalyzer {
             case "GenericidadVaciaOpcional":
             case "GenericidadOpcional":
                 followSet.addAll(firstSet("HerenciaOpcional"));
+                followSet.add("comma");
                 followSet.add("openPar");
                 followSet.add("openCurl");
                 followSet.add("idMetVar");
@@ -1162,6 +1196,8 @@ public class SyntaxAnalyzer {
                 followSet.addAll(firstSet("Clase"));
                 followSet.add("EOF");
                 break;
+            case "ImplementaOpcional":
+                followSet.add("openCurl");
         }
         return followSet;
     }

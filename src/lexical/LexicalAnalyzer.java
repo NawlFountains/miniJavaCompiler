@@ -50,7 +50,8 @@ public class LexicalAnalyzer {
 
     public Token nextToken() throws LexicalException{
         lexeme = "";
-        return initialState();
+        Token t = initialState();
+        return t;
     }
 
     Token initialState() throws LexicalException {

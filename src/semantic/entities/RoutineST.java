@@ -41,11 +41,11 @@ public abstract class RoutineST {
         return sameList(parametersTypeList,compare.getParameterTypeList());
     }
 
-    private boolean sameList(List listOne, List listTwo) {
+    private boolean sameList(List<Type> listOne, List<Type> listTwo) {
         boolean same = true;
         int i = 0;
         if(listOne.size() == listTwo.size()) {
-            while (!same && i <= listOne.size()) {
+            while (same && i < listOne.size()) {
                 if (!listOne.get(i).equals(listTwo.get(i))) {
                     same = false;
                 }

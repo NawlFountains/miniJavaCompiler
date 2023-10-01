@@ -46,7 +46,7 @@ public class MethodST extends RoutineST implements EntityST {
     }
     private void checkReturnReferenceType(ReferenceType type) throws SemanticException {
         if (SymbolTable.getInstance().getClassWithName(type.toString()) == null && SymbolTable.getInstance().getInterfaceWithName(type.toString()) == null ) {
-            throw new SemanticException(type.toString(),declarationToken.getLineNumber(),"El tipo de retorno "+type.toString()+" no se encuentra declarado");
+            throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de retorno "+type.toString()+" no se encuentra declarado");
         }
     }
 
@@ -59,7 +59,8 @@ public class MethodST extends RoutineST implements EntityST {
         for (ParameterST p : parameters.values()) {
             toReturn += p.toString()+" ,";
         }
-        toReturn = toReturn.substring(0,toReturn.length()-2);
+        if (!parameters.isEmpty())
+            toReturn = toReturn.substring(0,toReturn.length()-2);
         toReturn += ")";
         return toReturn;
     }
