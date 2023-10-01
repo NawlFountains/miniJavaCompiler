@@ -90,7 +90,6 @@ public class SyntaxAnalyzer {
             match ("idClase");
             InterfaceST i = new InterfaceST(interfaceToken,interfaceToken.getLexeme());
             SymbolTable.getInstance().setCurrentInterface(i);
-            System.out.println("Por entrar a exitende op");
             ExtiendeOpcional();
             match("openCurl");
             ListaEncabezados();
@@ -172,12 +171,10 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("ExtiendeOpcional")) {
             match("rw_extends");
             Token interfaceHeredada = currentToken;
-            System.out.println("Pide interfaz actual");
             SymbolTable.getInstance().getCurrentInterface().inheritsFrom(interfaceHeredada);
             match("idClase");
             GenericidadOpcional();
         } else if (isCurrentTokenOnFollowSetOf("ExtiendeOpcional")) {
-            System.out.println("No Exsitendo");
         } else {
             throw new SyntaxException(currentToken, firstSet("ExtiendeOpcional").toString());
         }
@@ -330,7 +327,7 @@ public class SyntaxAnalyzer {
             match("idMetVar");
             ArgsFormales(methodHeader);
             match("semiColon");
-            SymbolTable.getInstance().getCurrentInterface().insertMethod(currentToken,methodHeader);
+            SymbolTable.getInstance().getCurrentInterface().insertMethod(methodName,methodHeader);
         } else {
             throw new SyntaxException(currentToken, firstSet("EncabezadoMetodo").toString());
         }
@@ -823,7 +820,6 @@ public class SyntaxAnalyzer {
 
 
     private void match(String tokenName) throws LexicalException, SyntaxException {
-        System.out.println("About to match "+currentToken.getLexeme());
         if (tokenName.equals(currentToken.getId())) {
             currentToken = lexicalAnalyzer.nextToken();
         } else {

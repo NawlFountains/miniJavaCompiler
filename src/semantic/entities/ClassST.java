@@ -64,8 +64,6 @@ public class ClassST implements EntityST {
         return implementedInterface.getLexeme();
     }
     public void implementsFrom(Token implementedInterface) throws SemanticException {
-        System.out.println("ABOUT TO ADD INTERFACE "+implementedInterface.getLexeme());
-        System.out.println("extended "+extendedClass);
         if (extendedClass.getLexeme() == "Object") {
             this.implementedInterface = implementedInterface;
         } else {
@@ -74,7 +72,6 @@ public class ClassST implements EntityST {
     }
     public void insertMethod(Token token, MethodST method) throws SemanticException {
         if (!existMethod(token.getLexeme())) {
-            System.out.println("ABOUT TO INSERT METHOD "+method.getName());
             if (isMethodMain(method)) {
                 SymbolTable.getInstance().addMainMethod(method);
             }
@@ -101,7 +98,6 @@ public class ClassST implements EntityST {
 
     @Override
     public void checkDeclarations() throws SemanticException {
-        System.out.println("About to check circularInheritance");
         if (getParentClassName() != "Object") {
             circularInheritance(this.getClassName(),this.getClassName());
         }
@@ -128,7 +124,6 @@ public class ClassST implements EntityST {
         if (!className.equals("Object")) {
         // RC: we differ if its a class or an interface
             if (implementedInterface != null && SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName()) != null) {
-                System.out.println("Has interface time to consolidate");
                 InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(getImplementedInterfaceName());
                 if (!parentInterface.isConsolidated()) {
                     parentInterface.consolidate();
@@ -137,12 +132,9 @@ public class ClassST implements EntityST {
                 //Check all interface methods are implemented
                 Collection<MethodST> parentMethods = parentInterface.getMethods();
                 for (MethodST m : parentMethods) {
-                    System.out.println("Checking class "+className+" implements "+m.toString());
                     if (!checkIfMethodExist(m)) {
-                        System.out.println("It doesnt");
                         throw new SemanticException(SymbolTable.getInstance().getEOF().getLexeme(),SymbolTable.getInstance().getEOF().getLineNumber(),"Nunca se implementa en la clase "+className+" el metodo "+m.getName()+" de la intefaz "+parentInterface.getInterfaceName());
                     }
-                    System.out.println("It does");
                 }
             }
             if (SymbolTable.getInstance().getClassWithName(getParentClassName()) != null) {
@@ -177,21 +169,16 @@ public class ClassST implements EntityST {
     }
 
     private void circularInheritance(String startClassName, String currentClassName) throws SemanticException {
-        System.out.println("Checking circular inheritnace with start "+startClassName+" and current "+currentClassName);
         String parentClassName = SymbolTable.getInstance().getClassWithName(currentClassName).getParentClassName();
         ClassST parentClass = SymbolTable.getInstance().getClassWithName(parentClassName);
-        System.out.println("Checking with parent class "+parentClassName);
-        System.out.println("Parent class is null ? "+(parentClass == null));
         if (parentClass != null && parentClass.getClassName() != startClassName) {
             if (parentClass.getClassName() == "Object") {
-                System.out.println("Parent class is Object");
             } else {
                 circularInheritance(startClassName,parentClass.getParentClassName());
             }
         } else {
             Token parentDeclarationToken = SymbolTable.getInstance().getClassWithName(currentClassName).getExtendedClassToken();
             if (parentClass == null) {
-                System.out.println("About to throw exception for parentClass null");
                 throw new SemanticException(parentDeclarationToken.getLexeme(),parentDeclarationToken.getLineNumber(),"No existe la clase de la cual se hereda llamada "+parentDeclarationToken.getLexeme());
             } else {
                 throw new SemanticException(startClassName,SymbolTable.getInstance().getClassWithName(startClassName).getDeclarationToken().getLineNumber(),"Herencia circular para la clase "+startClassName);

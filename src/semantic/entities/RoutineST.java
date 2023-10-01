@@ -38,8 +38,6 @@ public abstract class RoutineST {
         return routineName;
     }
     public boolean equals(RoutineST compare) {
-        System.out.println("Abot to compare "+routineName+" with "+compare.getName());
-        System.out.println("Parameter list are "+parametersTypeList.toString()+" and "+compare.getParameterTypeList().toString()+" "+sameList(parametersTypeList,compare.getParameterTypeList()));
         return sameList(parametersTypeList,compare.getParameterTypeList());
     }
 

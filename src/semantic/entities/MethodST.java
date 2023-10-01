@@ -59,6 +59,7 @@ public class MethodST extends RoutineST implements EntityST {
         for (ParameterST p : parameters.values()) {
             toReturn += p.toString()+" ,";
         }
+        toReturn = toReturn.substring(0,toReturn.length()-2);
         toReturn += ")";
         return toReturn;
     }

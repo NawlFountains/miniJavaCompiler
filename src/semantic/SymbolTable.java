@@ -189,20 +189,16 @@ public class SymbolTable implements EntityST {
         return (classes.get(classOrInterfaceName) != null || interfaces.get(classOrInterfaceName) != null);
     }
     public ClassST getClassWithName(String className) {
-        System.out.println("getClassWithName("+className+")");
         return classes.get(className);
     }
     public InterfaceST getInterfaceWithName(String interfaceName) {
-        System.out.println("getInterfaceWithName("+interfaceName+")");
         return interfaces.get(interfaceName);
     }
     public void checkDeclarations() throws SemanticException {
         for (ClassST c : classes.values()) {
-            System.out.println("Checking declaration of class "+c.getClassName());
             c.checkDeclarations();
         }
         for (InterfaceST i : interfaces.values()) {
-            System.out.println("Checking declaration of interface "+i.getInterfaceName());
             i.checkDeclarations();
         }
         if (!hasMainMethod()) {
@@ -216,11 +212,9 @@ public class SymbolTable implements EntityST {
 
     public void consolidate() throws SemanticException {
         for (ClassST c : classes.values()) {
-            System.out.println("Consolidating "+c.getClassName());
             c.consolidate();
         }
         for (InterfaceST i : interfaces.values()) {
-            System.out.println("Consolidating interface "+i.getInterfaceName());
             i.consolidate();
         }
     }

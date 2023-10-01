@@ -16,7 +16,6 @@ public class InterfaceST implements EntityST {
     protected boolean consolidated;
 
     public InterfaceST(Token declarationToken,String interfaceName) {
-        System.out.println("Interface "+interfaceName+" created");
         this.declarationToken = declarationToken;
         this.interfaceName = interfaceName;
         consolidated = false;
@@ -24,7 +23,6 @@ public class InterfaceST implements EntityST {
     }
 
     public void inheritsFrom(Token superInterface) {
-        System.out.println("Por setear herencia a interfaz "+superInterface.getLexeme());
         this.superInterface = superInterface;
     }
     public String getInterfaceName() {
@@ -58,7 +56,6 @@ public class InterfaceST implements EntityST {
 
     public void consolidate() throws SemanticException {
         if (superInterface != null && SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme()) != null) {
-            System.out.println("Has interface time to consolidate");
             InterfaceST parentInterface = SymbolTable.getInstance().getInterfaceWithName(superInterface.getLexeme());
             if (!parentInterface.isConsolidated()) {
                 parentInterface.consolidate();
