@@ -24,6 +24,7 @@ public class InterfaceST implements EntityST {
     }
 
     public void inheritsFrom(Token superInterface) {
+        System.out.println("Por setear herencia a interfaz "+superInterface.getLexeme());
         this.superInterface = superInterface;
     }
     public String getInterfaceName() {

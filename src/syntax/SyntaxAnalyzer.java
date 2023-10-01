@@ -90,8 +90,8 @@ public class SyntaxAnalyzer {
             match ("idClase");
             InterfaceST i = new InterfaceST(interfaceToken,interfaceToken.getLexeme());
             SymbolTable.getInstance().setCurrentInterface(i);
+            System.out.println("Por entrar a exitende op");
             ExtiendeOpcional();
-            HerenciaOpcional();
             match("openCurl");
             ListaEncabezados();
             match("closeCurl");
@@ -172,11 +172,12 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("ExtiendeOpcional")) {
             match("rw_extends");
             Token interfaceHeredada = currentToken;
+            System.out.println("Pide interfaz actual");
             SymbolTable.getInstance().getCurrentInterface().inheritsFrom(interfaceHeredada);
             match("idClase");
             GenericidadOpcional();
         } else if (isCurrentTokenOnFollowSetOf("ExtiendeOpcional")) {
-
+            System.out.println("No Exsitendo");
         } else {
             throw new SyntaxException(currentToken, firstSet("ExtiendeOpcional").toString());
         }
