@@ -5,6 +5,7 @@ import lexical.LexicalException;
 import lexical.SemanticException;
 import semantic.SymbolTable;
 import syntax.SyntaxAnalyzer;
+import syntax.SyntaxAnalyzerStage3;
 import syntax.SyntaxException;
 
 public class MainStage3 {
@@ -39,7 +40,7 @@ public class MainStage3 {
             manager.openFile(filePath);
             SymbolTable.getInstance().resetTable();
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
-            SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
+            SyntaxAnalyzerStage3 syntaxAnalyzer = new SyntaxAnalyzerStage3(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
             SymbolTable.getInstance().checkDeclarations();
             SymbolTable.getInstance().consolidate();

@@ -1,13 +1,13 @@
 package ast.nodes;
 
-public class NodeReturn implements Node{
+public class NodeReturn extends NodeSentence implements Node{
     @Override
     public void check() {
 
     }
 
     @Override
-    public boolean isAsignable() {
+    public boolean isAssignable() {
         return false;
     }
 }

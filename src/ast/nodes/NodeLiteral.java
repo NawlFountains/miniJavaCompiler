@@ -1,6 +1,6 @@
 package ast.nodes;
 
-public class NodeOperand extends NodeCompoundExpression implements Node{
+public class NodeLiteral extends NodeOperand implements Node{
     @Override
     public void check() {
 

@@ -7,7 +7,7 @@ public class NodeSentence implements Node{
     }
 
     @Override
-    public boolean isAsignable() {
+    public boolean isAssignable() {
         return false;
     }
 }

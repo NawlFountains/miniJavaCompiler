@@ -1,6 +1,5 @@
 package syntax;
 
-import ast.nodes.*;
 import lexical.LexicalAnalyzer;
 import lexical.LexicalException;
 import lexical.SemanticException;
@@ -11,15 +10,15 @@ import semantic.SymbolTable;
 import semantic.Type;
 import semantic.entities.*;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public class SyntaxAnalyzer {
+public class SyntaxAnalyzerStage3 {
     private LexicalAnalyzer lexicalAnalyzer;
     private Token currentToken;
     private boolean isStaticAccess = false;
 
-    public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
+    public SyntaxAnalyzerStage3(LexicalAnalyzer lexicalAnalyzer) throws LexicalException, SyntaxException {
         this.lexicalAnalyzer = lexicalAnalyzer;
     }
 
@@ -484,32 +483,29 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ArgFormal").toString());
         }
     }
-    NodeBlock Bloque() throws LexicalException, SyntaxException, SemanticException {
+    void Bloque() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Bloque")) {
             match("openCurl");
-            NodeBlock nodeBlock = new NodeBlock();
-            ListaSentencias(nodeBlock);
+            ListaSentencias();
             match("closeCurl");
-            return nodeBlock;
         } else {
             throw new SyntaxException(currentToken, firstSet("Bloque").toString());
         }
     }
-    void ListaSentencias(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
+    void ListaSentencias() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
-            Sentencia(nodeBlock);
-            ListaSentencias(nodeBlock);
+            Sentencia();
+            ListaSentencias();
         } else if (isCurrentTokenOnFollowSetOf("ListaSentencias")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("ListaSentencias").toString());
         }
     }
-    NodeSentence Sentencia(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
+    void Sentencia() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             if (currentToken.getId().contains("idClase")) {
                 match("idClase");
-                //TODO fix optional breaking captured
                 if (currentToken.getId().contains("period")) {
                     match("period");
                     match("idMetVar");
@@ -519,7 +515,6 @@ public class SyntaxAnalyzer {
                 if (isStaticAccess) {
                     //Si es acceso termina asi
                     EncadenadoOpcional();
-
                 } else {
                     //Si es declaracion de variable
                     match("idMetVar");
@@ -527,33 +522,27 @@ public class SyntaxAnalyzer {
                     InicializacionOpcional();
                 }
                 isStaticAccess = false;
-                return null;
             } else {
-                NodeCompoundExpression nodeExpression = Expresion();
+                Expresion();
                 match("semiColon");
-                return nodeExpression;
             }
         } else if (isCurrentTokenOnFirstSetOf("VarLocal")) {
-            NodeVariable nodeVar = VarLocal();
+            VarLocal();
             match("semiColon");
-            return nodeVar;
         } else if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
-            NodeVariable nodeVarPrimitive = VarLocalConTipoPrimitivo();
+            VarLocalConTipoPrimitivo();
             match("semiColon");
-            return nodeVarPrimitive;
         } else if (isCurrentTokenOnFirstSetOf("Return")) {
-            NodeReturn nodeReturn = Return();
+            Return();
             match("semiColon");
-            return nodeReturn;
         } else if (isCurrentTokenOnFirstSetOf("If")) {
-            return If();
+            If();
         } else if (isCurrentTokenOnFirstSetOf("While")) {
-            return While();
+            While();
         } else if (isCurrentTokenOnFirstSetOf("Bloque")) {
-            return Bloque();
+            Bloque();
         } else if (currentToken.getId().contains("semiColon")) {
             match("semiColon");
-            return nodeBlock;
         } else {
             Set<String> auxToException = firstSet("Expresion");
             auxToException.addAll(firstSet("VarLocal"));
@@ -568,44 +557,34 @@ public class SyntaxAnalyzer {
     }
 
 
-    NodeVariable VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
+    void VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
-            Type variableType = new PrimitiveType(currentToken.getId());
             match(currentToken.getId());
-            currentToken.getLexeme();
-            NodeVariable nodeVariable = new NodeVariable(currentToken.getLexeme(),variableType);
             match("idMetVar");
-            //TODO optional breaking stuff
             DeclaracionVariableMultiple();
             InicializacionOpcional();
-            return nodeVariable;
         } else {
             throw new SyntaxException(currentToken, firstSet("VarLocalConTipoPrimitivo").toString());
         }
     }
 
 
-    NodeVariable VarLocal() throws LexicalException, SyntaxException, SemanticException {
+    void VarLocal() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocal")) {
             match("rw_var");
-            //TODO inffer variable type
             match("idMetVar");
             match("assign");
             ExpresionCompuesta();
-            return null;
         } else {
             Set<String> auxToException = firstSet("ClaseConcreta");
             auxToException.addAll(firstSet("Interface"));
             throw new SyntaxException(currentToken, auxToException.toString());
         }
     }
-    NodeReturn Return() throws LexicalException, SyntaxException, SemanticException {
+    void Return() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Return")) {
             match("rw_return");
-            NodeReturn nodeReturn = new NodeReturn();
-            //Check optional
             ExpresionOpcional();
-            return nodeReturn;
         } else {
             throw new SyntaxException(currentToken, firstSet("Return").toString());
         }
@@ -619,54 +598,49 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExpresionOpcional").toString());
         }
     }
-    NodeIf If() throws LexicalException, SyntaxException, SemanticException {
+    void If() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("If")) {
             match("rw_if");
             match("openPar");
-            NodeCompoundExpression conditionalExpression = Expresion();
+            Expresion();
             match("closePar");
-            NodeBlock thenBlock = Sentencia();
-            NodeIf nodeIf = new NodeIf(conditionalExpression,thenBlock);
-            Else(nodeIf);
-            return nodeIf;
+            Sentencia();
+            Else();
         } else {
             throw new SyntaxException(currentToken, firstSet("If").toString());
         }
     }
-    void Else(NodeIf nodeIf) throws LexicalException, SyntaxException, SemanticException {
+    void Else() throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
-            NodeBlock blockElse = Sentencia();
-            nodeIf.addElse(new NodeElse(nodeIf,blockElse));
+            Sentencia();
         } else if (isCurrentTokenOnFollowSetOf("Else")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("Else").toString());
         }
     }
-    NodeWhile While() throws LexicalException, SyntaxException, SemanticException {
+    void While() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("While")) {
             match("rw_while");
             match("openPar");
-            NodeCompoundExpression conditionalExpression = Expresion();
+            Expresion();
             match("closePar");
-            NodeBlock whileBlock = Sentencia();
-            NodeWhile nodeWhile = new NodeWhile(conditionalExpression,whileBlock);
+            Sentencia();
         } else {
             throw new SyntaxException(currentToken, firstSet("While").toString());
         }
     }
-    NodeCompoundExpression Expresion() throws LexicalException, SyntaxException, SemanticException {
+    void Expresion() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
-            NodeCompoundExpression nodeCompoundExp = ExpresionCompuesta();
+            ExpresionCompuesta();
             InicializacionOpcional();
-            return nodeCompoundExp;
         } else {
             throw new SyntaxException(currentToken, firstSet("Expresion").toString());
         }
     }
 
-    NodeCompoundExpression ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
+    void ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionCompuesta")) {
             ExpresionBasica();
             RExpresionCompuesta();
@@ -692,30 +666,26 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("OperadorBinario").toString());
         }
     }
-    NodeUnaryExpression ExpresionBasica() throws LexicalException, SyntaxException, SemanticException {
-        NodeUnaryExpression nodeUnaryExp= new NodeUnaryExpression();
+    void ExpresionBasica() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("OperadorUnario")) {
-            NodeOperand operandInExp = OperadorUnario();
-
+            OperadorUnario();
             Operando();
         } else if (isCurrentTokenOnFirstSetOf("Operando")) {
-            NodeOperand operandInExp = Operando();
-            nodeUnaryExp.addOperand(operandInExp);
-            return nodeUnaryExp;
+            Operando();
         } else {
             Set<String> auxToException = firstSet("OperadorUnario");
             auxToException.addAll(firstSet("Operando"));
             throw new SyntaxException(currentToken, auxToException.toString());
         }
     }
-    NodeOperand OperadorUnario() throws LexicalException, SyntaxException  {
+    void OperadorUnario() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("OperadorUnario")) {
             match(currentToken.getId());
         } else {
             throw new SyntaxException(currentToken, firstSet("OperadorUnario").toString());
         }
     }
-    NodeOperand Operando() throws LexicalException, SyntaxException, SemanticException {
+    void Operando() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
             Literal();
         } else if (isCurrentTokenOnFirstSetOf("Acceso")) {
@@ -726,7 +696,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, auxToException.toString());
         }
     }
-    NodeLiteral Literal() throws LexicalException, SyntaxException  {
+    void Literal() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
             match(currentToken.getId());
         } else {

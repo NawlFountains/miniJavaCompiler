@@ -1,13 +1,13 @@
 package ast.nodes;
 
-public class NodeUnaryExpression implements Node{
+public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
     @Override
     public void check() {
 
     }
 
     @Override
-    public boolean isAsignable() {
+    public boolean isAssignable() {
         return false;
     }
 }
