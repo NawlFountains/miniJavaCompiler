@@ -11,7 +11,7 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
 
     @Override
     public void check() {
-
+        //TODO check constructor exists with same parameters
     }
 
     @Override

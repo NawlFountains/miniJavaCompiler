@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public class NodeElse extends NodeSentence implements Node{
     protected NodeIf nodeIf;
     protected NodeSentence elseSentence;
@@ -9,8 +11,8 @@ public class NodeElse extends NodeSentence implements Node{
         this.elseSentence = elseSentence;
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        elseSentence.check();
     }
 
     @Override

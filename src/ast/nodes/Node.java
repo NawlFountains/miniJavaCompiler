@@ -1,7 +1,9 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public interface Node {
-    void check();
+    void check() throws SemanticException;
     boolean isAssignable();
     String getStructure();
 }

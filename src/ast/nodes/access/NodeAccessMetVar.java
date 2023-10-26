@@ -15,7 +15,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
     @Override
     public void check() {
-
+        //TODO check method or variable exist
     }
 
     @Override

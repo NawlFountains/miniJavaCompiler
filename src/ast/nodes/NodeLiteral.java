@@ -11,7 +11,7 @@ public class NodeLiteral extends NodeOperand implements Node{
 
     @Override
     public void check() {
-
+        //TODO couldnt be wrong this
     }
 
     @Override

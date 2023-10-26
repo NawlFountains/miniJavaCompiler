@@ -12,7 +12,8 @@ public class NodeAccessThis extends NodeAccess implements Node {
 
     @Override
     public void check() {
-
+        //TODO this will suffice?
+        chainedNode.check();
     }
 
     @Override

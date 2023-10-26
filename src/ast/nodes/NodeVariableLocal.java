@@ -1,6 +1,7 @@
 package ast.nodes;
 
 import lexical.Token;
+import semantic.SymbolTable;
 import semantic.Type;
 
 public class NodeVariableLocal extends NodeCompoundExpression implements Node{
@@ -17,7 +18,7 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
     }
     @Override
     public void check() {
-
+        //TODO check name colission
     }
 
     @Override

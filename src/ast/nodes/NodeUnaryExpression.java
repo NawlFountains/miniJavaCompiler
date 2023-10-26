@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
 
     protected NodeOperand unaryOperand;
@@ -13,8 +15,12 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
         System.out.println("NodeUnaryExpression:addUnaryOperand:"+nodeOperand.toString());
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        operand.check();
+        if (unaryOperand != null) {
+            unaryOperand.check();
+        }
+        //TODO check if operand is in conformity with unaryOperand
     }
 
     @Override

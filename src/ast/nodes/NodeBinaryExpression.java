@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public class NodeBinaryExpression extends NodeCompoundExpression implements Node{
     protected NodeCompoundExpression leftSide;
     protected NodeOperand operand;
@@ -11,8 +13,11 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         System.out.println("NodeBinaryExpression:created:"+leftSide.toString()+"+"+operand.toString()+"+"+rightSide.toString());
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        //TODO check left and right expression compatible with operand
+        leftSide.check();
+        operand.check();
+        rightSide.check();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import lexical.SemanticException;
 import lexical.Token;
 
 public class NodeAssignment extends NodeCompoundExpression implements Node{
@@ -11,8 +12,12 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
     }
 
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        leftSide.check();
+        rightSide.check();
+        if (!leftSide.isAssignable()) {
+            //TODO throw exception
+        }
     }
 
     @Override

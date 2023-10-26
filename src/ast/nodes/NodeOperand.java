@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import lexical.SemanticException;
 import lexical.Token;
 
 public class NodeOperand extends NodeCompoundExpression implements Node{
@@ -8,7 +9,7 @@ public class NodeOperand extends NodeCompoundExpression implements Node{
         this.operandToken = operandToken;
     }
     @Override
-    public void check() {
+    public void check() throws SemanticException {
 
     }
 

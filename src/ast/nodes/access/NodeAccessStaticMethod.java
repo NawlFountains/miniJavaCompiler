@@ -12,7 +12,7 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
 
     @Override
     public void check() {
-
+        //TODO check method exits and its static
     }
 
     @Override

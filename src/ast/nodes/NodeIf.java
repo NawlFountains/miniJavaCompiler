@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public class NodeIf extends NodeSentence implements Node{
     protected NodeSentence thenSentence;
     protected NodeCompoundExpression conditionalExpression;
@@ -15,8 +17,12 @@ public class NodeIf extends NodeSentence implements Node{
         this.nodeElse = nodeElse;
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        conditionalExpression.check();
+        thenSentence.check();
+        //TODO check conditionalExpression is boolean
+        if (nodeElse != null)
+            nodeElse.check();
     }
 
     @Override

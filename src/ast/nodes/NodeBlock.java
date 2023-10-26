@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +18,10 @@ public class NodeBlock extends NodeSentence implements Node {
         }
     }
 
-    public void check() {
-
+    public void check() throws SemanticException {
+        for (NodeSentence n : nodeSentenceList) {
+            n.check();
+        }
     }
     public boolean isAssignable() {
         return false;

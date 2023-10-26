@@ -1,10 +1,11 @@
 package ast.nodes;
 
+import lexical.SemanticException;
 import lexical.Token;
 
 public abstract class  NodeSentence implements Node{
     @Override
-    public void check() {
+    public void check() throws SemanticException {
 
     }
 
@@ -13,6 +14,6 @@ public abstract class  NodeSentence implements Node{
         return false;
     }
     public String getStructure() {
-        return "should be able to see this";
+        return "shouldn't be able to see this";
     }
 }

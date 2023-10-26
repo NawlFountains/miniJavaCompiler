@@ -5,14 +5,13 @@ import lexical.Token;
 
 public class NodeChained extends NodeAccess implements Node {
     protected NodeChained nodeChained;
-    protected Token firstChainedToken;
     public NodeChained(Token token) {
         super(token);
         System.out.println("Created chained node with "+token.getLexeme());
     }
     @Override
     public void check() {
-
+        //TODO check if receiver has what this node refers, maybe we need to pass it
     }
     public void addChainedNode(NodeChained nodeChained) {
         this.nodeChained = nodeChained;
