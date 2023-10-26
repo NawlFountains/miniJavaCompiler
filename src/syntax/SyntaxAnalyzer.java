@@ -524,20 +524,23 @@ public class SyntaxAnalyzer {
     NodeSentence Sentencia() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             if (currentToken.getId().contains("idClase")) {
+                NodeAccessStaticMethod accessStaticMethod = null;
                 Token idClassToken = currentToken;
                 match("idClase");
                 //TODO fix optional breaking captured
                 if (currentToken.getId().contains("period")) {
                     match("period");
+                    Token methodToken = currentToken;
                     match("idMetVar");
-                    ArgsActuales();
+
+                    accessStaticMethod = new NodeAccessStaticMethod(idClassToken,methodToken);
+                    ArgsActuales(accessStaticMethod);
                     isStaticAccess = true;
                 }
                 if (isStaticAccess) {
                     //Si es acceso termina asi
-                    NodeAccessConstructor nodeAccessConstructor = new NodeAccessConstructor(idClassToken);
-                    EncadenadoOpcional();
-                    return nodeAccessConstructor;
+                    PrimerEncadenadoOpcional(accessStaticMethod);
+                    return accessStaticMethod;
                 } else {
                     //Si es declaracion de variable
                     match("idMetVar");
@@ -556,11 +559,11 @@ public class SyntaxAnalyzer {
                 return nodeExpression;
             }
         } else if (isCurrentTokenOnFirstSetOf("VarLocal")) {
-            NodeVariable nodeVar = VarLocal();
+            NodeVariableLocal nodeVar = VarLocal();
             match("semiColon");
             return nodeVar;
         } else if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
-            NodeVariable nodeVarPrimitive = VarLocalConTipoPrimitivo();
+            NodeVariableLocal nodeVarPrimitive = VarLocalConTipoPrimitivo();
             match("semiColon");
             return nodeVarPrimitive;
         } else if (isCurrentTokenOnFirstSetOf("Return")) {
@@ -594,37 +597,39 @@ public class SyntaxAnalyzer {
     }
 
 
-    NodeVariable VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
+    NodeVariableLocal VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
             Type variableType = new PrimitiveType(currentToken.getId());
             match(currentToken.getId());
             currentToken.getLexeme();
-            NodeVariable nodeVariable = new NodeVariable(currentToken.getLexeme(),variableType);
+            NodeVariableLocal nodeVariableLocal = new NodeVariableLocal(currentToken,variableType);
             match("idMetVar");
             //TODO optional breaking stuff
             DeclaracionVariableMultiple();
 
-            NodeAssignment possibleAssignment = InicializacionOpcional(nodeVariable);
+            NodeAssignment possibleAssignment = InicializacionOpcional(nodeVariableLocal);
 //            if (possibleAssignment == null) {
 //                return nodeVariable;
 //            } else {
 //                return NodeAssignment;
 //            }
-            return nodeVariable;
+            return nodeVariableLocal;
         } else {
             throw new SyntaxException(currentToken, firstSet("VarLocalConTipoPrimitivo").toString());
         }
     }
 
 
-    NodeVariable VarLocal() throws LexicalException, SyntaxException, SemanticException {
+    NodeVariableLocal VarLocal() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocal")) {
             match("rw_var");
+            Token idMetVarToken = currentToken;
             //TODO inffer variable type
             match("idMetVar");
             match("assign");
-            ExpresionCompuesta();
-            return null;
+            NodeCompoundExpression assignmentExpression = ExpresionCompuesta();
+            NodeVariableLocal nodeVariableLocal = new NodeVariableLocal(idMetVarToken,assignmentExpression);
+            return nodeVariableLocal;
         } else {
             Set<String> auxToException = firstSet("ClaseConcreta");
             auxToException.addAll(firstSet("Interface"));
@@ -795,7 +800,9 @@ public class SyntaxAnalyzer {
     NodeCompoundExpression Acceso() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Acceso")) {
             NodeCompoundExpression firstAccess = Primario();
-            EncadenadoOpcional();
+            if (firstAccess instanceof NodeAccess) {
+                PrimerEncadenadoOpcional((NodeAccess)firstAccess);
+            }
             return firstAccess;
         } else {
             throw new SyntaxException(currentToken, firstSet("Acceso").toString());
@@ -836,9 +843,9 @@ public class SyntaxAnalyzer {
             Token idClassToken = currentToken;
             match("idClase");
             GenericidadVaciaOpcional();
-            ArgsActuales();
-            //TODO add argument for choosing contructor accordingly
             NodeAccessConstructor constructorNode = new NodeAccessConstructor(idClassToken);
+            ArgsActuales(constructorNode);
+            //TODO add argument for choosing contructor accordingly
             return constructorNode;
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoConstructor").toString());
@@ -848,16 +855,16 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("AccesoMetVar")) {
             NodeAccessMetVar accessNode = new NodeAccessMetVar(currentToken);
             match("idMetVar");
-            ArgsActualesOpcionales();
+            ArgsActualesOpcionales(accessNode);
             //TODO finish
             return  accessNode;
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoMetVar").toString());
         }
     }
-    void ArgsActualesOpcionales() throws LexicalException, SyntaxException, SemanticException {
+    void ArgsActualesOpcionales(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
-            ArgsActuales();
+            ArgsActuales(accessNode);
         } else if (isCurrentTokenOnFollowSetOf("ArgsActualesOpcionales")) {
 
         } else {
@@ -882,8 +889,8 @@ public class SyntaxAnalyzer {
             Token methodCalled = currentToken;
             match("idMetVar");
             //TODO add arguments
-            ArgsActuales();
             NodeAccessStaticMethod staticCall= new NodeAccessStaticMethod(receiverClass,methodCalled);
+            ArgsActuales(staticCall);
             return staticCall;
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoMetodoEstatico").toString());
@@ -902,52 +909,68 @@ public class SyntaxAnalyzer {
         }
     }
 
-    void ArgsActuales() throws LexicalException, SyntaxException, SemanticException {
+    void ArgsActuales(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             match("openPar");
-            ListaExpsOpcional();
+            ListaExpsOpcional(accessNode);
             match("closePar");
         } else {
             throw new SyntaxException(currentToken, firstSet("ArgsActuales").toString());
         }
     }
-    void ListaExpsOpcional() throws LexicalException, SyntaxException, SemanticException {
+    void ListaExpsOpcional(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
-            ListaExps();
+            ListaExps(accessNode);
         } else if (isCurrentTokenOnFollowSetOf("ListaExpsOpcional")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("ListaExpsOpcional").toString());
         }
     }
-    void ListaExps() throws LexicalException, SyntaxException, SemanticException {
+    void ListaExps(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaExps")) {
-            Expresion();
-            ContinuaListaExps();
+            NodeCompoundExpression argument = Expresion();
+            accessNode.addArgument(argument);
+            ContinuaListaExps(accessNode);
         } else {
             throw new SyntaxException(currentToken, firstSet("ListaExps").toString());
         }
     }
-    void ContinuaListaExps() throws LexicalException, SyntaxException, SemanticException {
+    void ContinuaListaExps(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("comma")){
             match("comma");
-            ListaExps();
+            ListaExps(accessNode);
         } else if (isCurrentTokenOnFollowSetOf("ContinuaListaExps")) {
 
         } else {
             throw new SyntaxException(currentToken, firstSet("ContinuaListaExps").toString());
         }
     }
-    void EncadenadoOpcional() throws LexicalException, SyntaxException, SemanticException {
+    void PrimerEncadenadoOpcional(NodeAccess ankorNode) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("period")) {
             match("period");
             Token methodOrVarToken = currentToken;
             match("idMetVar");
-            ArgsActualesOpcionales();
             NodeChained nodeChained = new NodeChained(methodOrVarToken);
-            EncadenadoOpcional();
+            ankorNode.addChainingNode(nodeChained);
+            ArgsActualesOpcionales(nodeChained);
+            EncadenadoOpcional(nodeChained);
         } else if (isCurrentTokenOnFollowSetOf("EncadenadoOpcional")) {
 
+        } else {
+            throw new SyntaxException(currentToken, firstSet("EncadenadoOpcional").toString());
+        }
+    }
+    void EncadenadoOpcional(NodeChained ankorNode) throws LexicalException, SyntaxException, SemanticException {
+        if (currentToken.getId().contains("period")) {
+            match("period");
+            Token methodOrVarToken = currentToken;
+            match("idMetVar");
+            NodeChained nodeChained = new NodeChained(methodOrVarToken);
+            ankorNode.addChainedNode(nodeChained);
+            ArgsActualesOpcionales(nodeChained);
+            EncadenadoOpcional(nodeChained);
+        } else if (isCurrentTokenOnFollowSetOf("EncadenadoOpcional")) {
         } else {
             throw new SyntaxException(currentToken, firstSet("EncadenadoOpcional").toString());
         }

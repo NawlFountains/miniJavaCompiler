@@ -1,18 +1,25 @@
 package ast.nodes.access;
 
-import ast.nodes.Node;
-import ast.nodes.NodeChained;
-import ast.nodes.NodeOperand;
+import ast.nodes.*;
 import lexical.Token;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class NodeAccess extends NodeOperand implements Node {
+    protected List<NodeCompoundExpression> argumentList;
     protected NodeChained chainedNode;
     public NodeAccess(Token callerToken) {
         super(callerToken);
+        argumentList = new ArrayList<>();
     }
 
     public void addChainingNode(NodeChained nodeChained){
-        this.chainedNode = chainedNode;
+        this.chainedNode = nodeChained;
+    }
+    public void addArgument(NodeCompoundExpression nodeArgument) {
+        System.out.println("NodeAccess:ArgumentAdded:"+nodeArgument.getStructure());
+        argumentList.add(nodeArgument);
     }
     @Override
     public void check() {
@@ -24,9 +31,13 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         return false;
     }
     public String getStructure(){
-        String toReturn = "Access : "+operandToken.getLexeme();
+        String toReturn = "Access : "+operandToken.getLexeme()+"(";
+        for (NodeCompoundExpression n : argumentList) {
+            toReturn += n.getStructure();
+        }
+        toReturn += ")";
         if (chainedNode != null)
-            toReturn += " "+chainedNode.getStructure();
+            toReturn += "."+chainedNode.getStructure();
         return toReturn;
     }
 }
