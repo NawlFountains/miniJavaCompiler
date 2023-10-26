@@ -10,9 +10,13 @@ import java.util.List;
 public abstract class NodeAccess extends NodeOperand implements Node {
     protected List<NodeCompoundExpression> argumentList;
     protected NodeChained chainedNode;
+    protected boolean isAttribute = true;
     public NodeAccess(Token callerToken) {
         super(callerToken);
         argumentList = new ArrayList<>();
+    }
+    public void isNotAttribute() {
+        isAttribute = false;
     }
 
     public void addChainingNode(NodeChained nodeChained){

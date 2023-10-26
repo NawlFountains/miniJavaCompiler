@@ -3,6 +3,7 @@ package ast.nodes.access;
 import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.access.NodeAccess;
+import lexical.SemanticException;
 import lexical.Token;
 
 public class NodeAccessThis extends NodeAccess implements Node {
@@ -11,7 +12,7 @@ public class NodeAccessThis extends NodeAccess implements Node {
     }
 
     @Override
-    public void check() {
+    public void check() throws SemanticException {
         //TODO this will suffice?
         chainedNode.check();
     }

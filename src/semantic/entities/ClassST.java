@@ -47,6 +47,9 @@ public class ClassST implements EntityST {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede definir mas de un constructor por clase");
         }
     }
+    public ConstructorST getConstructor() {
+        return constructor;
+    }
 
     public void inheritsFrom(Token extendedClass) throws SemanticException {
         if (lexemeAlreadyOnList(extendedClasses,extendedClass)) {

@@ -1,19 +1,10 @@
-///[Error:a|6]
+///[Error:a|7]
 // 
-class A extends B{
+class A {
 	void a(int x){
 		System.println("XD");
 		var a = 9;
-	}
-	int calculate(int x) {
-		var y = new B();
-		x.a;
+		int a = 3;
 	}
 	static void main(){}
-}
-class B {
-	int a = 3;
-public B(int x, int y){
-	super(x,y);
-}
 }

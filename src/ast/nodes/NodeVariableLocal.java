@@ -15,8 +15,6 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
     public NodeVariableLocal(Token variableIdToken, NodeCompoundExpression assignmentExpression) {
         this.variableIdToken = variableIdToken;
         this.assignmentExpression = assignmentExpression;
-        //TODO If we didn't specify type we need to inffer it
-        variableType = new PrimitiveType("int"); //Placeholder
     }
     public NodeVariableLocal(Token variableIdToken, Type type) {
         this.variableIdToken = variableIdToken;
@@ -24,7 +22,16 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
     }
     @Override
     public void check() throws SemanticException{
-        //TODO check name colission
+        //Check if the assignmentExpression is correct
+        if (assignmentExpression != null) {
+            assignmentExpression.check();
+            if (variableType == null) {
+                //TODO Because we only have an expression we need to inffer the type
+                variableType = new PrimitiveType("int"); //Placeholder
+            } else {
+                //TODO if we have type then check if expression correspond to it
+            }
+        }
         System.out.println("NodeVariableLocal["+variableIdToken.getLexeme()+"]:check():parentBlock"+parentBlock);
         RoutineST referenceEnviroment = parentBlock.getRoutineEnvironment();
         System.out.println("referenceEnviroment:"+referenceEnviroment);

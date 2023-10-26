@@ -1,10 +1,9 @@
-///[Error:a|7]
+///[Error:b|6]
 // 
-class A{
-	String a;
+class A {
 	void a(int x){
 		System.println("XD");
-		var a = 9;
+		this.b();
 	}
 	static void main(){}
 }

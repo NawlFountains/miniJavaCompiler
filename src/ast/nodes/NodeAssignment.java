@@ -9,6 +9,13 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
     public NodeAssignment(NodeCompoundExpression leftSide, NodeCompoundExpression rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
+        System.out.println("NodeAssignment:created:"+leftSide+"+"+rightSide+" parentBlock"+parentBlock);
+    }
+
+    public void addParentBlock(NodeBlock nodeBlock) {
+        super.addParentBlock(nodeBlock);
+        leftSide.addParentBlock(nodeBlock);
+        rightSide.addParentBlock(nodeBlock);
     }
 
     @Override

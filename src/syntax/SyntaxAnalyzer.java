@@ -382,6 +382,7 @@ public class SyntaxAnalyzer {
             match("assign");
             NodeCompoundExpression rightSide = Expresion();
             NodeAssignment assignment = new NodeAssignment(leftSide,rightSide);
+            System.out.println("Assignment "+leftSide+"="+rightSide);
             return assignment;
         } else if (isCurrentTokenOnFollowSetOf("InicializacionOpcional")) {
             return null;
@@ -557,7 +558,6 @@ public class SyntaxAnalyzer {
                 System.out.println("About to retunr null");
                 return null;
             } else {
-                System.out.println("EXPRESSINO FROM SENTENCE");
                 NodeCompoundExpression nodeExpression = Expresion();
                 match("semiColon");
                 System.out.println("Expressino from sentence returns"+nodeExpression);
@@ -917,6 +917,7 @@ public class SyntaxAnalyzer {
     void ArgsActuales(NodeAccess accessNode) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ArgsActuales")) {
             match("openPar");
+            accessNode.isNotAttribute();
             ListaExpsOpcional(accessNode);
             match("closePar");
         } else {

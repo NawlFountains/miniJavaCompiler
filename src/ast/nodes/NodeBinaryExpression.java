@@ -10,8 +10,18 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         this.leftSide = leftSide;
         this.operand = operand;
         this.rightSide = rightSide;
-        System.out.println("NodeBinaryExpression:created:"+leftSide.toString()+"+"+operand.toString()+"+"+rightSide.toString());
+        leftSide.addParentBlock(parentBlock);
+        operand.addParentBlock(parentBlock);
+        rightSide.addParentBlock(parentBlock);
+        System.out.println("NodeBinaryExpression:created:"+leftSide+"+"+operand+"+"+rightSide+" parentBlock"+parentBlock);
         returnType = operand.returnType;
+    }
+
+    public void addParentBlock(NodeBlock nodeBlock) {
+        super.addParentBlock(nodeBlock);
+        leftSide.addParentBlock(nodeBlock);
+        operand.addParentBlock(nodeBlock);
+        rightSide.addParentBlock(nodeBlock);
     }
     @Override
     public void check() throws SemanticException {
