@@ -1,6 +1,8 @@
 package ast.nodes;
 
-public class NodeSentence implements Node{
+import lexical.Token;
+
+public abstract class  NodeSentence implements Node{
     @Override
     public void check() {
 
@@ -9,5 +11,8 @@ public class NodeSentence implements Node{
     @Override
     public boolean isAssignable() {
         return false;
+    }
+    public String getStructure() {
+        return "should be able to see this";
     }
 }

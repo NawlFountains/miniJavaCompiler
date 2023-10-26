@@ -41,8 +41,11 @@ public class Main {
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
+            System.out.println("Finished analysis");
             SymbolTable.getInstance().checkDeclarations();
             SymbolTable.getInstance().consolidate();
+            String structure = SymbolTable.getInstance().getASTStructure();
+            System.out.println("AST Structure is "+structure);
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
             manager.closeCurrentFile();

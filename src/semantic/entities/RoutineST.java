@@ -1,5 +1,6 @@
 package semantic.entities;
 
+import ast.nodes.NodeBlock;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.Type;
@@ -13,6 +14,7 @@ public abstract class RoutineST {
     protected List<Type> parametersTypeList;
     protected ParameterST actualParameter;
     protected String routineName;
+    protected NodeBlock blockAST;
 
     protected RoutineST(String routineName) {
         parameters = new HashMap<>();
@@ -55,5 +57,17 @@ public abstract class RoutineST {
             same = false;
         }
         return same;
+    }
+    public void setAST(NodeBlock blockAST) {
+        this.blockAST = blockAST;
+    }
+    public String getASTStructure() {
+        System.out.println("RoutineST:getASTStructure:Start:"+routineName);
+        String toReturn = "Name : "+routineName+"\n";
+        System.out.println("RoutineST:getASTStructure:blockAST");
+        if (blockAST != null)
+        toReturn += blockAST.getStructure();
+        System.out.println("RoutineST:getASTStructure:blockAST:finished");
+        return toReturn;
     }
 }

@@ -223,6 +223,16 @@ public class ClassST implements EntityST {
         toReturn += constructor.toString();
         return toReturn;
     }
+    public String getASTStructure() {
+        System.out.println("ClassST:getASTStructure:Start");
+        String toReturn = "AST Methods :\n";
+        for (MethodST m : methods.values()) {
+            toReturn += m.getASTStructure()+"\n";
+        }
+        toReturn += "\n AST Constructor \n";
+        toReturn += constructor.getASTStructure()+"\n";
+        return toReturn;
+    }
     private boolean checkIfMethodExist(MethodST method) throws SemanticException {
         boolean found = false;
         for (MethodST m : methods.values()) {

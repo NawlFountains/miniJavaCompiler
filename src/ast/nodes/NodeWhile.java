@@ -2,10 +2,10 @@ package ast.nodes;
 
 public class NodeWhile extends NodeSentence implements Node{
     protected NodeCompoundExpression conditionalExpression;
-    protected NodeBlock whileBlock;
-    public NodeWhile(NodeCompoundExpression conditionalExpression, NodeBlock whileBlock) {
+    protected NodeSentence whileSentence;
+    public NodeWhile(NodeCompoundExpression conditionalExpression, NodeSentence whileSentence) {
         this.conditionalExpression = conditionalExpression;
-        this.whileBlock = whileBlock;
+        this.whileSentence = whileSentence;
     }
     @Override
     public void check() {
@@ -15,5 +15,8 @@ public class NodeWhile extends NodeSentence implements Node{
     @Override
     public boolean isAssignable() {
         return false;
+    }
+    public String getStructure() {
+        return "While \n"+conditionalExpression.getStructure()+"\n "+whileSentence.getStructure()+"\n";
     }
 }
