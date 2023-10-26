@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import lexical.SemanticException;
+
 public class NodeWhile extends NodeSentence implements Node{
     protected NodeCompoundExpression conditionalExpression;
     protected NodeSentence whileSentence;
@@ -8,8 +10,9 @@ public class NodeWhile extends NodeSentence implements Node{
         this.whileSentence = whileSentence;
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        conditionalExpression.check();
+        whileSentence.check();
     }
 
     @Override

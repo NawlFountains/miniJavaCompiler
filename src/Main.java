@@ -45,6 +45,7 @@ public class Main {
             SymbolTable.getInstance().checkDeclarations();
             SymbolTable.getInstance().consolidate();
             String structure = SymbolTable.getInstance().getASTStructure();
+            SymbolTable.getInstance().checkSentences();
             System.out.println("AST Structure is "+structure);
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);

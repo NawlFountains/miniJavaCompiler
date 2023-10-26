@@ -12,14 +12,27 @@ import java.util.List;
 public abstract class RoutineST {
     protected HashMap<String,ParameterST> parameters;
     protected List<Type> parametersTypeList;
+    protected HashMap<String,Type> localVariables;
     protected ParameterST actualParameter;
     protected String routineName;
+    protected ClassST ownerClass;
+    protected InterfaceST ownerInterface;
     protected NodeBlock blockAST;
 
     protected RoutineST(String routineName) {
         parameters = new HashMap<>();
         parametersTypeList = new ArrayList<>();
+        localVariables = new HashMap<>();
         this.routineName = routineName;
+    }
+    public void addLocalVariable(String varName, Type varType) {
+        localVariables.put(varName,varType);
+    }
+    public boolean existVariableWithName(String varName) {
+        return localVariables.get(varName) != null;
+    }
+    public Type getVariableType(String varName) {
+        return localVariables.get(varName);
     }
     public void insertParameter(Token token, ParameterST parameterST) throws SemanticException {
         if (!existParameter(token.getLexeme())) {
@@ -29,6 +42,18 @@ public abstract class RoutineST {
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un parametro en este constructor con el identificador "+token.getLexeme());
         }
+    }
+    public void setOwnerClass(ClassST classST) {
+        this.ownerClass = classST;
+    }
+    public ClassST getOwnerClass() {
+        return ownerClass;
+    }
+    public void setOwnerInterface(InterfaceST interfaceST) {
+        this.ownerInterface = interfaceST;
+    }
+    public InterfaceST getOwnerInterface() {
+        return ownerInterface;
     }
     public List<Type> getParameterTypeList() {
         return parametersTypeList;

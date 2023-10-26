@@ -205,6 +205,11 @@ public class SymbolTable implements EntityST {
             throw new SemanticException(EOF.getLexeme(), EOF.getLineNumber(), "No se definio un metodo main");
         }
     }
+    public void checkSentences() throws SemanticException {
+        for (ClassST c : classes.values()) {
+            c.checkSentences();
+        }
+    }
 
     public boolean hasMainMethod() {
         return !mainMethods.isEmpty();

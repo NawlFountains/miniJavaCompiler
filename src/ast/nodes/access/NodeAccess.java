@@ -1,6 +1,7 @@
 package ast.nodes.access;
 
 import ast.nodes.*;
+import lexical.SemanticException;
 import lexical.Token;
 
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         argumentList.add(nodeArgument);
     }
     @Override
-    public void check() {
-
+    public void check() throws SemanticException {
+        
     }
 
     @Override

@@ -82,6 +82,7 @@ public class ClassST implements EntityST {
                 SymbolTable.getInstance().addMainMethod(method);
             }
             methods.put(token.getLexeme(),method);
+            method.setOwnerClass(this);
             this.actualMethod = method;
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un metodo en esta clase con la signatura "+token.getLexeme());
@@ -271,5 +272,13 @@ public class ClassST implements EntityST {
             }
         }
         return found;
+    }
+    public void checkSentences() throws SemanticException {
+        for (MethodST m : methods.values()) {
+            System.out.println("ClassST("+className+"):checkSentences():method:"+m.getName());
+            //TODO fix error with predefined classes
+            if (m.blockAST != null)
+             m.blockAST.check();
+        }
     }
 }

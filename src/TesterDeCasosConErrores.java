@@ -18,7 +18,7 @@ public class TesterDeCasosConErrores {
     
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private static final String testFilesDirectoryPath = "resources/semanticTests/conErrores/";
+    private static final String testFilesDirectoryPath = "resources/customTests/conErrores/";
     private boolean fullCompilerOuputPrintingInEachTest = true;
      
     @Before

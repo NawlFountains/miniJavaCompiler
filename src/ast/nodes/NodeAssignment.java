@@ -13,6 +13,7 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
 
     @Override
     public void check() throws SemanticException {
+        System.out.println("NodeAssignment:check():leftside:"+leftSide+":rightside:"+rightSide);
         leftSide.check();
         rightSide.check();
         if (!leftSide.isAssignable()) {

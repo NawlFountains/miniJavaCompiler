@@ -290,6 +290,7 @@ public class SyntaxAnalyzer {
             ArgsFormales(constructor);
             NodeBlock blockNode = Bloque();
             constructor.setAST(blockNode);
+            blockNode.setRoutineEnvironment(constructor);
             SymbolTable.getInstance().getCurrentClass().setConstructor(declarationToken,constructor);
         } else {
             Set<String> auxToException = firstSet("ArgsFormales");
@@ -334,6 +335,7 @@ public class SyntaxAnalyzer {
             ArgsFormales(method);
             NodeBlock blockNode = Bloque();
             method.setAST(blockNode);
+            blockNode.setRoutineEnvironment(method);
             method.setReturnType(typeDeclared);
             method.setStatic(isStatic);
             SymbolTable.getInstance().setCurrentMethod(method);
@@ -513,7 +515,10 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
             NodeSentence sentence = Sentencia();
             System.out.println("Created sentence "+sentence);
-            nodeBlock.addSentence(sentence);
+            if (sentence != null) {
+                nodeBlock.addSentence(sentence);
+                sentence.addParentBlock(nodeBlock);
+            }
             ListaSentencias(nodeBlock);
         } else if (isCurrentTokenOnFollowSetOf("ListaSentencias")) {
 
@@ -951,7 +956,7 @@ public class SyntaxAnalyzer {
             match("period");
             Token methodOrVarToken = currentToken;
             match("idMetVar");
-            NodeChained nodeChained = new NodeChained(methodOrVarToken);
+            NodeChained nodeChained = new NodeChained(ankorNode,methodOrVarToken);
             ankorNode.addChainingNode(nodeChained);
             ArgsActualesOpcionales(nodeChained);
             EncadenadoOpcional(nodeChained);
@@ -966,7 +971,7 @@ public class SyntaxAnalyzer {
             match("period");
             Token methodOrVarToken = currentToken;
             match("idMetVar");
-            NodeChained nodeChained = new NodeChained(methodOrVarToken);
+            NodeChained nodeChained = new NodeChained(ankorNode,methodOrVarToken);
             ankorNode.addChainedNode(nodeChained);
             ArgsActualesOpcionales(nodeChained);
             EncadenadoOpcional(nodeChained);

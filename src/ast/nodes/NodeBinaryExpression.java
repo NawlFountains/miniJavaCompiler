@@ -11,6 +11,7 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         this.operand = operand;
         this.rightSide = rightSide;
         System.out.println("NodeBinaryExpression:created:"+leftSide.toString()+"+"+operand.toString()+"+"+rightSide.toString());
+        returnType = operand.returnType;
     }
     @Override
     public void check() throws SemanticException {

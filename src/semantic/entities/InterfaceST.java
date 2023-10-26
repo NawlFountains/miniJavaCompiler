@@ -40,6 +40,7 @@ public class InterfaceST implements EntityST {
         if (!existMethod(token.getLexeme())) {
             if (!method.isStatic) {
                 methods.put(token.getLexeme(),method);
+                method.setOwnerInterface(this);
                 this.actualMethod = method;
             } else {
                 throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede declarar un metodo estatico en una interfaz ");

@@ -3,6 +3,7 @@ package ast.nodes.access;
 import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.NodeOperand;
+import lexical.SemanticException;
 import lexical.Token;
 
 public class NodeAccessMetVar extends NodeAccess implements Node {
@@ -14,8 +15,9 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
     }
 
     @Override
-    public void check() {
+    public void check() throws SemanticException {
         //TODO check method or variable exist
+
     }
 
     @Override

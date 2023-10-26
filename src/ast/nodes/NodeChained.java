@@ -5,8 +5,16 @@ import lexical.Token;
 
 public class NodeChained extends NodeAccess implements Node {
     protected NodeChained nodeChained;
-    public NodeChained(Token token) {
+    protected NodeChained previousNode;
+    protected NodeAccess previousNodeAccess;
+    public NodeChained(NodeChained previousNode,Token token) {
         super(token);
+        this.previousNode = previousNode;
+        System.out.println("Created chained node with "+token.getLexeme());
+    }
+    public NodeChained(NodeAccess previousNodeAccess,Token token) {
+        super(token);
+        this.previousNodeAccess = previousNodeAccess;
         System.out.println("Created chained node with "+token.getLexeme());
     }
     @Override

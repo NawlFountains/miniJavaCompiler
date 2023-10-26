@@ -1,6 +1,7 @@
 package ast.nodes.access;
 
 import ast.nodes.Node;
+import lexical.SemanticException;
 import lexical.Token;
 
 public class NodeAccessStaticMethod extends NodeAccess implements Node {
@@ -11,8 +12,9 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
     }
 
     @Override
-    public void check() {
+    public void check() throws SemanticException {
         //TODO check method exits and its static
+        System.out.println("NodeAccessStaticMethod:check()");
     }
 
     @Override
