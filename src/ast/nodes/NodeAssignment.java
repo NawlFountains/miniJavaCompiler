@@ -6,9 +6,11 @@ import lexical.Token;
 public class NodeAssignment extends NodeCompoundExpression implements Node{
     protected NodeCompoundExpression leftSide;
     protected NodeCompoundExpression rightSide;
-    public NodeAssignment(NodeCompoundExpression leftSide, NodeCompoundExpression rightSide) {
+    protected Token declarationToken;
+    public NodeAssignment(NodeCompoundExpression leftSide, NodeCompoundExpression rightSide, Token declarationToken) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
+        this.declarationToken = declarationToken;
         System.out.println("NodeAssignment:created:"+leftSide+"+"+rightSide+" parentBlock"+parentBlock);
     }
 
@@ -23,8 +25,11 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         System.out.println("NodeAssignment:check():leftside:"+leftSide+":rightside:"+rightSide);
         leftSide.check();
         rightSide.check();
+        System.out.println("NodeAssigmnet:check():completed:seeAssignment");
         if (!leftSide.isAssignable()) {
             //TODO throw exception
+            System.out.println("Leftside was "+leftSide.getStructure()+" type "+leftSide);
+            throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El lado izquierdo no es asignable");
         }
     }
 

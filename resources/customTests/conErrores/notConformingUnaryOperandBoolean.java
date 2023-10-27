@@ -1,4 +1,4 @@
-///[Error:true|5]
+///[Error:+|5]
 // 
 class A {
 	void a(int x){

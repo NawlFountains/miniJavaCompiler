@@ -8,15 +8,9 @@ class A{
 		x = 93+(73/3);
 		var bool = false;
 		bool = ((93 < 3) == false);
-		if ( 9 < (9 + 3) ) {
+		bool = !false;
 			x = true;
-		}
+		x = -x;
 	}
 	static void main(){}
-}
-class B {
-	int a = 3;
-public B(int x, int y){
-	super(x,y);
-}
 }

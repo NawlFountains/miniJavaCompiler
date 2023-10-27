@@ -25,6 +25,9 @@ public abstract class NodeAccess extends NodeOperand implements Node {
     public void addChainingNode(NodeChained nodeChained){
         this.chainedNode = nodeChained;
     }
+    public Token getToken(){
+        return operandToken;
+    }
     public void addArgument(NodeCompoundExpression nodeArgument) {
         System.out.println("NodeAccess:ArgumentAdded:"+nodeArgument.getStructure());
         argumentTypeList.add(nodeArgument.getReturnType());
@@ -37,7 +40,10 @@ public abstract class NodeAccess extends NodeOperand implements Node {
 
     @Override
     public boolean isAssignable() {
-        return false;
+        boolean assignable = false;
+        if (chainedNode != null)
+            assignable = chainedNode.isAssignable();
+        return assignable;
     }
     public String getStructure(){
         String toReturn = "Access : "+operandToken.getLexeme()+"(";
@@ -48,5 +54,20 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         if (chainedNode != null)
             toReturn += "."+chainedNode.getStructure();
         return toReturn;
+    }
+    boolean sameParameterTypes(List<Type> listOne, List<Type> listTwo) {
+        boolean same = true;
+        int i = 0;
+        if(listOne.size() == listTwo.size()) {
+            while (same && i < listOne.size()) {
+                if (!listOne.get(i).equals(listTwo.get(i))) {
+                    same = false;
+                }
+                i++;
+            }
+        } else {
+            same = false;
+        }
+        return same;
     }
 }

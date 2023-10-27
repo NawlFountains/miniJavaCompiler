@@ -34,9 +34,11 @@ public class NodeIf extends NodeSentence implements Node{
     }
     @Override
     public void check() throws SemanticException {
+        System.out.println("NodeIf:check:conditionalExpression");
         conditionalExpression.check();
+        System.out.println("NodeIf:check:thenSentence");
         thenSentence.check();
-        System.out.println("conditionalExpression "+conditionalExpression.getStructure()+" return type "+conditionalExpression.getReturnType().toString());
+        System.out.println("conditionalExpression "+conditionalExpression+" return type "+conditionalExpression.getReturnType());
         if (!conditionalExpression.getReturnType().toString().equals("boolean"))
             throw new SemanticException(declarationToken.getLexeme(), declarationToken.getLineNumber(),"Expresion dentro del if debe ser booleana");
         if (nodeElse != null)

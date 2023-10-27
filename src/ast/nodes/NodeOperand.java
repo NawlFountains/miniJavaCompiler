@@ -39,7 +39,7 @@ public class NodeOperand extends NodeCompoundExpression implements Node{
         return false;
     }
     public String getStructure() {
-        System.out.println("NodeOperand:getStruture:Start");
+        System.out.println("NodeOperand:getStruture:Start asking "+this);
         return "Operand : "+operandToken.getLexeme()+"\n";
     }
 }

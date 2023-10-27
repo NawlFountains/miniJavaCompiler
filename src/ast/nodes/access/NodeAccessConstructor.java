@@ -27,15 +27,15 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
         if (constructorOfClassNamed.getParameterTypeList().size() != argumentList.size())
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No coincide la aridad entre el constructor definido y el usado "+operandToken.getLexeme());
         //TODO Check for every parameter if type corresponds, we need to be able to know expression return type
+        if (!sameParameterTypes(constructorOfClassNamed.getParameterTypeList(),argumentTypeList)) {
+            System.out.println(constructorOfClassNamed.getParameterTypeList().toString()+" vs "+ argumentTypeList.toString());
+            throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No coincide ningun constructor de "+constructorOfClassNamed.getName()+" para los parametro especificados.");
+        }
         System.out.println("NodeAccessConstructor:check:finished continue with chained node");
         if (chainedNode != null)
             chainedNode.check();
     }
 
-    @Override
-    public boolean isAssignable() {
-        return false;
-    }
     public String getStructure() {
         String toReturn = "new "+operandToken.getLexeme();
         if (argumentList.size() > 0) {

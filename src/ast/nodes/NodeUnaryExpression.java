@@ -1,18 +1,25 @@
 package ast.nodes;
 
 import lexical.SemanticException;
+import lexical.Token;
 
 public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
 
     protected NodeOperand unaryOperand;
-    protected NodeOperand operand;
-    public NodeUnaryExpression(NodeOperand operand) {
+    protected NodeCompoundExpression operand;
+    public NodeUnaryExpression(NodeCompoundExpression operand) {
         this.operand = operand;
         System.out.println("NodeUnaryExpression:created:"+operand);
     }
     public void addUnaryOperand(NodeOperand nodeOperand) {
         this.unaryOperand = nodeOperand;
         System.out.println("NodeUnaryExpression:addUnaryOperand:"+nodeOperand.toString());
+    }
+    public void addParentBlock(NodeBlock parentBlock) {
+        super.addParentBlock(parentBlock);
+        operand.addParentBlock(parentBlock);
+        if (unaryOperand != null)
+            unaryOperand.addParentBlock(parentBlock);
     }
     @Override
     public void check() throws SemanticException {
@@ -24,6 +31,8 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
             //TODO check if operand is in conformity with unaryOperand
             typeConformity(unaryOperand,operand);
         }
+        returnType = operand.getReturnType();
+        System.out.println("NodeUnaryExpression:check:finish");
     }
 
     @Override

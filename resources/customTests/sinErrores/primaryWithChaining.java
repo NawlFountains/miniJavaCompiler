@@ -6,7 +6,7 @@ class A{
 		System.println("XD");
 	}
 	int calculate(int x) {
-		this.a(x) = 3;
+		this.a = 3;
 		var y = new B(3,3);
 		x.a;
 	}

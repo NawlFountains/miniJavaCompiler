@@ -52,6 +52,7 @@ public class NodeBlock extends NodeSentence implements Node {
             System.out.println("NodeBlock:check():Sentence:"+n);
             n.check();
         }
+        System.out.println("NodeBlock:check():finish");
     }
     public boolean isAssignable() {
         return false;

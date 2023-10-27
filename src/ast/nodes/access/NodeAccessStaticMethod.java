@@ -36,9 +36,4 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
             }
         }
     }
-
-    @Override
-    public boolean isAssignable() {
-        return false;
-    }
 }

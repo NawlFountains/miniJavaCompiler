@@ -26,6 +26,8 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         boolean found = false;
         RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
+
+            assignable = true;
             System.out.println("NodeAccessMetVar:check:attribute");
             //Serach in parameters
             found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
@@ -50,7 +52,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 }
             } else {
                 found = true;
-                assignable = true;
             }
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"No existe ninguna variable local ni atributo con nombre "+methodOrVarToken.getLexeme());
@@ -60,7 +61,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 if (methodOrVarToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
                         //TODO check parameter types
-                        if (m.getParameterTypeList().equals(argumentTypeList)) {
+                        if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
                             found = true;
                             break;
                         } else {
@@ -82,6 +83,8 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
     @Override
     public boolean isAssignable() {
+        if (chainedNode != null)
+            assignable = chainedNode.isAssignable();
         return assignable;
     }
     public String getStructure() {

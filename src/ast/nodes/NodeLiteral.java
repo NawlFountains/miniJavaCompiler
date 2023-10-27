@@ -9,11 +9,11 @@ public class NodeLiteral extends NodeOperand implements Node{
     public NodeLiteral(Token literalToken) {
         super(literalToken);
         String typeString = "";
-        if (literalToken.getId().equals("idClase") || literalToken.getId().equals("stringLiteral")) {
-            typeString = (literalToken.getId().equals("stringLiteral"))?"String": literalToken.getLexeme();
+        if (operandToken.getId().equals("idClase") || operandToken.getId().equals("stringLiteral")) {
+            typeString = (operandToken.getId().equals("stringLiteral"))?"String": operandToken.getLexeme();
             returnType = new ReferenceType(typeString);
         }else {
-            switch (literalToken.getId()){
+            switch (operandToken.getId()){
                 case("intLiteral"):
                     typeString = "int";
                     break;
@@ -28,10 +28,11 @@ public class NodeLiteral extends NodeOperand implements Node{
                     typeString = "boolean";
                     break;
                 default:
-                    System.out.println("ERROR NOT PRIMITIVE TYPE");
+                    typeString = "null";
             }
             returnType = new PrimitiveType(typeString);
         }
+        System.out.println("NodeLiteral:created: id "+operandToken.getId()+" return "+returnType.toString()+" "+this);
     }
 
     @Override

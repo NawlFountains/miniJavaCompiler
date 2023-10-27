@@ -17,10 +17,6 @@ public class NodeAccessThis extends NodeAccess implements Node {
         chainedNode.check();
     }
 
-    @Override
-    public boolean isAssignable() {
-        return false;
-    }
     public String getStructure() {
         String toReturn = "this";
         if (argumentList.size() > 0) {

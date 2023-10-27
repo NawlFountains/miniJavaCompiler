@@ -335,9 +335,9 @@ public class SyntaxAnalyzer {
             ArgsFormales(method);
             NodeBlock blockNode = Bloque();
             method.setAST(blockNode);
-            blockNode.setRoutineEnvironment(method);
             method.setReturnType(typeDeclared);
             method.setStatic(isStatic);
+            blockNode.setRoutineEnvironment(method);
             SymbolTable.getInstance().setCurrentMethod(method);
             SymbolTable.getInstance().getCurrentClass().insertMethod(nameDeclared,method);
         } else {
@@ -378,11 +378,10 @@ public class SyntaxAnalyzer {
     }
     NodeAssignment InicializacionOpcional(NodeCompoundExpression leftSide) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("assign")) {
-            System.out.println("Found assignment");
+            Token declarationToekn = currentToken;
             match("assign");
             NodeCompoundExpression rightSide = Expresion();
-            NodeAssignment assignment = new NodeAssignment(leftSide,rightSide);
-            System.out.println("Assignment "+leftSide+"="+rightSide);
+            NodeAssignment assignment = new NodeAssignment(leftSide,rightSide,declarationToekn);
             return assignment;
         } else if (isCurrentTokenOnFollowSetOf("InicializacionOpcional")) {
             return null;
@@ -779,7 +778,7 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("OperadorUnario")) {
             NodeOperand unaryOperand = OperadorUnario();
             NodeCompoundExpression operand = Operando();
-            NodeUnaryExpression nodeUnaryExp = new NodeUnaryExpression((NodeOperand)operand);
+            NodeUnaryExpression nodeUnaryExp = new NodeUnaryExpression(operand);
             nodeUnaryExp.addUnaryOperand(unaryOperand);
             return nodeUnaryExp;
         } else if (isCurrentTokenOnFirstSetOf("Operando")) {

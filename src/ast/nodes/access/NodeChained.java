@@ -1,15 +1,13 @@
-package ast.nodes;
+package ast.nodes.access;
 
-import ast.nodes.access.NodeAccess;
-import ast.nodes.access.NodeAccessConstructor;
-import ast.nodes.access.NodeAccessThis;
+import ast.nodes.Node;
+import ast.nodes.NodeCompoundExpression;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.SymbolTable;
 import semantic.entities.AttributeST;
 import semantic.entities.ClassST;
 import semantic.entities.MethodST;
-import semantic.entities.RoutineST;
 
 public class NodeChained extends NodeAccess implements Node {
     protected NodeChained nodeChained;
@@ -35,9 +33,20 @@ public class NodeChained extends NodeAccess implements Node {
                 ClassST thisClass = previousNodeAccess.getParentBlock().getRoutineEnvironment().getOwnerClass();
                 checkExistanceOfMetVar(thisClass);
             } else if (previousNodeAccess instanceof NodeAccessConstructor) {
-                ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.operandToken.getLexeme());
+                ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getToken().getLexeme());
                 checkExistanceOfMetVar(constructorClass);
+            } else if (previousNodeAccess instanceof NodeAccessMetVar ) {
+                //
+                if (isAttribute) {
+                    if (previousNodeAccess.isAttribute) {
+
+                    }
+                }
             }
+        } else if (previousNode.isAttribute) {
+            //TODO access both attribute and method
+        } else {
+            //TODO previous was method , check from return type
         }
     }
 
@@ -77,7 +86,11 @@ public class NodeChained extends NodeAccess implements Node {
 
     @Override
     public boolean isAssignable() {
-        return false;
+        boolean assignable = isAttribute;
+        if (chainedNode != null)
+            assignable = chainedNode.isAssignable();
+        System.out.println(getStructure()+" asked if assignable "+isAttribute);
+        return assignable;
     }
 
     @Override

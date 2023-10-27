@@ -14,20 +14,26 @@ public class NodeReturn extends NodeSentence implements Node{
         this.declarationToken = declarationToken;
         this.returnExpression = returnExpression;
     }
+    public void addParentBlock(NodeBlock nodeBlock) {
+        super.addParentBlock(nodeBlock);
+        if (returnExpression != null)
+            returnExpression.addParentBlock(nodeBlock);
+    }
     @Override
     public void check() throws SemanticException {
-        //TODO returnExpression type must be conformant with method return type
-        NodeBlock rootBlock = getRootBlock();
         System.out.println("NodeReturn:check:start");
-//        if (returnExpression != null) {
-//                returnExpression.check();
-//                System.out.println("NodeReturn:check:notNull");
-//                if (!rootBlock.getRoutineEnvironment().getReturnType().toString().equals(returnExpression.getReturnType().toString()))
-//                    throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de return no corresponde con el declarado por el metodo, se esperaba "+rootBlock.getRootBlock().getRoutineEnvironment().getReturnType().toString()+" pero se obtuvo "+returnExpression.getReturnType().toString());
-//        } else {
-//            if (!rootBlock.getRoutineEnvironment().getReturnType().toString().equals("void"))
-//                throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de return no corresponde con el declarado por el metodo, se esperaba "+rootBlock.getRootBlock().getRoutineEnvironment().getReturnType().toString()+" pero se obtuvo void");
-//        }
+        NodeBlock rootBlock = getRootBlock();
+        if (returnExpression != null) {
+            System.out.println("NodeReturn:check:start"+returnExpression.getParentBlock());
+            returnExpression.check();
+                System.out.println("NodeReturn:check:notNull");
+                System.out.println("Return type expected"+returnExpression.getReturnType());
+                if (!rootBlock.getRoutineEnvironment().getReturnType().toString().equals(returnExpression.getReturnType().toString()))
+                    throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de return no corresponde con el declarado por el metodo, se esperaba "+rootBlock.getRoutineEnvironment().getReturnType().toString()+" pero se obtuvo "+returnExpression.getReturnType().toString());
+        } else {
+            if (!rootBlock.getRoutineEnvironment().getReturnType().toString().equals("void"))
+                throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de return no corresponde con el declarado por el metodo, se esperaba "+rootBlock.getRoutineEnvironment().getReturnType().toString()+" pero se obtuvo void");
+        }
     }
 
     @Override
