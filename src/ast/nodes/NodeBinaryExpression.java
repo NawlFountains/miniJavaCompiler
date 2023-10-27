@@ -13,8 +13,6 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         leftSide.addParentBlock(parentBlock);
         operand.addParentBlock(parentBlock);
         rightSide.addParentBlock(parentBlock);
-        System.out.println("NodeBinaryExpression:created: leftside: "+leftSide.getStructure()+" operand : "+operand.getStructure()+" rightside: "+rightSide.getStructure()+" parentBlock"+parentBlock);
-        System.out.println("NodeBinaryExpression:created: leftside: "+leftSide+" operand : "+operand+" rightside: "+rightSide+" parentBlock"+parentBlock);
         returnType = operand.getReturnType();
     }
 
@@ -37,7 +35,6 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         return false;
     }
     public String getStructure() {
-        System.out.println("NodeBinaryExpression:getStructure:Start");
         String toReturn = "Binary expression \n";
         toReturn += "Left side \n "+leftSide.getStructure();
         toReturn +=  "operand "+ operand.getStructure();

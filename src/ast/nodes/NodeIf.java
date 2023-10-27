@@ -25,7 +25,6 @@ public class NodeIf extends NodeSentence implements Node{
             nodeElse.addParentBlock(nodeBlock);
     }
     public void setRoutineEnvironment(RoutineST routineEnvironment) {
-        System.out.println("NodeIf:setRoutieEnviroment:"+routineEnvironment+" to "+conditionalExpression+" and "+thenSentence);
         this.routineEnvironment = routineEnvironment;
         conditionalExpression.setRoutineEnvironment(routineEnvironment);
         if (thenSentence != null)
@@ -37,12 +36,9 @@ public class NodeIf extends NodeSentence implements Node{
     }
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeIf:check:conditionalExpression");
         conditionalExpression.check();
-        System.out.println("NodeIf:check:thenSentence");
         if (thenSentence != null)
             thenSentence.check();
-        System.out.println("conditionalExpression "+conditionalExpression+" return type "+conditionalExpression.getReturnType());
         if (!conditionalExpression.getReturnType().toString().equals("boolean"))
             throw new SemanticException(declarationToken.getLexeme(), declarationToken.getLineNumber(),"Expresion dentro del if debe ser booleana");
         if (nodeElse != null)
@@ -54,7 +50,6 @@ public class NodeIf extends NodeSentence implements Node{
         return false;
     }
     public String getStructure() {
-        System.out.println("NodeIf:getStructure:Start");
         String toReturn = "If \n";
         toReturn += "Condition "+conditionalExpression.getStructure()+"\n";
         if (thenSentence != null)

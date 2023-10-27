@@ -88,12 +88,9 @@ public abstract class RoutineST {
         this.blockAST = blockAST;
     }
     public String getASTStructure() {
-        System.out.println("RoutineST:getASTStructure:Start:"+routineName);
         String toReturn = "Name : "+routineName+"\n";
-        System.out.println("RoutineST:getASTStructure:blockAST");
         if (blockAST != null)
         toReturn += blockAST.getStructure();
-        System.out.println("RoutineST:getASTStructure:blockAST:finished");
         return toReturn;
     }
 }

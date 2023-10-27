@@ -22,16 +22,11 @@ public class NodeReturn extends NodeSentence implements Node{
     }
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeReturn:check:start");
         NodeBlock rootBlock = getRootBlock();
-        System.out.println("NodeReturn:check:instanceOfCosntructor"+ (rootBlock.getRoutineEnvironment() instanceof ConstructorST));
         if (rootBlock.getRoutineEnvironment() instanceof ConstructorST)
             throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"No se puede hacer return en un constructor");
         if (returnExpression != null) {
-            System.out.println("NodeReturn:check:start"+returnExpression.getStructure());
             returnExpression.check();
-                System.out.println("NodeReturn:check:notNull");
-                System.out.println("Return type expected"+returnExpression.getReturnType());
                 if (!rootBlock.getRoutineEnvironment().getReturnType().toString().equals(returnExpression.getReturnType().toString()))
                     throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El tipo de return no corresponde con el declarado por el metodo, se esperaba "+rootBlock.getRoutineEnvironment().getReturnType().toString()+" pero se obtuvo "+returnExpression.getReturnType().toString());
         } else {

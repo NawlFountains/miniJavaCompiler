@@ -19,7 +19,6 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
     @Override
     public void check() throws SemanticException {
         //Check if class exists
-        System.out.println("NodeAccessConstructor:check():"+operandToken.getLexeme());
         ClassST classReferenceByConstructor = SymbolTable.getInstance().getClassWithName(operandToken.getLexeme());
         if (classReferenceByConstructor == null)
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No existe ninguna clase con el nombre "+operandToken.getLexeme());
@@ -28,10 +27,8 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
         if (constructorOfClassNamed.getParameterTypeList().size() != argumentList.size())
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No coincide la aridad entre el constructor definido y el usado "+operandToken.getLexeme());
         if (!sameParameterTypes(constructorOfClassNamed.getParameterTypeList(),argumentTypeList)) {
-            System.out.println(constructorOfClassNamed.getParameterTypeList().toString()+" vs "+ argumentTypeList.toString());
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No coincide ningun constructor de "+constructorOfClassNamed.getName()+" para los parametro especificados.");
         }
-        System.out.println("NodeAccessConstructor:check:finished continue with chained node");
         returnType = new ReferenceType(operandToken.getLexeme());
         if (chainedNode != null) {
             chainedNode.check();

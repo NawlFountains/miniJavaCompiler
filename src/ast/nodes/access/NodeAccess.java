@@ -29,7 +29,6 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         return operandToken;
     }
     public void addArgument(NodeCompoundExpression nodeArgument) {
-        System.out.println("NodeAccess:ArgumentAdded:"+nodeArgument.getStructure());
         argumentTypeList.add(nodeArgument.getReturnType());
         argumentList.add(nodeArgument);
     }

@@ -21,16 +21,13 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeAccesMetVar:check():"+methodOrVarToken.getLexeme()+" isAttribute:"+isAttribute);
         boolean found = false;
-        System.out.println(this+" parent is "+getParentBlock());
         RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
 
             assignable = true;
             //Search in parameters
 
-            System.out.println("NodeAccessMetVar:check:parameter");
             found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
             if (found) {
                 returnType = routineEnvironment.getParameterType(methodOrVarToken.getLexeme());
@@ -38,7 +35,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
             //Search in local variables
 
-            System.out.println("NodeAccessMetVar:check:localVar");
             NodeBlock pivotBlock = getParentBlock();
             while (!pivotBlock.isRoot() && !found) {
                 if (pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme())) {
@@ -55,16 +51,13 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             }
             if (!found) {
                 //Search in attributes
-                System.out.println("NodeAccessMetVar:check:attribute");
                 for (AttributeST a : routineEnvironment.getOwnerClass().getAttributes()) {
                     if (methodOrVarToken.getLexeme().equals(a.getAttributeName())) {
-                        System.out.println("NodeAccessMetVar:check:Found");
                         found = true;
                         returnType = a.getAttributeType();
                         break;
                     }
                 }
-                System.out.println("NodeAccessMetVar:check:finish");
             } else {
                 found = true;
             }
@@ -91,7 +84,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 throw new SemanticException(methodOrVarToken.getLexeme(), methodOrVarToken.getLineNumber(),"No existe el metodo "+methodOrVarToken.getLexeme()+" en la clase "+ routineEnvironment.getOwnerClass().getClassName());
         }
         if (chainedNode != null) {
-            System.out.println("NodeAccesMetVar:chainedNode:check");
             chainedNode.check();
             returnType = chainedNode.getReturnType();
         }
@@ -101,7 +93,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
     public boolean isAssignable() {
         if (chainedNode != null)
             assignable = chainedNode.isAssignable();
-        System.out.println(getStructure()+" was asked if assignable "+assignable+" by "+this);
         return assignable;
     }
     public String getStructure() {

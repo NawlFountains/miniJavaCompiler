@@ -27,9 +27,6 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         if (!leftSide.isAssignable()) {
             throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El lado izquierdo no es asignable");
         } else {
-            System.out.println("NodeAssignment:LeftType:"+leftSide.getReturnType());
-            System.out.print("RightSide:"+rightSide.getReturnType());
-            System.out.println();
             typeConformityForAssignment(leftSide.getReturnType(),rightSide.getReturnType(),declarationToken);
         }
     }
@@ -39,7 +36,6 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         return true;
     }
     public String getStructure() {
-        System.out.println("NodeAssignment:getStructure:Start");
         return "Assignment \n"+leftSide.getStructure()+"\n = \n"+rightSide.getStructure()+"\n";
     }
 }

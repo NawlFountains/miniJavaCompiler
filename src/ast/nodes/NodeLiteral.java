@@ -32,7 +32,6 @@ public class NodeLiteral extends NodeOperand implements Node{
             }
             returnType = new PrimitiveType(typeString);
         }
-        System.out.println("NodeLiteral:created: id "+operandToken.getId()+" return "+returnType.toString()+" "+this);
     }
 
     @Override

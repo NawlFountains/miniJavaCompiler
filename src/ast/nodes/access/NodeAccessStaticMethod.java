@@ -21,11 +21,8 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
         if (receiverClass == null) {
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No existe la clase "+operandToken.getLexeme()+" referida.");
         }
-        System.out.println("Methods of "+receiverClass.getClassName()+" are "+receiverClass.getMethods().toString());
         for (MethodST m : receiverClass.getMethods()) {
-            System.out.println("COmparing "+m.getName()+" with "+methodToken.getLexeme());
             if (methodToken.getLexeme().equals(m.getName())) {
-                System.out.println("Equal");
                 if (m.getParameterTypeList().size() == argumentList.size()) {
                     if (m.isStatic()) {
                         if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {

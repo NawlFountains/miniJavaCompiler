@@ -231,7 +231,6 @@ public class ClassST implements EntityST {
         return toReturn;
     }
     public String getASTStructure() {
-        System.out.println("ClassST:getASTStructure:Start");
         String toReturn = "AST Methods :\n";
         for (MethodST m : methods.values()) {
             toReturn += m.getASTStructure()+"\n";
@@ -281,7 +280,6 @@ public class ClassST implements EntityST {
     }
     public void checkSentences() throws SemanticException {
         for (MethodST m : methods.values()) {
-            System.out.println("ClassST("+className+"):checkSentences():method:"+m.getName());
             //Skip predefined classes maybe not the best idea
             if (m.blockAST != null)
              m.blockAST.check();

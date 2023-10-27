@@ -525,10 +525,8 @@ public class SyntaxAnalyzer {
     void ListaSentencias(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
             NodeSentence sentence = Sentencia(nodeBlock);
-            System.out.println("Created sentence "+sentence);
             if (sentence != null) {
                 nodeBlock.addSentence(sentence);
-                System.out.println("SyntaxAnalyzer:addParentBlock:"+sentence);
                 sentence.addParentBlock(nodeBlock);
             }
             ListaSentencias(nodeBlock);
@@ -565,12 +563,10 @@ public class SyntaxAnalyzer {
                     InicializacionOpcional();
                 }
                 isStaticAccess = false;
-                System.out.println("About to retunr null");
                 return null;
             } else {
                 NodeCompoundExpression nodeExpression = Expresion();
                 match("semiColon");
-                System.out.println("Expressino from sentence returns"+nodeExpression);
                 return nodeExpression;
             }
         } else if (isCurrentTokenOnFirstSetOf("VarLocal")) {
@@ -590,7 +586,6 @@ public class SyntaxAnalyzer {
         } else if (isCurrentTokenOnFirstSetOf("While")) {
             return While(parentBlock);
         } else if (isCurrentTokenOnFirstSetOf("Bloque")) {
-            System.out.println("Block from sentence");
             return Bloque(parentBlock);
         } else if (currentToken.getId().contains("semiColon")) {
             match("semiColon");
@@ -717,11 +712,9 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             NodeCompoundExpression nodeCompoundExp = ExpresionCompuesta();
             NodeAssignment possibleAssignment = InicializacionOpcional(nodeCompoundExp);
-            System.out.println("IN EXPRESSION COMPUNDEXP "+nodeCompoundExp+" ASSIGNMENT "+possibleAssignment);
             if (possibleAssignment == null) {
                 return nodeCompoundExp;
             } else {
-                System.out.println(possibleAssignment.getStructure());
                 return possibleAssignment;
             }
         } else {
@@ -732,13 +725,10 @@ public class SyntaxAnalyzer {
     NodeCompoundExpression ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionCompuesta")) {
             NodeCompoundExpression basicExpression = ExpresionBasica();
-            System.out.println("ExpresionCompuesta:basicExpression:"+basicExpression.getStructure());
             NodeBinaryExpression leftOverExpression = RExpresionCompuesta(basicExpression);
             if (leftOverExpression == null) {
-                System.out.println("basic expression only");
                 return basicExpression;
             } else {
-                System.out.println("ExpresionCompuesta:leftOver:"+leftOverExpression.getStructure());
                 return leftOverExpression;
             }
         } else {
@@ -764,7 +754,6 @@ public class SyntaxAnalyzer {
     NodeOperand OperadorBinario() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("OperadorBinario")) {
             NodeOperand operand = new NodeOperand(currentToken);
-            System.out.println("Found binary operand "+currentToken.getLexeme());
             match(currentToken.getId());
             return operand;
         } else {
@@ -780,7 +769,6 @@ public class SyntaxAnalyzer {
             return nodeUnaryExp;
         } else if (isCurrentTokenOnFirstSetOf("Operando")) {
             NodeCompoundExpression operand = Operando();
-            System.out.println("Operand is "+operand.getStructure());
             return operand;
         } else {
             Set<String> auxToException = firstSet("OperadorUnario");
@@ -799,10 +787,8 @@ public class SyntaxAnalyzer {
     }
     NodeCompoundExpression Operando() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
-            System.out.println("Operand is a literal");
             return Literal();
         } else if (isCurrentTokenOnFirstSetOf("Acceso")) {
-            System.out.println("Operand is an access");
             return Acceso();
         } else {
             Set<String> auxToException = firstSet("Literal");
@@ -813,7 +799,6 @@ public class SyntaxAnalyzer {
     NodeLiteral Literal() throws LexicalException, SyntaxException  {
         if (isCurrentTokenOnFirstSetOf("Literal")) {
             NodeLiteral literal = new NodeLiteral(currentToken);
-            System.out.println("Literal is "+literal);
             match(currentToken.getId());
             return literal;
         } else {

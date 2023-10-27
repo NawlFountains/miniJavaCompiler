@@ -37,27 +37,21 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
                 //If doing optional must check type declared and assignment match
             }
         }
-        System.out.println("NodeVariableLocal["+variableIdToken.getLexeme()+"]:check():parentBlock"+parentBlock);
 
         NodeBlock rootBlock = getRootBlock();
 
         RoutineST referenceEnviroment = rootBlock.getRoutineEnvironment();
-        System.out.println("referenceEnviroment:"+referenceEnviroment);
         //Check name doesn't collide with a parameter for this method
         if (!referenceEnviroment.existParameter(variableIdToken.getLexeme())) {
             //Check name doesn't collide with an existing attribute
-            System.out.println("NodeVariableLocal:check:toInitFor");
             for (AttributeST at : referenceEnviroment.getOwnerClass().getAttributes()) {
-                System.out.println("NodeVariableLocal:for:"+at.getAttributeName()+"=="+variableIdToken.getLexeme()+" is "+variableIdToken.getLexeme().equals(at.getAttributeName()));
                 if (variableIdToken.getLexeme().equals(at.getAttributeName())) {
                     throw new SemanticException(variableIdToken.getLexeme(),variableIdToken.getLineNumber(),"Colision de nombres, ya existe un atributo con el identificador "+variableIdToken.getLexeme());
                 }
             }
             //Check name doesn't collide with an existing local variable
-            System.out.println("NodeVariableLocal:check:toCheckForLocalVariables");
             NodeBlock pivotBlock = getParentBlock();
             boolean found = false;
-            System.out.println("NodeVariableLocal:check:startIteration pivotBlock "+pivotBlock+" who is root ? "+pivotBlock.isRoot());
             while (!pivotBlock.isRoot() && !found) {
                 if (pivotBlock.existsVariableWithName(variableIdToken.getLexeme())) {
                     found = true;
@@ -65,11 +59,9 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
                     pivotBlock = pivotBlock.getParentBlock();
                 }
             }
-            System.out.println("NodeVariableLocal:check:outIteration");
             if (!found && pivotBlock.existsVariableWithName(variableIdToken.getLexeme())) {
                 found = true;
             }
-            System.out.println("NodeVariableLocal:check:nearFinish:found "+found);
             if (found)
                 throw new SemanticException(variableIdToken.getLexeme(),variableIdToken.getLineNumber(),"Colision de nombres, ya existe una variable local con el identificador "+variableIdToken.getLexeme());
             else
@@ -77,7 +69,6 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
         } else {
             throw new SemanticException(variableIdToken.getLexeme(),variableIdToken.getLineNumber(),"Colision de nombres, ya existe un parametro con el identificador "+variableIdToken.getLexeme());
         }
-        System.out.println("Finish checking");
     }
 
     @Override

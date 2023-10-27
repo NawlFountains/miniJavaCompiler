@@ -24,7 +24,6 @@ public class NodeChained extends NodeAccess implements Node {
     }
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeChained:check:"+getToken().getLexeme());
         //If previous node was an access node it could be a This access (this.x()) , a var access (class.var) or a Constructor access (new Class())
         if (previousNodeAccess != null) {
             if (previousNodeAccess instanceof NodeAccessThis) {
@@ -34,7 +33,6 @@ public class NodeChained extends NodeAccess implements Node {
                 ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getToken().getLexeme());
                 checkExistanceOfMetVar(constructorClass);
             } else if (previousNodeAccess instanceof NodeAccessMetVar ) {
-                System.out.println("NodeChained:check:previousNodeAccess(NodeAccessMetVar)");
                 if (previousCallReturnAClass(previousNodeAccess)) {
                     ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getReturnType().toString());
                     checkExistanceOfMetVar(previousClassType);
@@ -49,9 +47,7 @@ public class NodeChained extends NodeAccess implements Node {
                 throw new SemanticException(operandToken.getLexeme(), operandToken.getLineNumber(),"No se puede hacer un llamado o accesso a un tipo primitivo");
         }
 
-        System.out.println("Finished chain ");
         if (nodeChained != null) {
-            System.out.println("Has left chain "+nodeChained.getToken());
             nodeChained.check();
             returnType = nodeChained.getReturnType();
         }
@@ -59,13 +55,11 @@ public class NodeChained extends NodeAccess implements Node {
 
     private void checkExistanceOfMetVar(ClassST topClass) throws SemanticException {
         boolean found = false;
-        System.out.println("NodeChained:checkExistanceOfMetVar("+topClass.getClassName()+") of "+operandToken.getLexeme()+" which is an attribute "+isAttribute);
         if (isAttribute) {
             for (AttributeST a : topClass.getAttributes()) {
                     if (operandToken.getLexeme().equals(a.getAttributeName())) {
                         found = true;
                         returnType = a.getAttributeType();
-                        System.out.println("NodeChained:attribute("+a.getAttributeName()+"):found:"+found);
                         break;
                     }
             }
@@ -101,9 +95,6 @@ public class NodeChained extends NodeAccess implements Node {
         boolean assignable = isAttribute;
         if (nodeChained != null)
             assignable = nodeChained.isAssignable();
-        else
-            System.out.println("Last one in chain");
-        System.out.println(getToken().getLexeme()+" was asked if assignable "+assignable+" by "+this.getStructure());
         return assignable;
     }
 

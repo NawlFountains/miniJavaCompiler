@@ -238,10 +238,8 @@ public class SymbolTable implements EntityST {
         return EOF;
     }
     public String getASTStructure() {
-        System.out.println("SymbolTable:getASTStructure:Start");
         String toReturn = "Clases \n";
         for (ClassST c : classes.values()) {
-            System.out.println("SymbolTable:getASTStructure:Iteration:"+c.getClassName());
             toReturn += c.getASTStructure()+"\n";
         }
         return  toReturn;
