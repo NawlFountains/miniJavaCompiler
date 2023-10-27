@@ -7,7 +7,7 @@ class A{
 	}
 	int calculate(int x) {
 		this.a(x) = 3;
-		var y = new B();
+		var y = new B(3,3);
 		x.a;
 	}
 	static void main(){}

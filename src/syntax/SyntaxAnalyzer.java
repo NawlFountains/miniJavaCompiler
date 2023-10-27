@@ -504,7 +504,19 @@ public class SyntaxAnalyzer {
     NodeBlock Bloque() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Bloque")) {
             match("openCurl");
-            NodeBlock nodeBlock = new NodeBlock();
+            NodeBlock nodeBlock = new NodeBlock(true);
+            ListaSentencias(nodeBlock);
+            match("closeCurl");
+            return nodeBlock;
+        } else {
+            throw new SyntaxException(currentToken, firstSet("Bloque").toString());
+        }
+    }
+    NodeBlock Bloque(NodeBlock parentBlock) throws LexicalException, SyntaxException, SemanticException {
+        if (isCurrentTokenOnFirstSetOf("Bloque")) {
+            match("openCurl");
+            NodeBlock nodeBlock = new NodeBlock(false);
+            nodeBlock.addParentBlock(parentBlock);
             ListaSentencias(nodeBlock);
             match("closeCurl");
             return nodeBlock;
@@ -514,7 +526,7 @@ public class SyntaxAnalyzer {
     }
     void ListaSentencias(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ListaSentencias")) {
-            NodeSentence sentence = Sentencia();
+            NodeSentence sentence = Sentencia(nodeBlock);
             System.out.println("Created sentence "+sentence);
             if (sentence != null) {
                 nodeBlock.addSentence(sentence);
@@ -527,7 +539,7 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ListaSentencias").toString());
         }
     }
-    NodeSentence Sentencia() throws LexicalException, SyntaxException, SemanticException {
+    NodeSentence Sentencia(NodeBlock parentBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Expresion")) {
             if (currentToken.getId().contains("idClase")) {
                 NodeAccessStaticMethod accessStaticMethod = null;
@@ -576,12 +588,12 @@ public class SyntaxAnalyzer {
             match("semiColon");
             return nodeReturn;
         } else if (isCurrentTokenOnFirstSetOf("If")) {
-            return If();
+            return If(parentBlock);
         } else if (isCurrentTokenOnFirstSetOf("While")) {
-            return While();
+            return While(parentBlock);
         } else if (isCurrentTokenOnFirstSetOf("Bloque")) {
             System.out.println("Block from sentence");
-            return Bloque();
+            return Bloque(parentBlock);
         } else if (currentToken.getId().contains("semiColon")) {
             Token semiColonToken = currentToken;
             match("semiColon");
@@ -604,7 +616,7 @@ public class SyntaxAnalyzer {
 
     NodeVariableLocal VarLocalConTipoPrimitivo() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("VarLocalConTipoPrimitivo")) {
-            Type variableType = new PrimitiveType(currentToken.getId());
+            Type variableType = new PrimitiveType(currentToken.getId().substring(3,currentToken.getId().length()));
             match(currentToken.getId());
             currentToken.getLexeme();
             NodeVariableLocal nodeVariableLocal = new NodeVariableLocal(currentToken,variableType);
@@ -664,24 +676,25 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("ExpresionOpcional").toString());
         }
     }
-    NodeIf If() throws LexicalException, SyntaxException, SemanticException {
+    NodeIf If(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("If")) {
             match("rw_if");
             match("openPar");
             NodeCompoundExpression conditionalExpression = Expresion();
             match("closePar");
-            NodeSentence thenSentence = Sentencia();
+            NodeSentence thenSentence = Sentencia(nodeBlock);
             NodeIf nodeIf = new NodeIf(conditionalExpression,thenSentence);
-            Else(nodeIf);
+            System.out.println("IF created "+conditionalExpression.getStructure());
+            Else(nodeIf,nodeBlock);
             return nodeIf;
         } else {
             throw new SyntaxException(currentToken, firstSet("If").toString());
         }
     }
-    void Else(NodeIf nodeIf) throws LexicalException, SyntaxException, SemanticException {
+    void Else(NodeIf nodeIf, NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
-            NodeSentence elseSentence = Sentencia();
+            NodeSentence elseSentence = Sentencia(nodeBlock);
             nodeIf.addElse(new NodeElse(nodeIf,elseSentence));
         } else if (isCurrentTokenOnFollowSetOf("Else")) {
 
@@ -689,13 +702,13 @@ public class SyntaxAnalyzer {
             throw new SyntaxException(currentToken, firstSet("Else").toString());
         }
     }
-    NodeWhile While() throws LexicalException, SyntaxException, SemanticException {
+    NodeWhile While(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("While")) {
             match("rw_while");
             match("openPar");
             NodeCompoundExpression conditionalExpression = Expresion();
             match("closePar");
-            NodeSentence whileSentence = Sentencia();
+            NodeSentence whileSentence = Sentencia(nodeBlock);
             NodeWhile nodeWhile = new NodeWhile(conditionalExpression,whileSentence);
             return nodeWhile;
         } else {
@@ -719,12 +732,14 @@ public class SyntaxAnalyzer {
 
     NodeCompoundExpression ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionCompuesta")) {
-            NodeCompoundExpression nodeLeftExpression = ExpresionBasica();
-            NodeCompoundExpression nodeRightExpression = RExpresionCompuesta(nodeLeftExpression);
-            if (nodeRightExpression == null) {
-                return nodeLeftExpression;
+            NodeCompoundExpression basicExpression = ExpresionBasica();
+            NodeCompoundExpression compoundExpression = RExpresionCompuesta(basicExpression);
+            if (compoundExpression == null) {
+                System.out.println("basic expression only");
+                return basicExpression;
             } else {
-                return nodeRightExpression;
+                System.out.println("Compound expression "+compoundExpression.getStructure());
+                return compoundExpression;
             }
         } else {
             throw new SyntaxException(currentToken, firstSet("ExpresionCompuesta").toString());

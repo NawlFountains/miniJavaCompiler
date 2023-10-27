@@ -12,7 +12,6 @@ import java.util.List;
 public abstract class RoutineST {
     protected HashMap<String,ParameterST> parameters;
     protected List<Type> parametersTypeList;
-    protected HashMap<String,Type> localVariables;
     protected ParameterST actualParameter;
     protected String routineName;
     protected ClassST ownerClass;
@@ -22,17 +21,7 @@ public abstract class RoutineST {
     protected RoutineST(String routineName) {
         parameters = new HashMap<>();
         parametersTypeList = new ArrayList<>();
-        localVariables = new HashMap<>();
         this.routineName = routineName;
-    }
-    public void addLocalVariable(String varName, Type varType) {
-        localVariables.put(varName,varType);
-    }
-    public boolean existVariableWithName(String varName) {
-        return localVariables.get(varName) != null;
-    }
-    public Type getVariableType(String varName) {
-        return localVariables.get(varName);
     }
     public void insertParameter(Token token, ParameterST parameterST) throws SemanticException {
         if (!existParameter(token.getLexeme())) {

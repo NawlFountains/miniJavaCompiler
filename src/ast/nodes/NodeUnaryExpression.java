@@ -16,11 +16,14 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
     }
     @Override
     public void check() throws SemanticException {
+        System.out.println("NodeUnaryExpression::check");
         operand.check();
         if (unaryOperand != null) {
+            System.out.println("NodeUnaryExpression::check:unaryOperand");
             unaryOperand.check();
+            //TODO check if operand is in conformity with unaryOperand
+            typeConformity(unaryOperand,operand);
         }
-        //TODO check if operand is in conformity with unaryOperand
     }
 
     @Override

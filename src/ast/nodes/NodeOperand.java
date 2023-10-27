@@ -22,12 +22,12 @@ public class NodeOperand extends NodeCompoundExpression implements Node{
             case "opNotEq":
                 returnType = new PrimitiveType("boolean");
                 break;
-            case "opDiv":
-                returnType = new PrimitiveType("float");
-                break;
             default:
                 returnType = new PrimitiveType("int");
         }
+    }
+    public Type getReturnType() {
+        return returnType;
     }
     @Override
     public void check() throws SemanticException {

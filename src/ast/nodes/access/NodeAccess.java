@@ -3,17 +3,20 @@ package ast.nodes.access;
 import ast.nodes.*;
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class NodeAccess extends NodeOperand implements Node {
     protected List<NodeCompoundExpression> argumentList;
+    protected List<Type> argumentTypeList;
     protected NodeChained chainedNode;
     protected boolean isAttribute = true;
     public NodeAccess(Token callerToken) {
         super(callerToken);
         argumentList = new ArrayList<>();
+        argumentTypeList = new ArrayList<>();
     }
     public void isNotAttribute() {
         isAttribute = false;
@@ -24,6 +27,7 @@ public abstract class NodeAccess extends NodeOperand implements Node {
     }
     public void addArgument(NodeCompoundExpression nodeArgument) {
         System.out.println("NodeAccess:ArgumentAdded:"+nodeArgument.getStructure());
+        argumentTypeList.add(nodeArgument.getReturnType());
         argumentList.add(nodeArgument);
     }
     @Override

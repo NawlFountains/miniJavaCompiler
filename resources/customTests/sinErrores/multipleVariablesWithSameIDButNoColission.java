@@ -1,17 +1,21 @@
 ///[SinErrores]
 // 
 class A{
-	int a;
+	int x;
 	void method(){
 		if(4>3){
-		a = 3;
+			var a = 3;
 		} else {
-			a = 4;
+			if ( 3 > 2) {
+				var a = 3;
+			}
+			var a = 4;
 		}
 		while(true) {
+			var a = 2;
 		}
 	}
-	int calculate(int x) {
+	int calculate(int a) {
  		return x * a;	
 	}
 	static void main(){}

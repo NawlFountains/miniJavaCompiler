@@ -29,6 +29,7 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         leftSide.check();
         operand.check();
         rightSide.check();
+        typeConformity(leftSide,operand,rightSide);
     }
 
     @Override

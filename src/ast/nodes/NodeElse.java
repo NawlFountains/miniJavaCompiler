@@ -10,6 +10,11 @@ public class NodeElse extends NodeSentence implements Node{
         this.nodeIf = nodeIf;
         this.elseSentence = elseSentence;
     }
+
+    public void addParentBlock(NodeBlock nodeBlock) {
+        super.addParentBlock(nodeBlock);
+        elseSentence.addParentBlock(nodeBlock);
+    }
     @Override
     public void check() throws SemanticException {
         elseSentence.check();

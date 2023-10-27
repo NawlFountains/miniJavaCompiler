@@ -10,7 +10,7 @@ public class NodeReturn extends NodeSentence implements Node{
     }
     @Override
     public void check() {
-
+        //TODO returnExpression type must be conformant with method return type
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ast.nodes.access;
 
 import ast.nodes.Node;
+import ast.nodes.NodeBlock;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.NodeOperand;
 import lexical.SemanticException;
@@ -11,6 +12,7 @@ import semantic.entities.RoutineST;
 
 public class NodeAccessMetVar extends NodeAccess implements Node {
     protected Token methodOrVarToken;
+    protected boolean assignable = false;
     public NodeAccessMetVar(Token methodOrVarToken) {
         //TODO assume is 'this"
         super(new Token ("","",-1));
@@ -22,11 +24,24 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         //TODO check method or variable exist
         System.out.println("NodeAccesMetVar:check():parentBlock"+parentBlock);
         boolean found = false;
-        RoutineST routineEnvironment = parentBlock.getRoutineEnvironment();
+        RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
             System.out.println("NodeAccessMetVar:check:attribute");
-            //Check if exist and attribute or variable with this id
-            if (!routineEnvironment.existVariableWithName(methodOrVarToken.getLexeme())) {
+            //Serach in parameters
+            found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
+
+            //Search in local variables
+            NodeBlock pivotBlock = getParentBlock();
+            while (!pivotBlock.isRoot() && !found) {
+                if (pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme()))
+                    found = true;
+                else
+                    pivotBlock = pivotBlock.getParentBlock();
+            }
+            if (!found && pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme()))
+                found = true;
+            if (!found) {
+                //Search in attributes
                 for (AttributeST a : routineEnvironment.getOwnerClass().getAttributes()) {
                     if (methodOrVarToken.getLexeme().equals(a.getAttributeName())) {
                         found = true;
@@ -35,6 +50,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 }
             } else {
                 found = true;
+                assignable = true;
             }
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"No existe ninguna variable local ni atributo con nombre "+methodOrVarToken.getLexeme());
@@ -44,13 +60,18 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 if (methodOrVarToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
                         //TODO check parameter types
-                        found = true;
-                        break;
+                        if (m.getParameterTypeList().equals(argumentTypeList)) {
+                            found = true;
+                            break;
+                        } else {
+                            throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"Distinto tipo de parametros para el metodo "+m.getName());
+                        }
                     } else {
                         throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"Distinta cantidad de parametros para el metodo "+m.getName());
                     }
                 }
             }
+            assignable = false;
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(), methodOrVarToken.getLineNumber(),"No existe el metodo "+methodOrVarToken.getLexeme()+" en la clase "+ routineEnvironment.getOwnerClass().getClassName());
         }
@@ -61,7 +82,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
     @Override
     public boolean isAssignable() {
-        return false;
+        return assignable;
     }
     public String getStructure() {
         String toReturn = "AccessMetVar "+methodOrVarToken.getLexeme();
