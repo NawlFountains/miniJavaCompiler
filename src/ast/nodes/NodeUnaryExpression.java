@@ -28,7 +28,6 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
         if (unaryOperand != null) {
             System.out.println("NodeUnaryExpression::check:unaryOperand");
             unaryOperand.check();
-            //TODO check if operand is in conformity with unaryOperand
             typeConformity(unaryOperand,operand);
         }
         returnType = operand.getReturnType();

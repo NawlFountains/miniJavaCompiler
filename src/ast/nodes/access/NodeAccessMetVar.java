@@ -14,42 +14,56 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
     protected Token methodOrVarToken;
     protected boolean assignable = false;
     public NodeAccessMetVar(Token methodOrVarToken) {
-        //TODO assume is 'this"
-        super(new Token ("","",-1));
+        //Assume is 'this"
+        super(methodOrVarToken);
         this.methodOrVarToken = methodOrVarToken;
     }
 
     @Override
     public void check() throws SemanticException {
-        //TODO check method or variable exist
-        System.out.println("NodeAccesMetVar:check():parentBlock"+parentBlock);
+        System.out.println("NodeAccesMetVar:check():"+methodOrVarToken.getLexeme());
         boolean found = false;
         RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
 
             assignable = true;
-            System.out.println("NodeAccessMetVar:check:attribute");
-            //Serach in parameters
+            //Search in parameters
+
+            System.out.println("NodeAccessMetVar:check:parameter");
             found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
+            if (found) {
+                returnType = routineEnvironment.getParameterType(methodOrVarToken.getLexeme());
+            }
 
             //Search in local variables
+
+            System.out.println("NodeAccessMetVar:check:localVar");
             NodeBlock pivotBlock = getParentBlock();
             while (!pivotBlock.isRoot() && !found) {
-                if (pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme()))
+                if (pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme())) {
                     found = true;
-                else
+                    returnType = pivotBlock.getVariableType(methodOrVarToken.getLexeme());
+                }
+                else {
                     pivotBlock = pivotBlock.getParentBlock();
+                }
             }
-            if (!found && pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme()))
+            if (!found && pivotBlock.existsVariableWithName(methodOrVarToken.getLexeme())) {
                 found = true;
+                returnType = pivotBlock.getVariableType(methodOrVarToken.getLexeme());
+            }
             if (!found) {
                 //Search in attributes
+                System.out.println("NodeAccessMetVar:check:attribute");
                 for (AttributeST a : routineEnvironment.getOwnerClass().getAttributes()) {
                     if (methodOrVarToken.getLexeme().equals(a.getAttributeName())) {
+                        System.out.println("NodeAccessMetVar:check:Found");
                         found = true;
+                        returnType = a.getAttributeType();
                         break;
                     }
                 }
+                System.out.println("NodeAccessMetVar:check:finish");
             } else {
                 found = true;
             }
@@ -60,9 +74,9 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             for (MethodST m: routineEnvironment.getOwnerClass().getMethods()) {
                 if (methodOrVarToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
-                        //TODO check parameter types
                         if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
                             found = true;
+                            returnType = m.getReturnType();
                             break;
                         } else {
                             throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"Distinto tipo de parametros para el metodo "+m.getName());
@@ -77,7 +91,9 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                 throw new SemanticException(methodOrVarToken.getLexeme(), methodOrVarToken.getLineNumber(),"No existe el metodo "+methodOrVarToken.getLexeme()+" en la clase "+ routineEnvironment.getOwnerClass().getClassName());
         }
         if (chainedNode != null) {
+            System.out.println("NodeAccesMetVar:chainedNode:check");
             chainedNode.check();
+            returnType = chainedNode.getReturnType();
         }
     }
 

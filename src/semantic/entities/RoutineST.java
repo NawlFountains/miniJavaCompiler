@@ -57,6 +57,11 @@ public abstract class RoutineST {
     public boolean existParameter(String parameterName) {
         return parameters.get(parameterName) != null;
     }
+    public Type getParameterType(String parameterName) {
+        Type toReturn = null;
+        toReturn = parameters.get(parameterName).parameterType;
+        return toReturn;
+    }
     public String getName() {
         return routineName;
     }

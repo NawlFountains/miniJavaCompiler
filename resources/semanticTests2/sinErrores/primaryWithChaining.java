@@ -6,9 +6,8 @@ class A{
 		System.println("XD");
 	}
 	int calculate(int x) {
-		this.a = 3;
+		this.a = "Texto";
 		var y = new B(3,3);
-		x.a;
 	}
 	static void main(){}
 }

@@ -9,7 +9,6 @@ class A{
 		var bool = false;
 		bool = ((93 < 3) == false);
 		bool = !false;
-			x = true;
 		x = -x;
 	}
 	static void main(){}

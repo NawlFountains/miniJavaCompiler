@@ -378,10 +378,10 @@ public class SyntaxAnalyzer {
     }
     NodeAssignment InicializacionOpcional(NodeCompoundExpression leftSide) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("assign")) {
-            Token declarationToekn = currentToken;
+            Token declarationToken = currentToken;
             match("assign");
             NodeCompoundExpression rightSide = Expresion();
-            NodeAssignment assignment = new NodeAssignment(leftSide,rightSide,declarationToekn);
+            NodeAssignment assignment = new NodeAssignment(leftSide,rightSide,declarationToken);
             return assignment;
         } else if (isCurrentTokenOnFollowSetOf("InicializacionOpcional")) {
             return null;
@@ -403,7 +403,6 @@ public class SyntaxAnalyzer {
             return Tipo();
         } else if (currentToken.getId().contains("rw_void")) {
             match("rw_void");
-            //TODO shoul we do it like this?
             return new PrimitiveType("void");
         } else {
             Set<String> auxToException = firstSet("Tipo");
@@ -562,7 +561,6 @@ public class SyntaxAnalyzer {
                     //Si es declaracion de variable
                     match("idMetVar");
                     DeclaracionVariableMultiple();
-                    //TODO see later
                     InicializacionOpcional();
                 }
                 isStaticAccess = false;
@@ -594,10 +592,7 @@ public class SyntaxAnalyzer {
             System.out.println("Block from sentence");
             return Bloque(parentBlock);
         } else if (currentToken.getId().contains("semiColon")) {
-            Token semiColonToken = currentToken;
             match("semiColon");
-            //TODO revise what do if sentence is ;
-            System.out.println("About to end in semilcolon");
             return null;
         } else {
             Set<String> auxToException = firstSet("Expresion");
@@ -640,7 +635,6 @@ public class SyntaxAnalyzer {
         if (isCurrentTokenOnFirstSetOf("VarLocal")) {
             match("rw_var");
             Token idMetVarToken = currentToken;
-            //TODO inffer variable type
             match("idMetVar");
             match("assign");
             NodeCompoundExpression assignmentExpression = ExpresionCompuesta();
@@ -871,7 +865,6 @@ public class SyntaxAnalyzer {
             GenericidadVaciaOpcional();
             NodeAccessConstructor constructorNode = new NodeAccessConstructor(idClassToken);
             ArgsActuales(constructorNode);
-            //TODO add argument for choosing contructor accordingly
             return constructorNode;
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoConstructor").toString());
@@ -882,7 +875,6 @@ public class SyntaxAnalyzer {
             NodeAccessMetVar accessNode = new NodeAccessMetVar(currentToken);
             match("idMetVar");
             ArgsActualesOpcionales(accessNode);
-            //TODO finish
             return  accessNode;
         } else {
             throw new SyntaxException(currentToken, firstSet("AccesoMetVar").toString());
@@ -914,7 +906,6 @@ public class SyntaxAnalyzer {
             match("period");
             Token methodCalled = currentToken;
             match("idMetVar");
-            //TODO add arguments
             NodeAccessStaticMethod staticCall= new NodeAccessStaticMethod(receiverClass,methodCalled);
             ArgsActuales(staticCall);
             return staticCall;
@@ -1317,7 +1308,6 @@ public class SyntaxAnalyzer {
                 followSet.add("closePar");
                 followSet.add("comma");
             case "ExpresionOpcional":
-                //TODO see
                 followSet.add("semiColon");
                 break;
             case "EstaticoOpcional":

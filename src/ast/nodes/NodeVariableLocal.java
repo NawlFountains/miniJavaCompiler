@@ -27,7 +27,7 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
             if (variableType == null) {
                 variableType = assignmentExpression.getReturnType();
             } else {
-                //TODO if we have type then check if expression correspond to it
+                //If doing optional must check type declared and assignment match
             }
         }
         System.out.println("NodeVariableLocal["+variableIdToken.getLexeme()+"]:check():parentBlock"+parentBlock);
@@ -47,7 +47,6 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
                 }
             }
             //Check name doesn't collide with an existing local variable
-            //TODO remember there are multiple layer of local variables, each asociated with a block
             System.out.println("NodeVariableLocal:check:toCheckForLocalVariables");
             NodeBlock pivotBlock = getParentBlock();
             boolean found = false;

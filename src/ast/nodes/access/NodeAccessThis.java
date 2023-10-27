@@ -5,6 +5,8 @@ import ast.nodes.NodeCompoundExpression;
 import ast.nodes.access.NodeAccess;
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.ReferenceType;
+import semantic.SymbolTable;
 
 public class NodeAccessThis extends NodeAccess implements Node {
     public NodeAccessThis(Token operandToken) {
@@ -13,8 +15,11 @@ public class NodeAccessThis extends NodeAccess implements Node {
 
     @Override
     public void check() throws SemanticException {
-        //TODO this will suffice?
-        chainedNode.check();
+        returnType = new ReferenceType(getRootBlock().getRoutineEnvironment().getOwnerClass().getClassName());
+        if (chainedNode != null) {
+            chainedNode.check();
+            returnType = chainedNode.getReturnType();
+        }
     }
 
     public String getStructure() {

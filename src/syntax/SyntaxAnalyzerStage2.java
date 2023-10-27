@@ -1067,7 +1067,6 @@ public class SyntaxAnalyzerStage2 {
                 followSet.add("closePar");
                 followSet.add("comma");
             case "ExpresionOpcional":
-                //TODO see
                 followSet.add("semiColon");
                 break;
             case "EstaticoOpcional":

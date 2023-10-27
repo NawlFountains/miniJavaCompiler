@@ -16,7 +16,6 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
 
     @Override
     public void check() throws SemanticException {
-        //TODO check method exits and its static
         System.out.println("NodeAccessStaticMethod:check()");
         ClassST receiverClass = SymbolTable.getInstance().getClassWithName(operandToken.getLexeme());
         if (receiverClass == null) {
@@ -25,9 +24,12 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
         for (MethodST m : receiverClass.getMethods()) {
             if (operandToken.getLexeme().equals(m.getName())) {
                 if (m.getParameterTypeList().size() == argumentList.size()) {
-                    //TODO compare type of arguments
                     if (m.isStatic()) {
-                        break;
+                        if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
+                            break;
+                        }
+                        else
+                            throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"No se puede hacer una llamada estatica al metodo "+methodToken.getLexeme()+" porque no coinciden los tipos de los parametros.");
                     } else
                         throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"No se puede hacer una llamada estatica al metodo "+methodToken.getLexeme()+" porque no es estatico.");
 

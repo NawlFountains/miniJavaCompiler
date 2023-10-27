@@ -279,7 +279,7 @@ public class ClassST implements EntityST {
     public void checkSentences() throws SemanticException {
         for (MethodST m : methods.values()) {
             System.out.println("ClassST("+className+"):checkSentences():method:"+m.getName());
-            //TODO fix error with predefined classes
+            //Skip predefined classes maybe not the best idea
             if (m.blockAST != null)
              m.blockAST.check();
         }

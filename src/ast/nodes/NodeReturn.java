@@ -24,7 +24,7 @@ public class NodeReturn extends NodeSentence implements Node{
         System.out.println("NodeReturn:check:start");
         NodeBlock rootBlock = getRootBlock();
         if (returnExpression != null) {
-            System.out.println("NodeReturn:check:start"+returnExpression.getParentBlock());
+            System.out.println("NodeReturn:check:start"+returnExpression.getStructure());
             returnExpression.check();
                 System.out.println("NodeReturn:check:notNull");
                 System.out.println("Return type expected"+returnExpression.getReturnType());

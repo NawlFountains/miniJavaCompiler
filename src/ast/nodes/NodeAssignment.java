@@ -11,7 +11,7 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.declarationToken = declarationToken;
-        System.out.println("NodeAssignment:created:"+leftSide+"+"+rightSide+" parentBlock"+parentBlock);
+        System.out.println("NodeAssignment:created:"+leftSide.getStructure()+"+"+rightSide.getStructure()+" parentBlock"+parentBlock);
     }
 
     public void addParentBlock(NodeBlock nodeBlock) {
@@ -22,14 +22,19 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
 
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeAssignment:check():leftside:"+leftSide+":rightside:"+rightSide);
+        System.out.println("NodeAssignment:check():leftside:"+leftSide.getStructure());
         leftSide.check();
+        System.out.println("NodeAssignment:check():rightside:"+rightSide.getStructure());
         rightSide.check();
-        System.out.println("NodeAssigmnet:check():completed:seeAssignment");
+        System.out.println("NodeAssignment:check():completed:seeAssignment");
+        returnType = leftSide.getReturnType();
         if (!leftSide.isAssignable()) {
-            //TODO throw exception
-            System.out.println("Leftside was "+leftSide.getStructure()+" type "+leftSide);
             throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El lado izquierdo no es asignable");
+        } else {
+            System.out.println("NodeAssignment:LeftType:"+leftSide.getReturnType());
+            System.out.print("RightSide:"+rightSide.getReturnType());
+            System.out.println();
+            typeConformityForAssignment(leftSide.getReturnType(),rightSide.getReturnType(),declarationToken);
         }
     }
 

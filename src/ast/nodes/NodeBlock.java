@@ -1,6 +1,7 @@
 package ast.nodes;
 
 import lexical.SemanticException;
+import semantic.Type;
 import semantic.entities.RoutineST;
 
 import java.util.ArrayList;
@@ -21,6 +22,15 @@ public class NodeBlock extends NodeSentence implements Node {
     public void insertLocalVariable(NodeVariableLocal nodeVariableLocal) {
         System.out.println("NodeBlock:insertLocalVariable:"+nodeVariableLocal.getStructure()+":");
         localVariables.add(nodeVariableLocal);
+    }
+    public Type getVariableType(String name) {
+        Type toReturn = null;
+        for (NodeVariableLocal v : localVariables) {
+            if (v.variableIdToken.getLexeme().equals(name)) {
+                toReturn = v.variableType;
+            }
+        }
+        return toReturn;
     }
     public boolean existsVariableWithName(String name) {
         boolean found = false;

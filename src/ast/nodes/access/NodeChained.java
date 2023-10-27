@@ -4,6 +4,7 @@ import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.ReferenceType;
 import semantic.SymbolTable;
 import semantic.entities.AttributeST;
 import semantic.entities.ClassST;
@@ -25,9 +26,8 @@ public class NodeChained extends NodeAccess implements Node {
     }
     @Override
     public void check() throws SemanticException {
-        //TODO check if receiver has what this node refers, maybe we need to pass it
+        System.out.println("NodeChained:check:"+getToken().getLexeme());
         //If previous node was an access node it could be a This access (this.x()) , a var access (class.var) or a Constructor access (new Class())
-        // It cant be method because you cant reference a variable in method
         if (previousNodeAccess != null) {
             if (previousNodeAccess instanceof NodeAccessThis) {
                 ClassST thisClass = previousNodeAccess.getParentBlock().getRoutineEnvironment().getOwnerClass();
@@ -36,27 +36,38 @@ public class NodeChained extends NodeAccess implements Node {
                 ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getToken().getLexeme());
                 checkExistanceOfMetVar(constructorClass);
             } else if (previousNodeAccess instanceof NodeAccessMetVar ) {
-                //
-                if (isAttribute) {
-                    if (previousNodeAccess.isAttribute) {
-
-                    }
-                }
+                System.out.println("NodeChained:check:previousNodeAccess(NodeAccessMetVar)");
+                if (previousCallReturnAClass(previousNodeAccess)) {
+                    ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getReturnType().toString());
+                    checkExistanceOfMetVar(previousClassType);
+                } else
+                    throw new SemanticException(operandToken.getLexeme(), operandToken.getLineNumber(),"No se puede hacer un llamado o accesso a un tipo primitivo");
             }
-        } else if (previousNode.isAttribute) {
-            //TODO access both attribute and method
         } else {
-            //TODO previous was method , check from return type
+            if (previousNode.getReturnType() instanceof ReferenceType) {
+                ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNode.getReturnType().toString());
+                checkExistanceOfMetVar(previousClassType);
+            } else
+                throw new SemanticException(operandToken.getLexeme(), operandToken.getLineNumber(),"No se puede hacer un llamado o accesso a un tipo primitivo");
+        }
+
+        System.out.println("Finished chain ");
+        if (nodeChained != null) {
+            System.out.println("Has left chain "+nodeChained.getToken());
+            nodeChained.check();
+            returnType = nodeChained.getReturnType();
         }
     }
 
     private void checkExistanceOfMetVar(ClassST topClass) throws SemanticException {
         boolean found = false;
-        System.out.println("NodeChained:checkExistanceOfMetVar("+topClass.getClassName()+") of "+operandToken.getLexeme());
+        System.out.println("NodeChained:checkExistanceOfMetVar("+topClass.getClassName()+") of "+operandToken.getLexeme()+" which is an attribute "+isAttribute);
         if (isAttribute) {
             for (AttributeST a : topClass.getAttributes()) {
                     if (operandToken.getLexeme().equals(a.getAttributeName())) {
                         found = true;
+                        returnType = a.getAttributeType();
+                        System.out.println("NodeChained:attribute("+a.getAttributeName()+"):found:"+found);
                         break;
                     }
             }
@@ -67,9 +78,12 @@ public class NodeChained extends NodeAccess implements Node {
             for (MethodST m: topClass.getMethods()) {
                 if (operandToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
-                        //TODO check parameter types
-                        found = true;
-                        break;
+                        if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
+                            found = true;
+                            returnType = m.getReturnType();
+                            break;
+                        } else
+                            throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"Distinto tipos de parametros para el metodo "+m.getName());
                     } else {
                         throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"Distinta cantidad de parametros para el metodo "+m.getName());
                     }
@@ -107,5 +121,8 @@ public class NodeChained extends NodeAccess implements Node {
             toReturn += "."+nodeChained.getStructure();
         }
         return toReturn;
+    }
+    private boolean previousCallReturnAClass(NodeAccess previousNode) {
+        return previousNode.getReturnType() instanceof ReferenceType;
     }
 }

@@ -25,7 +25,6 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
     }
     @Override
     public void check() throws SemanticException {
-        //TODO check left and right expression compatible with operand
         leftSide.check();
         operand.check();
         rightSide.check();

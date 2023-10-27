@@ -2,7 +2,10 @@ package ast.nodes;
 
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.ReferenceType;
+import semantic.SymbolTable;
 import semantic.Type;
+import semantic.entities.ClassST;
 
 public abstract class NodeCompoundExpression extends NodeSentence implements Node{
     protected Type returnType;
@@ -11,6 +14,7 @@ public abstract class NodeCompoundExpression extends NodeSentence implements Nod
 
     }
     public Type getReturnType() {
+        System.out.println(this+":getReturnType:"+returnType);
         return returnType;
     }
 
@@ -56,7 +60,34 @@ public abstract class NodeCompoundExpression extends NodeSentence implements Nod
         System.out.println("isBooleanOperator "+operandID);
         return operandID.equals("opAnd") || operandID.equals("opOr");
     }
-
+    public void typeConformityForAssignment(Type declaredType, Type assignmentType,Token declarationToken) throws SemanticException {
+        //If both arent the same type
+        System.out.println("Checking typeconformity for assignment with "+declaredType.toString()+" and "+assignmentType.toString());
+        if (!declaredType.toString().equals(assignmentType.toString())) {
+            //But are both classes
+            if (declaredType instanceof ReferenceType && assignmentType instanceof ReferenceType) {
+                //But the right side is not a type that inherits from the left side
+                if (!isAncestor(declaredType.toString(),assignmentType.toString()))
+                    throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"No se puede asignar por tipos incompatible "+assignmentType.toString()+" no hereda de "+declaredType.toString());
+                else
+                    System.out.println(assignmentType.toString()+" es ancestro de "+declaredType.toString());
+            } else {
+                throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"No se puede asignar un tipo primtivo a una clase ni viceversa a"+declaredType.toString()+" no se le puede asignar "+assignmentType.toString());
+            }
+        }
+    }
+    private boolean isAncestor(String ancestorName, String descendantName) {
+        boolean isAncestor = false;
+        ClassST pivotClass = SymbolTable.getInstance().getClassWithName(descendantName);
+        System.out.println("Parent classes of "+descendantName+" "+pivotClass.getParentClassesNames().toString()+" contains "+ancestorName+" "+pivotClass.getParentClassesNames().contains(ancestorName));
+        if (pivotClass.getParentClassesNames().contains(ancestorName))
+            isAncestor = true;
+        else {
+            for (String s: pivotClass.getParentClassesNames())
+                isAncestor = isAncestor(ancestorName,s);
+        }
+        return isAncestor;
+    }
 
 
 }
