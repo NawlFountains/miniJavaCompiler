@@ -13,7 +13,7 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         leftSide.addParentBlock(parentBlock);
         operand.addParentBlock(parentBlock);
         rightSide.addParentBlock(parentBlock);
-        System.out.println("NodeBinaryExpression:created:"+leftSide+"+"+operand+"+"+rightSide+" parentBlock"+parentBlock);
+        System.out.println("NodeBinaryExpression:created: leftside: "+leftSide.getStructure()+" operand : "+operand.getStructure()+" rightside: "+rightSide.getStructure()+" parentBlock"+parentBlock);
         returnType = operand.returnType;
     }
 

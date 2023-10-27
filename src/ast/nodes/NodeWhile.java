@@ -1,14 +1,17 @@
 package ast.nodes;
 
 import lexical.SemanticException;
+import lexical.Token;
 import semantic.entities.RoutineST;
 
 public class NodeWhile extends NodeSentence implements Node{
     protected NodeCompoundExpression conditionalExpression;
     protected NodeSentence whileSentence;
-    public NodeWhile(NodeCompoundExpression conditionalExpression, NodeSentence whileSentence) {
+    protected Token declarationToken;
+    public NodeWhile(NodeCompoundExpression conditionalExpression, NodeSentence whileSentence,Token declarationToken) {
         this.conditionalExpression = conditionalExpression;
         this.whileSentence = whileSentence;
+        this.declarationToken = declarationToken;
     }
     public void setRoutineEnvironment(RoutineST routineEnvironment) {
         System.out.println("NodeIf:setRoutieEnviroment:"+routineEnvironment);
@@ -25,6 +28,8 @@ public class NodeWhile extends NodeSentence implements Node{
     public void check() throws SemanticException {
         conditionalExpression.check();
         whileSentence.check();
+        if (!conditionalExpression.getReturnType().toString().equals("boolean"))
+            throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"La expresion del bucle while debe ser booleana");
     }
 
     @Override

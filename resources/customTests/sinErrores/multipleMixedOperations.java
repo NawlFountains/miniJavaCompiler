@@ -8,7 +8,7 @@ class A{
 		x = 93+(73/3);
 		var bool = false;
 		bool = ((93 < 3) == false);
-		if ( 9 + 3 ) {
+		if ( 9 < (9 + 3) ) {
 			x = true;
 		}
 	}

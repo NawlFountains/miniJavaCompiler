@@ -9,7 +9,6 @@ import semantic.Type;
 import java.util.HashMap;
 
 public class MethodST extends RoutineST implements EntityST {
-    protected Type returnType;
     protected Token declarationToken;
     protected boolean isStatic;
     public MethodST(Token declarationToken,String methodName) {
@@ -19,12 +18,6 @@ public class MethodST extends RoutineST implements EntityST {
     }
     public Token getDeclarationToken() {
         return declarationToken;
-    }
-    public void setReturnType(Type returnType) {
-        this.returnType = returnType;
-    }
-    public Type getReturnType() {
-        return returnType;
     }
     public void setStatic(Boolean isStatic) {
         this.isStatic = isStatic;

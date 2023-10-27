@@ -1,17 +1,20 @@
 package ast.nodes;
 
 import lexical.SemanticException;
+import lexical.Token;
 import semantic.entities.RoutineST;
 
 public class NodeIf extends NodeSentence implements Node{
     protected NodeSentence thenSentence;
     protected NodeCompoundExpression conditionalExpression;
     protected NodeElse nodeElse;
+    protected Token declarationToken;
 
-    public NodeIf(NodeCompoundExpression conditionalExpression, NodeSentence thenSentence) {
+    public NodeIf(NodeCompoundExpression conditionalExpression, NodeSentence thenSentence, Token declarationToken) {
         this.thenSentence = thenSentence;
         this.conditionalExpression = conditionalExpression;
-        System.out.println("NodeIf:created:"+conditionalExpression.getStructure()+"+"+thenSentence.toString());
+        this.declarationToken = declarationToken;
+        System.out.println("NodeIf:created:"+conditionalExpression.getStructure()+"+"+thenSentence.getStructure());
     }
 
     public void addParentBlock(NodeBlock nodeBlock) {
@@ -35,8 +38,7 @@ public class NodeIf extends NodeSentence implements Node{
         thenSentence.check();
         System.out.println("conditionalExpression "+conditionalExpression.getStructure()+" return type "+conditionalExpression.getReturnType().toString());
         if (!conditionalExpression.getReturnType().toString().equals("boolean"))
-            throw new SemanticException("test",99,"Expresion dentro del if debe ser booleana");
-        //TODO check conditionalExpression is boolean
+            throw new SemanticException(declarationToken.getLexeme(), declarationToken.getLineNumber(),"Expresion dentro del if debe ser booleana");
         if (nodeElse != null)
             nodeElse.check();
     }

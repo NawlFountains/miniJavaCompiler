@@ -28,15 +28,9 @@ public abstract class NodeCompoundExpression extends NodeSentence implements Nod
     }
     public void typeConformity(NodeCompoundExpression leftOperand,NodeOperand binaryOperand,NodeCompoundExpression rightOperand) throws SemanticException {
         String operand = binaryOperand.operandToken.getId();
-        //TODO if (+, - , / , %) both int and return int
         if (isArithmeticOperator(operand) && leftOperand.getReturnType().toString().equals("int") && rightOperand.getReturnType().toString().equals("int")) {
-            System.out.println("Arithmetic operation");
         } else if (isArithmeticComparator(operand) && leftOperand.getReturnType().toString().equals("int") && rightOperand.getReturnType().toString().equals("int")){
-            //TODO if (<=, < , > , >=) both int and return boolean
-            System.out.println("Arithmetic comparation");
         } else if (isBooleanOperator(operand) && leftOperand.getReturnType().toString().equals("boolean") && rightOperand.getReturnType().toString().equals("boolean")) {
-            //TODO if (&&, ||) both boolean and return boolean
-            System.out.println("Boolean comparision");
         } else if (isSurfaceComparator(operand)) {
             //TODO if (== , !=) check inheritance
             System.out.println("Surface comparision");

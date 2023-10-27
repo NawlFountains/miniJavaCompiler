@@ -17,11 +17,18 @@ public abstract class RoutineST {
     protected ClassST ownerClass;
     protected InterfaceST ownerInterface;
     protected NodeBlock blockAST;
+    protected Type returnType;
 
     protected RoutineST(String routineName) {
         parameters = new HashMap<>();
         parametersTypeList = new ArrayList<>();
         this.routineName = routineName;
+    }
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+    public Type getReturnType() {
+        return returnType;
     }
     public void insertParameter(Token token, ParameterST parameterST) throws SemanticException {
         if (!existParameter(token.getLexeme())) {

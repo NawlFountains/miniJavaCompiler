@@ -655,12 +655,13 @@ public class SyntaxAnalyzer {
     }
     NodeReturn Return() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("Return")) {
+            Token declarationToken = currentToken;
             match("rw_return");
             //Check optional
-            NodeReturn nodeReturn = new NodeReturn();
+            NodeReturn nodeReturn = new NodeReturn(declarationToken);
             NodeCompoundExpression optionalExpression = ExpresionOpcional();
             if (optionalExpression != null) {
-                nodeReturn = new NodeReturn(optionalExpression);
+                nodeReturn = new NodeReturn(optionalExpression,declarationToken);
             }
             return nodeReturn;
         } else {
@@ -678,12 +679,13 @@ public class SyntaxAnalyzer {
     }
     NodeIf If(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("If")) {
+            Token declarationToken = currentToken;
             match("rw_if");
             match("openPar");
             NodeCompoundExpression conditionalExpression = Expresion();
             match("closePar");
             NodeSentence thenSentence = Sentencia(nodeBlock);
-            NodeIf nodeIf = new NodeIf(conditionalExpression,thenSentence);
+            NodeIf nodeIf = new NodeIf(conditionalExpression,thenSentence,declarationToken);
             System.out.println("IF created "+conditionalExpression.getStructure());
             Else(nodeIf,nodeBlock);
             return nodeIf;
@@ -704,12 +706,13 @@ public class SyntaxAnalyzer {
     }
     NodeWhile While(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("While")) {
+            Token declarationToken = currentToken;
             match("rw_while");
             match("openPar");
             NodeCompoundExpression conditionalExpression = Expresion();
             match("closePar");
             NodeSentence whileSentence = Sentencia(nodeBlock);
-            NodeWhile nodeWhile = new NodeWhile(conditionalExpression,whileSentence);
+            NodeWhile nodeWhile = new NodeWhile(conditionalExpression,whileSentence,declarationToken);
             return nodeWhile;
         } else {
             throw new SyntaxException(currentToken, firstSet("While").toString());
@@ -733,25 +736,29 @@ public class SyntaxAnalyzer {
     NodeCompoundExpression ExpresionCompuesta() throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("ExpresionCompuesta")) {
             NodeCompoundExpression basicExpression = ExpresionBasica();
-            NodeCompoundExpression compoundExpression = RExpresionCompuesta(basicExpression);
-            if (compoundExpression == null) {
+            System.out.println("ExpresionCompuesta:basicExpression:"+basicExpression.getStructure());
+            NodeBinaryExpression leftOverExpression = RExpresionCompuesta(basicExpression);
+            if (leftOverExpression == null) {
                 System.out.println("basic expression only");
                 return basicExpression;
             } else {
-                System.out.println("Compound expression "+compoundExpression.getStructure());
-                return compoundExpression;
+                System.out.println("ExpresionCompuesta:leftOver:"+leftOverExpression.getStructure());
+                return leftOverExpression;
             }
         } else {
             throw new SyntaxException(currentToken, firstSet("ExpresionCompuesta").toString());
         }
     }
-    NodeCompoundExpression RExpresionCompuesta(NodeCompoundExpression leftSide) throws LexicalException, SyntaxException, SemanticException {
+    NodeBinaryExpression RExpresionCompuesta(NodeCompoundExpression leftSide) throws LexicalException, SyntaxException, SemanticException {
         if (isCurrentTokenOnFirstSetOf("OperadorBinario")) {
             NodeOperand operand = OperadorBinario();
             NodeCompoundExpression rightSide = ExpresionBasica();
-            NodeCompoundExpression toReturn = new NodeBinaryExpression(leftSide,operand,rightSide);
-            RExpresionCompuesta(rightSide);
-            return toReturn;
+            NodeBinaryExpression toReturn = new NodeBinaryExpression(leftSide,operand,rightSide);
+            NodeCompoundExpression leftOver = RExpresionCompuesta(rightSide);
+            if (leftOver == null)
+                return toReturn;
+            else
+                return new NodeBinaryExpression(leftSide,operand,leftOver);
         } else if (isCurrentTokenOnFollowSetOf("RExpresionCompuesta")) {
             return null;
         } else {

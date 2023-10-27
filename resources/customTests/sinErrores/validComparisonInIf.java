@@ -2,7 +2,7 @@
 // 
 class A{
 	void method(){
-		if (3+4 > 3) {}
+		if ((3+4) > 3) {}
 
 	}
 	static void main(){}
