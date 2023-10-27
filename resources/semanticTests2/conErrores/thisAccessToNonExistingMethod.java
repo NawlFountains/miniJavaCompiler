@@ -1,8 +1,7 @@
-///[Error:b|6]
+///[Error:b|5]
 // 
 class A {
 	void a(int x){
-		System.println("XD");
 		this.b();
 	}
 	static void main(){}

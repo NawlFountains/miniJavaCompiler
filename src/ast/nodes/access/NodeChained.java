@@ -17,12 +17,10 @@ public class NodeChained extends NodeAccess implements Node {
     public NodeChained(NodeChained previousNode,Token token) {
         super(token);
         this.previousNode = previousNode;
-        System.out.println("Created chained node with "+token.getLexeme());
     }
     public NodeChained(NodeAccess previousNodeAccess,Token token) {
         super(token);
         this.previousNodeAccess = previousNodeAccess;
-        System.out.println("Created chained node with "+token.getLexeme());
     }
     @Override
     public void check() throws SemanticException {
@@ -101,9 +99,11 @@ public class NodeChained extends NodeAccess implements Node {
     @Override
     public boolean isAssignable() {
         boolean assignable = isAttribute;
-        if (chainedNode != null)
-            assignable = chainedNode.isAssignable();
-        System.out.println(getStructure()+" asked if assignable "+isAttribute);
+        if (nodeChained != null)
+            assignable = nodeChained.isAssignable();
+        else
+            System.out.println("Last one in chain");
+        System.out.println(getToken().getLexeme()+" was asked if assignable "+assignable+" by "+this.getStructure());
         return assignable;
     }
 

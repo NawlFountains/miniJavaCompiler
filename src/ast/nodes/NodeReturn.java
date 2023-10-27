@@ -2,6 +2,7 @@ package ast.nodes;
 
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.entities.ConstructorST;
 import semantic.entities.MethodST;
 
 public class NodeReturn extends NodeSentence implements Node{
@@ -23,6 +24,9 @@ public class NodeReturn extends NodeSentence implements Node{
     public void check() throws SemanticException {
         System.out.println("NodeReturn:check:start");
         NodeBlock rootBlock = getRootBlock();
+        System.out.println("NodeReturn:check:instanceOfCosntructor"+ (rootBlock.getRoutineEnvironment() instanceof ConstructorST));
+        if (rootBlock.getRoutineEnvironment() instanceof ConstructorST)
+            throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"No se puede hacer return en un constructor");
         if (returnExpression != null) {
             System.out.println("NodeReturn:check:start"+returnExpression.getStructure());
             returnExpression.check();

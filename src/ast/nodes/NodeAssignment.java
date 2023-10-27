@@ -11,7 +11,6 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.declarationToken = declarationToken;
-        System.out.println("NodeAssignment:created:"+leftSide.getStructure()+"+"+rightSide.getStructure()+" parentBlock"+parentBlock);
     }
 
     public void addParentBlock(NodeBlock nodeBlock) {
@@ -22,11 +21,8 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
 
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeAssignment:check():leftside:"+leftSide.getStructure());
         leftSide.check();
-        System.out.println("NodeAssignment:check():rightside:"+rightSide.getStructure());
         rightSide.check();
-        System.out.println("NodeAssignment:check():completed:seeAssignment");
         returnType = leftSide.getReturnType();
         if (!leftSide.isAssignable()) {
             throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"El lado izquierdo no es asignable");

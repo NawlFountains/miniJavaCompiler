@@ -34,6 +34,7 @@ public abstract class  NodeSentence implements Node{
         return "shouldn't be able to see this";
     }
     protected NodeBlock getRootBlock() {
+        System.out.println("getRootBlock:"+this);
         NodeBlock rootBlock = this.getParentBlock();
         while (!rootBlock.isRoot()) {
             rootBlock = rootBlock.getParentBlock();

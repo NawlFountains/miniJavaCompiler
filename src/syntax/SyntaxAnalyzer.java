@@ -528,6 +528,7 @@ public class SyntaxAnalyzer {
             System.out.println("Created sentence "+sentence);
             if (sentence != null) {
                 nodeBlock.addSentence(sentence);
+                System.out.println("SyntaxAnalyzer:addParentBlock:"+sentence);
                 sentence.addParentBlock(nodeBlock);
             }
             ListaSentencias(nodeBlock);
@@ -679,20 +680,21 @@ public class SyntaxAnalyzer {
             match("closePar");
             NodeSentence thenSentence = Sentencia(nodeBlock);
             NodeIf nodeIf = new NodeIf(conditionalExpression,thenSentence,declarationToken);
-            System.out.println("IF created "+conditionalExpression.getStructure());
-            Else(nodeIf,nodeBlock);
+            NodeElse possibleElse = Else(nodeBlock);
+            if (possibleElse != null)
+                nodeIf.addElse(possibleElse);
             return nodeIf;
         } else {
             throw new SyntaxException(currentToken, firstSet("If").toString());
         }
     }
-    void Else(NodeIf nodeIf, NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
+    NodeElse Else(NodeBlock nodeBlock) throws LexicalException, SyntaxException, SemanticException {
         if (currentToken.getId().contains("rw_else")) {
             match("rw_else");
             NodeSentence elseSentence = Sentencia(nodeBlock);
-            nodeIf.addElse(new NodeElse(nodeIf,elseSentence));
+            return new NodeElse(elseSentence);
         } else if (isCurrentTokenOnFollowSetOf("Else")) {
-
+            return null;
         } else {
             throw new SyntaxException(currentToken, firstSet("Else").toString());
         }
@@ -719,6 +721,7 @@ public class SyntaxAnalyzer {
             if (possibleAssignment == null) {
                 return nodeCompoundExp;
             } else {
+                System.out.println(possibleAssignment.getStructure());
                 return possibleAssignment;
             }
         } else {

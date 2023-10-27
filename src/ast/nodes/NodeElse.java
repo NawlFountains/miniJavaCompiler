@@ -3,21 +3,21 @@ package ast.nodes;
 import lexical.SemanticException;
 
 public class NodeElse extends NodeSentence implements Node{
-    protected NodeIf nodeIf;
     protected NodeSentence elseSentence;
 
-    public NodeElse(NodeIf nodeIf, NodeSentence elseSentence) {
-        this.nodeIf = nodeIf;
+    public NodeElse(NodeSentence elseSentence) {
         this.elseSentence = elseSentence;
     }
 
     public void addParentBlock(NodeBlock nodeBlock) {
         super.addParentBlock(nodeBlock);
-        elseSentence.addParentBlock(nodeBlock);
+        if (elseSentence != null)
+            elseSentence.addParentBlock(nodeBlock);
     }
     @Override
     public void check() throws SemanticException {
-        elseSentence.check();
+        if (elseSentence != null)
+            elseSentence.check();
     }
 
     @Override
@@ -25,6 +25,9 @@ public class NodeElse extends NodeSentence implements Node{
         return false;
     }
     public String getStructure(){
-        return elseSentence.getStructure()+"\n";
+        String toReturn = "Else ";
+        if (elseSentence != null)
+            toReturn += elseSentence.getStructure();
+        return toReturn;
     }
 }

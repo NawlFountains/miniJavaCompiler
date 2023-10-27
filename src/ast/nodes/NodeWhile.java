@@ -14,20 +14,22 @@ public class NodeWhile extends NodeSentence implements Node{
         this.declarationToken = declarationToken;
     }
     public void setRoutineEnvironment(RoutineST routineEnvironment) {
-        System.out.println("NodeIf:setRoutieEnviroment:"+routineEnvironment);
         this.routineEnvironment = routineEnvironment;
         conditionalExpression.setRoutineEnvironment(routineEnvironment);
-        whileSentence.setRoutineEnvironment(routineEnvironment);
+        if (whileSentence != null)
+         whileSentence.setRoutineEnvironment(routineEnvironment);
     }
     public void addParentBlock(NodeBlock nodeBlock) {
         super.addParentBlock(nodeBlock);
         conditionalExpression.addParentBlock(nodeBlock);
-        whileSentence.addParentBlock(nodeBlock);
+        if (whileSentence != null)
+            whileSentence.addParentBlock(nodeBlock);
     }
     @Override
     public void check() throws SemanticException {
         conditionalExpression.check();
-        whileSentence.check();
+        if (whileSentence != null)
+            whileSentence.check();
         if (!conditionalExpression.getReturnType().toString().equals("boolean"))
             throw new SemanticException(declarationToken.getLexeme(),declarationToken.getLineNumber(),"La expresion del bucle while debe ser booleana");
     }
@@ -37,6 +39,9 @@ public class NodeWhile extends NodeSentence implements Node{
         return false;
     }
     public String getStructure() {
-        return "While \n"+conditionalExpression.getStructure()+"\n "+whileSentence.getStructure()+"\n";
+        String toReturn = "While "+conditionalExpression.getStructure();
+        if (whileSentence != null)
+                toReturn += " "+whileSentence.getStructure();
+        return toReturn;
     }
 }

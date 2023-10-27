@@ -21,8 +21,9 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
 
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeAccesMetVar:check():"+methodOrVarToken.getLexeme());
+        System.out.println("NodeAccesMetVar:check():"+methodOrVarToken.getLexeme()+" isAttribute:"+isAttribute);
         boolean found = false;
+        System.out.println(this+" parent is "+getParentBlock());
         RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
 
@@ -86,7 +87,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
                     }
                 }
             }
-            assignable = false;
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(), methodOrVarToken.getLineNumber(),"No existe el metodo "+methodOrVarToken.getLexeme()+" en la clase "+ routineEnvironment.getOwnerClass().getClassName());
         }
@@ -101,6 +101,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
     public boolean isAssignable() {
         if (chainedNode != null)
             assignable = chainedNode.isAssignable();
+        System.out.println(getStructure()+" was asked if assignable "+assignable+" by "+this);
         return assignable;
     }
     public String getStructure() {

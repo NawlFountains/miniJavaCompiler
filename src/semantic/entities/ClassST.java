@@ -42,6 +42,9 @@ public class ClassST implements EntityST {
     public boolean isConsolidated() { return consolidated;}
     public void setConstructor(Token token,ConstructorST constructor) throws SemanticException {
         if (this.constructor == DEFAULT_CONSTRUCTOR) {
+            if (!constructor.getName().equals(className)) {
+                throw new SemanticException(token.getLexeme(),token.getLineNumber(),"El constructor debe tener el nombre de la clase , se esperaba "+className+" y se encontro "+token.getLexeme()+".");
+            }
             this.constructor = constructor;
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede definir mas de un constructor por clase");
@@ -283,5 +286,7 @@ public class ClassST implements EntityST {
             if (m.blockAST != null)
              m.blockAST.check();
         }
+        if (constructor.blockAST != null)
+            constructor.blockAST.check();
     }
 }

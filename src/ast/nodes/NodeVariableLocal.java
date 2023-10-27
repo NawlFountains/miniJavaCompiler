@@ -19,6 +19,11 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
         this.variableIdToken = variableIdToken;
         variableType = type;
     }
+    public void addParentBlock(NodeBlock parentNode) {
+        super.addParentBlock(parentNode);
+        if (assignmentExpression != null)
+            assignmentExpression.addParentBlock(parentNode);
+    }
     @Override
     public void check() throws SemanticException{
         //Check if the assignmentExpression is correct
@@ -26,6 +31,8 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
             assignmentExpression.check();
             if (variableType == null) {
                 variableType = assignmentExpression.getReturnType();
+                if (variableType.toString().equals("void") || variableType.toString().equals("null"))
+                    throw new SemanticException(variableIdToken.getLexeme(),variableIdToken.getLineNumber(),"Una variable no puede ser de tipo void ni de tipo null");
             } else {
                 //If doing optional must check type declared and assignment match
             }

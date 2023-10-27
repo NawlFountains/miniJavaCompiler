@@ -3,7 +3,7 @@
 class A{
 	String a;
 	void a(int x){
-		System.println("XD");
+		System.println();
 		var a = 9;
 	}
 	static void main(){}

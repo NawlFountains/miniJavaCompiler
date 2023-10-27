@@ -3,7 +3,7 @@
 class A{
 	String a;
 	void a(int x){
-		System.println("XD");
+		System.printS("XD");
 	}
 	int calculate(int x) {
 		this.a = "Texto";
@@ -14,6 +14,5 @@ class A{
 class B {
 	int a = 3;
 public B(int x, int y){
-	super(x,y);
 }
 }

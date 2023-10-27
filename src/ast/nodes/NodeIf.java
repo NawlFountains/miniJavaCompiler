@@ -14,19 +14,22 @@ public class NodeIf extends NodeSentence implements Node{
         this.thenSentence = thenSentence;
         this.conditionalExpression = conditionalExpression;
         this.declarationToken = declarationToken;
-        System.out.println("NodeIf:created:"+conditionalExpression.getStructure()+"+"+thenSentence.getStructure());
     }
 
     public void addParentBlock(NodeBlock nodeBlock) {
         super.addParentBlock(nodeBlock);
         conditionalExpression.addParentBlock(nodeBlock);
-        thenSentence.addParentBlock(nodeBlock);
+        if (thenSentence != null)
+            thenSentence.addParentBlock(nodeBlock);
+        if (nodeElse != null)
+            nodeElse.addParentBlock(nodeBlock);
     }
     public void setRoutineEnvironment(RoutineST routineEnvironment) {
         System.out.println("NodeIf:setRoutieEnviroment:"+routineEnvironment+" to "+conditionalExpression+" and "+thenSentence);
         this.routineEnvironment = routineEnvironment;
         conditionalExpression.setRoutineEnvironment(routineEnvironment);
-        thenSentence.setRoutineEnvironment(routineEnvironment);
+        if (thenSentence != null)
+            thenSentence.setRoutineEnvironment(routineEnvironment);
     }
 
     public void addElse(NodeElse nodeElse) {
@@ -37,7 +40,8 @@ public class NodeIf extends NodeSentence implements Node{
         System.out.println("NodeIf:check:conditionalExpression");
         conditionalExpression.check();
         System.out.println("NodeIf:check:thenSentence");
-        thenSentence.check();
+        if (thenSentence != null)
+            thenSentence.check();
         System.out.println("conditionalExpression "+conditionalExpression+" return type "+conditionalExpression.getReturnType());
         if (!conditionalExpression.getReturnType().toString().equals("boolean"))
             throw new SemanticException(declarationToken.getLexeme(), declarationToken.getLineNumber(),"Expresion dentro del if debe ser booleana");
@@ -53,7 +57,8 @@ public class NodeIf extends NodeSentence implements Node{
         System.out.println("NodeIf:getStructure:Start");
         String toReturn = "If \n";
         toReturn += "Condition "+conditionalExpression.getStructure()+"\n";
-        toReturn += "Then sentence"+thenSentence.getStructure()+"\n";
+        if (thenSentence != null)
+           toReturn += "Then sentence"+thenSentence.getStructure()+"\n";
         if (nodeElse != null) {
             toReturn += "Else sentence"+nodeElse.getStructure()+"\n";
         }

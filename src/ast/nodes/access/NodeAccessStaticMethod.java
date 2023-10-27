@@ -16,26 +16,32 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
 
     @Override
     public void check() throws SemanticException {
-        System.out.println("NodeAccessStaticMethod:check()");
         ClassST receiverClass = SymbolTable.getInstance().getClassWithName(operandToken.getLexeme());
+        boolean found = false;
         if (receiverClass == null) {
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No existe la clase "+operandToken.getLexeme()+" referida.");
         }
+        System.out.println("Methods of "+receiverClass.getClassName()+" are "+receiverClass.getMethods().toString());
         for (MethodST m : receiverClass.getMethods()) {
-            if (operandToken.getLexeme().equals(m.getName())) {
+            System.out.println("COmparing "+m.getName()+" with "+methodToken.getLexeme());
+            if (methodToken.getLexeme().equals(m.getName())) {
+                System.out.println("Equal");
                 if (m.getParameterTypeList().size() == argumentList.size()) {
                     if (m.isStatic()) {
                         if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
+                            found = true;
+                            returnType = m.getReturnType();
                             break;
                         }
                         else
                             throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"No se puede hacer una llamada estatica al metodo "+methodToken.getLexeme()+" porque no coinciden los tipos de los parametros.");
                     } else
                         throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"No se puede hacer una llamada estatica al metodo "+methodToken.getLexeme()+" porque no es estatico.");
-
                 } else
                     throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"Diferente cantidad de parametros para el metodo "+methodToken.getLexeme());
             }
         }
+        if (!found)
+            throw new SemanticException(methodToken.getLexeme(),methodToken.getLineNumber(),"No se encontro el metodo estatico llamado "+methodToken.getLexeme()+" de "+operandToken.getLexeme());
     }
 }
