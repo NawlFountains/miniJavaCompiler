@@ -223,6 +223,14 @@ public class SymbolTable implements EntityST {
             i.consolidate();
         }
     }
+
+    public void generateCode() {
+        //TODO propagate code generation
+        for (ClassST c : classes.values()) {
+            c.generateCode();
+        }
+        //Should we do interfaces also?
+    }
     public String toString(){
         String toReturn = "Classes\n";
         for (ClassST c : classes.values()) {

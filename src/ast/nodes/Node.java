@@ -6,4 +6,7 @@ public interface Node {
     void check() throws SemanticException;
     boolean isAssignable();
     String getStructure();
+
+    void generateCode();
+
 }

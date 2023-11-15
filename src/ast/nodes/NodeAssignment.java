@@ -2,6 +2,7 @@ package ast.nodes;
 
 import lexical.SemanticException;
 import lexical.Token;
+import filemanager.CodeGenerator;
 
 public class NodeAssignment extends NodeCompoundExpression implements Node{
     protected NodeCompoundExpression leftSide;
@@ -37,5 +38,12 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
     }
     public String getStructure() {
         return "Assignment \n"+leftSide.getStructure()+"\n = \n"+rightSide.getStructure()+"\n";
+    }
+
+    @Override
+    public void generateCode() {
+        leftSide.generateCode();
+        rightSide.generateCode();
+//        CodeGenerator.getInstance().addLine();
     }
 }

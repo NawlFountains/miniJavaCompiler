@@ -1,4 +1,3 @@
-import filemanager.CodeGenerator;
 import filemanager.FileManager;
 import filemanager.ImpFileManager;
 import lexical.LexicalAnalyzer;
@@ -8,7 +7,7 @@ import semantic.SymbolTable;
 import syntax.SyntaxAnalyzer;
 import syntax.SyntaxException;
 
-public class Main {
+public class MainStage4 {
     static FileManager manager = new ImpFileManager();
     static String successfulExecutionMsg = "[SinErrores]";
     public static void notifyLexicalError(LexicalException e) {
@@ -47,9 +46,6 @@ public class Main {
             SymbolTable.getInstance().checkSentences();
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
-            System.out.println("Generacion de codigo");
-            CodeGenerator.getInstance().setFileName(filePath);
-            SymbolTable.getInstance().generateCode();
             manager.closeCurrentFile();
         } catch (LexicalException e) {
             notifyLexicalError(e);

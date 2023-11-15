@@ -1,5 +1,6 @@
 package semantic.entities;
 
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.SymbolTable;
@@ -16,6 +17,7 @@ public class ClassST implements EntityST {
     protected boolean consolidated;
     protected HashMap<String,AttributeST> attributes;
     protected HashMap<String,MethodST> methods;
+    protected HashMap<String,Integer> offsetMethods;
     protected ConstructorST constructor;
 
     public ClassST(Token decToken,String className) {
@@ -286,5 +288,25 @@ public class ClassST implements EntityST {
         }
         if (constructor.blockAST != null)
             constructor.blockAST.check();
+    }
+    public void generateCode() {
+        for (MethodST m : methods.values()) {
+            //Skip predefined classes maybe not the best idea
+            if (m.blockAST != null)
+                m.blockAST.generateCode();
+        }
+        if (constructor.blockAST != null)
+            constructor.blockAST.generateCode();
+    }
+    private void createCIR() {
+        for (AttributeST a: attributes.values()) {
+            //TODO add atributes to CIR-D
+        }
+    }
+    private void createVT() {
+        for (MethodST m: methods.values()) {
+            //TODO add methods to VT
+//            CodeGenerator.getInstance().addLine("");
+        }
     }
 }
