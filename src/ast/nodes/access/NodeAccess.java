@@ -29,7 +29,6 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         return operandToken;
     }
     public void addArgument(NodeCompoundExpression nodeArgument) {
-        argumentTypeList.add(nodeArgument.getReturnType());
         argumentList.add(nodeArgument);
     }
     @Override
@@ -68,5 +67,13 @@ public abstract class NodeAccess extends NodeOperand implements Node {
             same = false;
         }
         return same;
+    }
+    protected void checkArgumentsList() throws SemanticException {
+        argumentTypeList = new ArrayList<>();
+        for (NodeCompoundExpression n : argumentList) {
+            n.addParentBlock(this.getParentBlock());
+            n.check();
+            argumentTypeList.add(n.getReturnType());
+        }
     }
 }

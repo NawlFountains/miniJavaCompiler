@@ -21,7 +21,7 @@ public class TesterDeCasosSinErrores {
     private static final String testFilesDirectoryPath = "resources/semanticTests2/sinErrores/";
 
     //TODO: el tipo de esta variable init tiene que ser la clase que tiene el main
-    private static final Main init = null;
+    private static final MainStage4 init = null;
    
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;

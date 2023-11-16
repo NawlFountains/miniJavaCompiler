@@ -1,5 +1,6 @@
 package semantic.entities;
 
+import filemanager.CodeGenerationException;
 import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
@@ -26,6 +27,7 @@ public class ClassST implements EntityST {
         extendedClasses = new ArrayList<>();
         implementedInterfaces = new ArrayList<>();
         DEFAULT_CONSTRUCTOR = new ConstructorST(className);
+        DEFAULT_CONSTRUCTOR.setOwnerClass(this);
         constructor = DEFAULT_CONSTRUCTOR;
         consolidated = false;
 
@@ -289,24 +291,37 @@ public class ClassST implements EntityST {
         if (constructor.blockAST != null)
             constructor.blockAST.check();
     }
-    public void generateCode() {
+    public void generateCode() throws CodeGenerationException {
+        createVT();
+        constructor.generateCode();
         for (MethodST m : methods.values()) {
-            //Skip predefined classes maybe not the best idea
-            if (m.blockAST != null)
-                m.blockAST.generateCode();
+//            Skip predefined classes maybe not the best idea
+            if (m.blockAST != null) {
+//                m.generateCode();
+            }
         }
-        if (constructor.blockAST != null)
-            constructor.blockAST.generateCode();
     }
     private void createCIR() {
         for (AttributeST a: attributes.values()) {
             //TODO add atributes to CIR-D
         }
     }
-    private void createVT() {
+    private void createVT() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine(".DATA");
+        String toInsert = CodeGenerator.generateLabelForVT(this)+": DW ";
         for (MethodST m: methods.values()) {
             //TODO add methods to VT
-//            CodeGenerator.getInstance().addLine("");
+            if( !m.isStatic() )
+                CodeGenerator.getInstance().addLine(CodeGenerator.generateLabelForMethod(m)+",");
         }
+        if (toInsert.endsWith("DW "))
+            //Doesn't have any dynamic methods
+            toInsert = toInsert.substring(0,toInsert.length()-4) + " NOP";
+        else {
+            //Remove last ,
+            toInsert.substring(0,toInsert.length()-1);
+        }
+        CodeGenerator.getInstance().addLine(toInsert);
+        CodeGenerator.getInstance().addLine("");
     }
 }

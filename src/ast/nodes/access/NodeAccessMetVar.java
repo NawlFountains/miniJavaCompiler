@@ -24,10 +24,8 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         boolean found = false;
         RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         if (isAttribute) {
-
             assignable = true;
             //Search in parameters
-
             found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
             if (found) {
                 returnType = routineEnvironment.getParameterType(methodOrVarToken.getLexeme());
@@ -64,6 +62,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(),methodOrVarToken.getLineNumber(),"No existe ninguna variable local ni atributo con nombre "+methodOrVarToken.getLexeme());
         } else {
+            checkArgumentsList();
             //Check if exist method with same name, arity an type
             for (MethodST m: routineEnvironment.getOwnerClass().getMethods()) {
                 if (methodOrVarToken.getLexeme().equals(m.getName())) {

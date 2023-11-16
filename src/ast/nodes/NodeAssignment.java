@@ -40,10 +40,10 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
         return "Assignment \n"+leftSide.getStructure()+"\n = \n"+rightSide.getStructure()+"\n";
     }
 
-    @Override
+//    @Override
     public void generateCode() {
-        leftSide.generateCode();
-        rightSide.generateCode();
+//        leftSide.generateCode();
+//        rightSide.generateCode();
 //        CodeGenerator.getInstance().addLine();
     }
 }

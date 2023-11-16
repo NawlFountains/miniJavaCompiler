@@ -19,6 +19,7 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
     @Override
     public void check() throws SemanticException {
         //Check if class exists
+        checkArgumentsList();
         ClassST classReferenceByConstructor = SymbolTable.getInstance().getClassWithName(operandToken.getLexeme());
         if (classReferenceByConstructor == null)
             throw new SemanticException(operandToken.getLexeme(),operandToken.getLineNumber(),"No existe ninguna clase con el nombre "+operandToken.getLexeme());

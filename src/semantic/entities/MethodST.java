@@ -1,5 +1,6 @@
 package semantic.entities;
 
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.ReferenceType;
@@ -59,5 +60,9 @@ public class MethodST extends RoutineST implements EntityST {
     }
     public boolean equals(MethodST method) {
         return super.equals(method) && returnType.equals(method.getReturnType()) && (isStatic == method.isStatic);
+    }
+    public void generateCode() {
+        //TODO RA for each method
+//        CodeGenerator.getInstance().addLine("");
     }
 }

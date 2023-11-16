@@ -7,6 +7,6 @@ public interface Node {
     boolean isAssignable();
     String getStructure();
 
-    void generateCode();
+//    void generateCode();
 
 }

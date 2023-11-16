@@ -1,5 +1,7 @@
 package semantic;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.entities.*;
@@ -224,12 +226,24 @@ public class SymbolTable implements EntityST {
         }
     }
 
-    public void generateCode() {
+    public void generateCode() throws CodeGenerationException {
+        generateMainMethodCall();
+        String heapRoutines = CodeGenerator.generateHeapRoutines();
+        CodeGenerator.getInstance().addLine(heapRoutines);
+        CodeGenerator.getInstance().addLine("");
         //TODO propagate code generation
-        for (ClassST c : classes.values()) {
+        for (ClassST c : classes.values())
             c.generateCode();
-        }
-        //Should we do interfaces also?
+    }
+    private void generateMainMethodCall() throws CodeGenerationException {
+        //TODO add main method call
+        String lblForMainMethod = CodeGenerator.generateLabelForMethod(mainMethods.iterator().next());
+        CodeGenerator.getInstance().addLine(".CODE");
+        CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.getLabelForHeap());
+        CodeGenerator.getInstance().addLine("CALL");
+        CodeGenerator.getInstance().addLine("PUSH "+lblForMainMethod);
+        CodeGenerator.getInstance().addLine("CALL");
+        CodeGenerator.getInstance().addLine("HALT");
     }
     public String toString(){
         String toReturn = "Classes\n";

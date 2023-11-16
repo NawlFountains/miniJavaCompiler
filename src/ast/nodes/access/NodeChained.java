@@ -66,6 +66,7 @@ public class NodeChained extends NodeAccess implements Node {
             if (!found)
                 throw new SemanticException(operandToken.getLexeme(), operandToken.getLineNumber(), "No existe ningun atributo con identificador "+operandToken.getLexeme()+" en "+ topClass.getClassName());
         } else {
+            checkArgumentsList();
             //If it's not an attribute check if the method corresponds
             for (MethodST m: topClass.getMethods()) {
                 if (operandToken.getLexeme().equals(m.getName())) {
