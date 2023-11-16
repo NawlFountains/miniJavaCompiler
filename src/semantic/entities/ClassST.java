@@ -311,15 +311,16 @@ public class ClassST implements EntityST {
         for (MethodST m: methods.values()) {
             //TODO add methods to VT
             if( !m.isStatic() )
-                CodeGenerator.getInstance().addLine(CodeGenerator.generateLabelForMethod(m)+",");
+                toInsert += CodeGenerator.generateLabelForMethod(m)+",";
         }
+
         if (toInsert.endsWith("DW "))
             //Doesn't have any dynamic methods
             toInsert = toInsert.substring(0,toInsert.length()-4) + " NOP";
-        else {
+        else
             //Remove last ,
-            toInsert.substring(0,toInsert.length()-1);
-        }
+            toInsert = toInsert.substring(0,toInsert.length() -1);
+
         CodeGenerator.getInstance().addLine(toInsert);
         CodeGenerator.getInstance().addLine("");
     }
