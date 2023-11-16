@@ -58,29 +58,29 @@ public class CodeGenerator {
     }
 
     public static String generateLabelForConstructor(ConstructorST constructor) {
-        return labelPrefixConstructor+constructor.getName()+labelPrefixName+constructor.getOwnerClass().getClassName();
+        return labelPrefixConstructor+labelPrefixName+constructor.getOwnerClass().getClassName();
     }
     public static String generateLabelForVT(ClassST classST) {
         return labelPrefixVT+classST.getClassName();
     }
     public static String generateHeapRoutines() {
-        return "simple_heap_init:\n" +
-                "\tRET 0\t; Retorna inmediatamente\n" +
+        return "simple_heap_init: " +
+                "RET 0\t; Retorna inmediatamente\n" +
                 "\n" +
-                "simple_malloc:\n" +
-                "\tLOADFP\t; Inicialización unidad\t\n" +
-                "\tLOADSP\n" +
-                "\tSTOREFP ; Finaliza inicialización del RA\n" +
-                "\tLOADHL\t; hl\n" +
-                "\tDUP\t; hl\n" +
-                "\tPUSH 1\t; 1\n" +
-                "\tADD\t; hl+1\n" +
-                "\tSTORE 4 ; Guarda el resultado (un puntero a la primer celda de la región de memoria)\n" +
-                " \tLOAD 3\t; Carga la cantidad de celdas a alojar (parámetro que debe ser positivo)\n" +
-                "\tADD\n" +
-                "\tSTOREHL ; Mueve el heap limit (hl). Expande el heap\n" +
-                "\tSTOREFP\n" +
-                "\tRET 1\t; Retorna eliminando el parámetro\n";
+                "simple_malloc: " +
+                "LOADFP\t; Inicialización unidad\t\n" +
+                "LOADSP\n" +
+                "STOREFP ; Finaliza inicialización del RA\n" +
+                "LOADHL\t; hl\n" +
+                "DUP\t; hl\n" +
+                "PUSH 1\t; 1\n" +
+                "ADD\t; hl+1\n" +
+                "STORE 4 ; Guarda el resultado (un puntero a la primer celda de la región de memoria)\n" +
+                " LOAD 3\t; Carga la cantidad de celdas a alojar (parámetro que debe ser positivo)\n" +
+                "ADD\n" +
+                "STOREHL ; Mueve el heap limit (hl). Expande el heap\n" +
+                "STOREFP\n" +
+                "RET 1\t; Retorna eliminando el parámetro\n";
     }
     public static String getLabelForHeap() {
         return heapLabel;

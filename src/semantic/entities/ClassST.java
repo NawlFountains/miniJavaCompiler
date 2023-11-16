@@ -18,7 +18,7 @@ public class ClassST implements EntityST {
     protected boolean consolidated;
     protected HashMap<String,AttributeST> attributes;
     protected HashMap<String,MethodST> methods;
-    protected HashMap<String,Integer> offsetMethods;
+    protected HashMap<String,MethodST> uniqueMethods;
     protected ConstructorST constructor;
 
     public ClassST(Token decToken,String className) {
@@ -33,6 +33,7 @@ public class ClassST implements EntityST {
 
         attributes = new HashMap<>();
         methods = new HashMap<>();
+        uniqueMethods = new HashMap<>();
     }
     public String getClassName() {
         return className;
@@ -92,6 +93,7 @@ public class ClassST implements EntityST {
                 SymbolTable.getInstance().addMainMethod(method);
             }
             methods.put(token.getLexeme(),method);
+            uniqueMethods.put(token.getLexeme(),method);
             method.setOwnerClass(this);
             this.actualMethod = method;
         } else {
@@ -294,11 +296,8 @@ public class ClassST implements EntityST {
     public void generateCode() throws CodeGenerationException {
         createVT();
         constructor.generateCode();
-        for (MethodST m : methods.values()) {
-//            Skip predefined classes maybe not the best idea
-            if (m.blockAST != null) {
-//                m.generateCode();
-            }
+        for (MethodST m : uniqueMethods.values()) {
+            m.generateCode();
         }
     }
     private void createCIR() {

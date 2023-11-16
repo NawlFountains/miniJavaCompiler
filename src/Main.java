@@ -36,7 +36,7 @@ public class Main {
     public static void main(String[] args) {
         try {
 //            String filePath = args[0];
-            String filePath = "D:/Users/nahue/UNS/Cursando/Compiladores/Practica/Proyecto/miniJavaCompiler/resources/codeGenerationTests/gen-04.java";
+            String filePath = "D:/Users/nahue/UNS/Cursando/Compiladores/Practica/Proyecto/miniJavaCompiler/resources/codeGenerationTests/gen-01.java";
             manager = new ImpFileManager();
             manager.openFile(filePath);
             SymbolTable.getInstance().resetTable();

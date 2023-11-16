@@ -1,13 +1,11 @@
 package semantic.entities;
 
+import filemanager.CodeGenerationException;
 import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.ReferenceType;
 import semantic.SymbolTable;
-import semantic.Type;
-
-import java.util.HashMap;
 
 public class MethodST extends RoutineST implements EntityST {
     protected Token declarationToken;
@@ -61,8 +59,95 @@ public class MethodST extends RoutineST implements EntityST {
     public boolean equals(MethodST method) {
         return super.equals(method) && returnType.equals(method.getReturnType()) && (isStatic == method.isStatic);
     }
-    public void generateCode() {
+    public void generateCode() throws CodeGenerationException {
         //TODO RA for each method
-//        CodeGenerator.getInstance().addLine("");
+        //Check if its not a predefined method
+        beginningCode();
+        if (blockAST == null) //That mean its a predefined class
+            generateCodeForPredefinedMethods();
+        else {
+//            blockAST.generateCode();
+        }
+    }
+
+    private void generateCodeForPredefinedMethods() throws CodeGenerationException {
+        //TODO generate code for predefined methods like printS and debugprint
+        String predefinedCodeToInsert = "";
+        switch (routineName) {
+            case "debugPrint":
+            case "printI":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "IPRINT  ; Imprime el entero en el tope de la pila\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "printC":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "CPRINT  ; Imprime el char en el tope de la pila\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "printS":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "SPRINT  ; Imprime el string en el tope de la pila\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "printSln":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "SPRINT  ; Imprime el booleano en el tope de la pila\n" +
+                        "PRNLN  ; Imprime el caracter de nueva línea\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "println":
+                predefinedCodeToInsert = "PRNLN  ; Imprime el caracter de nueva línea\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 0";
+                break;
+            case "printCln":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "CPRINT  ; Imprime el char en el tope de la pila\n" +
+                        "PRNLN  ; Imprime el caracter de nueva línea\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "read":
+                predefinedCodeToInsert = "READ  ; Lee un valor entero\n" +
+                        "PUSH 48  ; Por ASCII\n" +
+                        "SUB\n" +
+                        "STORE 3  ; Devuelve el valor entero leído, poniendo el tope de la pila en la locación reservada\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 0";
+                break;
+            case "printB":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "BPRINT  ; Imprime el booleano en el tope de la pila\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "printBln":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "BPRINT  ; Imprime el booleano en el tope de la pila\n" +
+                        "PRNLN  ; Imprime el caracter de nueva línea\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+            case "printIln":
+                predefinedCodeToInsert = "LOAD 3  ; Apila el parámetro\n" +
+                        "IPRINT  ; Imprime el entero en el tope de la pila\n" +
+                        "PRNLN  ; Imprime el caracter de nueva línea\n" +
+                        "STOREFP  ; Almacena el tope de la pila en el registro fp\n" +
+                        "RET 1";
+                break;
+        }
+        CodeGenerator.getInstance().addLine(predefinedCodeToInsert);
+        CodeGenerator.getInstance().addLine("");
+    }
+
+    private void beginningCode() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine(CodeGenerator.generateLabelForMethod(this)+": LOADFP");
+        CodeGenerator.getInstance().addLine("LOADSP");
+        CodeGenerator.getInstance().addLine("STORESP");
     }
 }

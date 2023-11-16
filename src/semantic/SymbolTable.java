@@ -236,7 +236,6 @@ public class SymbolTable implements EntityST {
             c.generateCode();
     }
     private void generateMainMethodCall() throws CodeGenerationException {
-        //TODO add main method call
         String lblForMainMethod = CodeGenerator.generateLabelForMethod(mainMethods.iterator().next());
         CodeGenerator.getInstance().addLine(".CODE");
         CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.getLabelForHeap());
