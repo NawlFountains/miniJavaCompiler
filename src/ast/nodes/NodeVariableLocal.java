@@ -84,4 +84,8 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
         }
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for local variable
+    }
 }

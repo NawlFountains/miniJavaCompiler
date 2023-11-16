@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.Token;
 import semantic.PrimitiveType;
 import semantic.ReferenceType;
@@ -41,5 +43,10 @@ public class NodeLiteral extends NodeOperand implements Node{
     @Override
     public boolean isAssignable() {
         return false;
+    }
+
+    @Override
+    public void generateCode() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine("PUSH "+operandToken.getLexeme()+" ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
     }
 }

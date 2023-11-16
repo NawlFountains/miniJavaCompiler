@@ -44,4 +44,8 @@ public class NodeWhile extends NodeSentence implements Node{
                 toReturn += " "+whileSentence.getStructure();
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for while
+    }
 }

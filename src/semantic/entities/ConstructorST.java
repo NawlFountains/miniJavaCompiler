@@ -31,6 +31,7 @@ public class ConstructorST extends RoutineST implements EntityST {
     public void generateCode() throws CodeGenerationException {
         System.out.println("About to generate code for constructor of class "+this.getOwnerClass().getClassName());
         CodeGenerator.getInstance().addLine(".CODE");
+        CodeGenerator.getInstance().addLine("");
         if (blockAST == null) {
             generateDefaultConstructorCode();
         } else {

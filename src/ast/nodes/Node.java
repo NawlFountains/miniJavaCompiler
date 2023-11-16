@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 
 public interface Node {
@@ -7,6 +8,6 @@ public interface Node {
     boolean isAssignable();
     String getStructure();
 
-//    void generateCode();
+    void generateCode() throws CodeGenerationException;
 
 }

@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 import semantic.Type;
 import semantic.entities.RoutineST;
@@ -73,5 +74,17 @@ public class NodeBlock extends NodeSentence implements Node {
             }
         }
         return toReturn;
+    }
+
+    @Override
+    public void generateCode() throws CodeGenerationException {
+        System.out.println("generateCode:NodeBlock:"+this);
+        //TODO add code generation for Block
+        for (NodeSentence ns: nodeSentenceList) {
+            if (ns != null) {
+                System.out.println("generateCode:NodeBlock:Lopp:"+ns);
+                ns.generateCode();
+            }
+        }
     }
 }

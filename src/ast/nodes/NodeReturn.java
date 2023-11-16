@@ -46,4 +46,8 @@ public class NodeReturn extends NodeSentence implements Node{
         }
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for return
+    }
 }

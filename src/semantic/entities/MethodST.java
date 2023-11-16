@@ -66,8 +66,15 @@ public class MethodST extends RoutineST implements EntityST {
         if (blockAST == null) //That mean its a predefined class
             generateCodeForPredefinedMethods();
         else {
-//            blockAST.generateCode();
+            blockAST.generateCode();
+            CodeGenerator.getInstance().addLine("FMEM 0");
+            CodeGenerator.getInstance().addLine("STOREFP");
+            if (SymbolTable.getInstance().getMainMethod().equals(this))
+             CodeGenerator.getInstance().addLine("RET "+0);
+            else
+                CodeGenerator.getInstance().addLine("RET "+(getParameterTypeList().size()+1));
         }
+        CodeGenerator.getInstance().addLine("");
     }
 
     private void generateCodeForPredefinedMethods() throws CodeGenerationException {
@@ -142,12 +149,11 @@ public class MethodST extends RoutineST implements EntityST {
                 break;
         }
         CodeGenerator.getInstance().addLine(predefinedCodeToInsert);
-        CodeGenerator.getInstance().addLine("");
     }
 
     private void beginningCode() throws CodeGenerationException {
         CodeGenerator.getInstance().addLine(CodeGenerator.generateLabelForMethod(this)+": LOADFP");
         CodeGenerator.getInstance().addLine("LOADSP");
-        CodeGenerator.getInstance().addLine("STORESP");
+        CodeGenerator.getInstance().addLine("STOREFP");
     }
 }

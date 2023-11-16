@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.PrimitiveType;
@@ -40,5 +41,10 @@ public class NodeOperand extends NodeCompoundExpression implements Node{
     }
     public String getStructure() {
         return "Operand : "+operandToken.getLexeme()+"\n";
+    }
+
+    @Override
+    public void generateCode() throws CodeGenerationException {
+        //TODO generate code for operand
     }
 }

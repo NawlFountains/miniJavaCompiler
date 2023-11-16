@@ -41,4 +41,8 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         toReturn += "Right side \n"+ rightSide.getStructure()+"\n";
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for binary expression
+    }
 }

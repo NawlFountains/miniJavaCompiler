@@ -172,6 +172,9 @@ public class SymbolTable implements EntityST {
     public void addMainMethod(MethodST mainMethod) {
             mainMethods.add(mainMethod);
     }
+    public MethodST getMainMethod() {
+        return mainMethods.iterator().next();
+    }
     public void insertClass(Token token, ClassST classST) throws SemanticException {
         if (!classOrInterfaceExits(token.getLexeme())) {
             classes.put(token.getLexeme(),classST);

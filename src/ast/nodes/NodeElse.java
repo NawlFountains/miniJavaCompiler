@@ -30,4 +30,8 @@ public class NodeElse extends NodeSentence implements Node{
             toReturn += elseSentence.getStructure();
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for else block
+    }
 }

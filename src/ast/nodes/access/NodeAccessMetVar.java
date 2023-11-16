@@ -4,6 +4,8 @@ import ast.nodes.Node;
 import ast.nodes.NodeBlock;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.NodeOperand;
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.entities.AttributeST;
@@ -107,5 +109,31 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             toReturn += "."+chainedNode.getStructure();
         }
         return toReturn;
+    }
+    @Override
+    public void generateCode() throws CodeGenerationException {
+        if (!isAttribute) {
+            for (NodeCompoundExpression n: argumentList)
+                n.generateCode();
+            CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForMethod(searchMethod())+" ; Apliamos el metodo");
+            CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
+        }
+    }
+
+    private MethodST searchMethod() {
+        boolean found = false;
+        MethodST methodToReturn = null;
+        for (MethodST m: routineEnvironment.getOwnerClass().getMethods()) {
+            if (methodOrVarToken.getLexeme().equals(m.getName())) {
+                if (argumentList.size() == m.getParameterTypeList().size()) {
+                    if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
+                        found = true;
+                        methodToReturn = m;
+                        break;
+                    }
+                }
+            }
+        }
+        return methodToReturn;
     }
 }

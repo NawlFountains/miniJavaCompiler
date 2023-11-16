@@ -41,4 +41,9 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
         toReturn += operand.getStructure()+"\n";
         return toReturn;
     }
+
+    @Override
+    public void generateCode() {
+        //TODO add generate code for unary expression
+    }
 }

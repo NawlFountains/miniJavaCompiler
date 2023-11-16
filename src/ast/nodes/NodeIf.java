@@ -59,4 +59,8 @@ public class NodeIf extends NodeSentence implements Node{
         }
         return toReturn;
     }
+    @Override
+    public void generateCode() {
+        //TODO add generate code for if block
+    }
 }
