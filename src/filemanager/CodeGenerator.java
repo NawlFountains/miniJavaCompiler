@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class CodeGenerator {
     protected static CodeGenerator instance = null;
-    protected static final String FORMAT = ".out";
     protected static final String labelPrefix = "lbl";
     protected static final String labelPrefixName = "@";
     protected static final String labelPrefixMethod = labelPrefix+"Met";
@@ -31,9 +30,7 @@ public class CodeGenerator {
         instance = null;
     }
     public void setFileName(String fileName) throws CodeGenerationException {
-        String fileNameFormated = "["+fileName.substring(fileName.lastIndexOf('/')+1,fileName.length())+"]"+FORMAT;
-        System.out.println("Filename is "+fileNameFormated);
-        outputFile = new File(fileNameFormated);
+        outputFile = new File(fileName);
         try {
             if (!outputFile.exists()) {
                 outputFile.createNewFile();

@@ -49,13 +49,10 @@ public class NodeAccessStaticMethod extends NodeAccess implements Node {
     }
 
     public void generateCode() throws CodeGenerationException {
-        System.out.println("generateCode:NodeAccessStaticMethod:" + operandToken.getLexeme()+":"+methodToken.getLexeme());
         for (NodeCompoundExpression n: argumentList)
             n.generateCode();
-        System.out.println("generateCode:NodeAccessStaticMethod:mid");
         CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForMethod(searchStaticMethod())+" ; Apliamos el metodo");
         CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
-        System.out.println("generateCode:NodeAccessStaticMethod:end");
     }
 
     protected MethodST searchStaticMethod() {

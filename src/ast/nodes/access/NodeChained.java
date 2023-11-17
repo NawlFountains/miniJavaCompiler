@@ -118,18 +118,14 @@ public class NodeChained extends NodeAccess implements Node {
     }
     @Override
     public void generateCode() throws CodeGenerationException {
-        System.out.println("generateCode:NodeChained:"+operandToken.getLexeme());
         if (!isAttribute) {
             if (chainedNode == null) {
-                for (NodeCompoundExpression n: argumentList) {
-                    n.generateCode();
-                    CodeGenerator.getInstance().addLine("SWAP");
-                }
-                System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):start");
                 MethodST currentMethod = searchMethod();
-                System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):method:"+currentMethod);
                 if (!currentMethod.isStatic()) {
-                    System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):dynamic");
+                    for (NodeCompoundExpression n: argumentList) {
+                        n.generateCode();
+                        CodeGenerator.getInstance().addLine("SWAP");
+                    }
                     if (!currentMethod.getReturnType().toString().equals("void")) {
                         CodeGenerator.getInstance().addLine("RMEM 1 ; Reservamos una locacion de memoria para guardar el resultado de "+currentMethod.getName());
                         CodeGenerator.getInstance().addLine("SWAP");
@@ -139,7 +135,9 @@ public class NodeChained extends NodeAccess implements Node {
                     CodeGenerator.getInstance().addLine("LOADREF "+ currentMethod.getOffsetInVT() +"; Apilo offset del metodo "+operandToken.getLexeme()+" en la VT");
                     CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
                 } else {
-                    System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):static");
+                    for (NodeCompoundExpression n: argumentList) {
+                        n.generateCode();
+                    }
                     CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForMethod(searchMethod())+" ; Apliamos el metodo");
                     CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
                 }
@@ -147,23 +145,27 @@ public class NodeChained extends NodeAccess implements Node {
                 chainedNode.generateCode();
             }
         } else {
-//            Search if Var is attribute, parameter o local
-            System.out.println("generateCode:NodeAccessMetVar");
-            String variableName = operandToken.getLexeme();
-            if (isAccessingParameter(variableName)) {
-                System.out.println("Is accessing parameter");
-                CodeGenerator.getInstance().addLine("LOAD "+searchParameterOffset(variableName)+"; Apilo el valor en memoria del offset de "+variableName);
-            } else if (isAccessingAttribute(variableName)) {
-                CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
-                CodeGenerator.getInstance().addLine("LOADREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
+            if (chainedNode == null && isAttribute) {
+                if (previousNodeAccess != null) {
+                    int offset=-1;
+                    if (previousNodeAccess instanceof NodeAccessThis) {
+                        ClassST thisClass = previousNodeAccess.getParentBlock().getRoutineEnvironment().getOwnerClass();
+                        offset = searchAttributeOffset(thisClass);
+                    } else if (previousNodeAccess instanceof NodeAccessConstructor) {
+                        ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getToken().getLexeme());
+                        offset = searchAttributeOffset(constructorClass);
+                    } else if (previousNodeAccess instanceof NodeAccessMetVar ) {
+                        ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getStandaloneReturnType().toString());
+                        offset = searchAttributeOffset(previousClassType);
+                    } else {
+                        ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNode.getReturnType().toString());
+                        offset = searchAttributeOffset(previousClassType);
+                    }
+                    CodeGenerator.getInstance().addLine("LOADREF "+offset+" ; Apilo offset de atributo "+operandToken.getLexeme());
+                }
             } else {
-                //If it's not an attribute nor a parameter then its a local variable
-                System.out.println("isLocalVariable:"+variableName);
-                System.out.println("localVariableOffset:"+variableName+":"+searchLocalVariableOffset(variableName));
-                CodeGenerator.getInstance().addLine("LOAD "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
-            }
-            if (chainedNode != null)
                 chainedNode.generateCode();
+            }
         }
     }
     private boolean previousCallReturnAClass(NodeAccess previousNode) {
@@ -173,12 +175,8 @@ public class NodeChained extends NodeAccess implements Node {
     protected MethodST searchMethod() {
         MethodST methodToReturn = null;
         if (previousNode != null) {
-
-            System.out.println("searchMethod:nodeChained:start:"+previousNode);
             ClassST classToSearchIn = SymbolTable.getInstance().getClassWithName(previousNode.getReturnType().toString());
-            System.out.println("searchMethod:nodeChained:class"+classToSearchIn);
             for (MethodST m: classToSearchIn.getMethods()) {
-                System.out.println("searchMethod:nodeChained:"+m);
                 if (operandToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
                         if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
@@ -189,11 +187,8 @@ public class NodeChained extends NodeAccess implements Node {
                 }
             }
         } else {
-            System.out.println("searchMethod:nodeChained:start:"+previousNodeAccess.getStandaloneReturnType());
             ClassST classToSearchIn = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getStandaloneReturnType().toString());
-            System.out.println("searchMethod:nodeChained:class"+classToSearchIn);
             for (MethodST m: classToSearchIn.getMethods()) {
-                System.out.println("searchMethod:nodeChained:"+m);
                 if (operandToken.getLexeme().equals(m.getName())) {
                     if (argumentList.size() == m.getParameterTypeList().size()) {
                         if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
@@ -205,5 +200,43 @@ public class NodeChained extends NodeAccess implements Node {
             }
         }
         return methodToReturn;
+    }
+    public void generateCodeForAssignment() throws CodeGenerationException {
+        if (chainedNode == null && isAttribute) {
+            if (previousNodeAccess != null) {
+                int offset=-1;
+                if (previousNodeAccess instanceof NodeAccessThis) {
+                    ClassST thisClass = previousNodeAccess.getParentBlock().getRoutineEnvironment().getOwnerClass();
+                    offset = searchAttributeOffset(thisClass);
+                } else if (previousNodeAccess instanceof NodeAccessConstructor) {
+                    CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+                    ClassST constructorClass = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getToken().getLexeme());
+                    offset = searchAttributeOffset(constructorClass);
+                } else if (previousNodeAccess instanceof NodeAccessMetVar ) {
+                    CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+                    ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getStandaloneReturnType().toString());
+                    offset = searchAttributeOffset(previousClassType);
+                } else {
+                    CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+                    ClassST previousClassType = SymbolTable.getInstance().getClassWithName(previousNode.getReturnType().toString());
+                    offset = searchAttributeOffset(previousClassType);
+                }
+                CodeGenerator.getInstance().addLine("SWAP");
+                CodeGenerator.getInstance().addLine("STOREREF "+offset+" ; Apilo offset de atributo "+operandToken.getLexeme());
+            }
+        } else {
+            chainedNode.generateCodeForAssignment();
+        }
+    }
+    private int searchAttributeOffset(ClassST topClass) {
+        int offset = 1;
+        for (AttributeST a : topClass.getAttributes()) {
+            if (operandToken.getLexeme().equals(a.getAttributeName())) {
+                break;
+            } else {
+                offset++;
+            }
+        }
+        return offset;
     }
 }

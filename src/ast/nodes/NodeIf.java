@@ -65,13 +65,12 @@ public class NodeIf extends NodeSentence implements Node{
     public void generateCode() throws CodeGenerationException {
         String outsideIfLabel = CodeGenerator.generateLabelForString("outIf");
         conditionalExpression.generateCode();
-
         if (nodeElse != null) {
 
             String elseLabel = CodeGenerator.generateLabelForString("else");
 
             //We negate the condition for "then" block , if its true then we should go into the else block
-            CodeGenerator.getInstance().addLine("BF: "+elseLabel);
+            CodeGenerator.getInstance().addLine("BF "+elseLabel);
             thenSentence.generateCode();
             CodeGenerator.getInstance().addLine("JUMP "+outsideIfLabel);
             CodeGenerator.getInstance().addLine(elseLabel+": NOP");
@@ -80,7 +79,7 @@ public class NodeIf extends NodeSentence implements Node{
         } else {
 
             //We negate the condition for "then" block , if its true then we shouldn't go into the then block
-            CodeGenerator.getInstance().addLine("BF: "+outsideIfLabel);
+            CodeGenerator.getInstance().addLine("BF "+outsideIfLabel);
             thenSentence.generateCode();
             CodeGenerator.getInstance().addLine(outsideIfLabel+": NOP");
         }

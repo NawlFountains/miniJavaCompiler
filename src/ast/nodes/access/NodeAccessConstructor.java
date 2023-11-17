@@ -53,6 +53,18 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
 
     @Override
     public void generateCode() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine("RMEM 1  ; Reservamos memoria para el resultado del malloc (la referencia al nuevo CIR de "+operandToken.getLexeme()+" )");
+        CodeGenerator.getInstance().addLine("PUSH "+(SymbolTable.getInstance().getClassWithName(operandToken.getLexeme()).getAttributes().size()+1));
+        CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.getLabelForMalloc());
+        CodeGenerator.getInstance().addLine("CALL ");
+        CodeGenerator.getInstance().addLine("DUP ");
+        CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForVT(SymbolTable.getInstance().getClassWithName(operandToken.getLexeme())));
+        CodeGenerator.getInstance().addLine("STOREREF 0");
+        CodeGenerator.getInstance().addLine("DUP ");
+        for (NodeCompoundExpression n  : argumentList) {
+            n.generateCode();
+            CodeGenerator.getInstance().addLine("SWAP ; ");
+        }
         CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForConstructor(SymbolTable.getInstance().getClassWithName(operandToken.getLexeme()).getConstructor()));
         CodeGenerator.getInstance().addLine("CALL ; LLamo al constructor");
     }

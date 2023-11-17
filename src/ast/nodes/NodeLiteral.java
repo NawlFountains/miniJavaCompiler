@@ -54,7 +54,13 @@ public class NodeLiteral extends NodeOperand implements Node{
             CodeGenerator.getInstance().addLine(referenceLabel+": DW "+operandToken.getLexeme()+",0 ");
             CodeGenerator.getInstance().addLine(".CODE");
             CodeGenerator.getInstance().addLine("PUSH "+referenceLabel);
-        } else
+        } else if (returnType.toString().equals("boolean")) {
+            if (operandToken.getId().equals("rw_true"))
+                CodeGenerator.getInstance().addLine("PUSH 1 ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
+            else
+                CodeGenerator.getInstance().addLine("PUSH 0 ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
+        }
+        else
             CodeGenerator.getInstance().addLine("PUSH "+operandToken.getLexeme()+" ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
     }
 }

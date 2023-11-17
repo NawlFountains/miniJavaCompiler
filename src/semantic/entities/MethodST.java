@@ -76,7 +76,9 @@ public class MethodST extends RoutineST implements EntityST {
             CodeGenerator.getInstance().addLine("FMEM "+blockAST.getAmountOfVariables());
             CodeGenerator.getInstance().addLine("STOREFP");
             if (SymbolTable.getInstance().getMainMethod().equals(this))
-             CodeGenerator.getInstance().addLine("RET "+0);
+                 CodeGenerator.getInstance().addLine("RET 0");
+            else if (isStatic())
+                CodeGenerator.getInstance().addLine("RET "+(getParameterTypeList().size()));
             else
                 CodeGenerator.getInstance().addLine("RET "+(getParameterTypeList().size()+1));
         }

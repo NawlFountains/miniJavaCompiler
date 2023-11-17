@@ -51,6 +51,7 @@ public class ClassST implements EntityST {
                 throw new SemanticException(token.getLexeme(),token.getLineNumber(),"El constructor debe tener el nombre de la clase , se esperaba "+className+" y se encontro "+token.getLexeme()+".");
             }
             this.constructor = constructor;
+            constructor.setOwnerClass(this);
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"No se puede definir mas de un constructor por clase");
         }

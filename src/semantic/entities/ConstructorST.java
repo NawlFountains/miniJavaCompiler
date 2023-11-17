@@ -29,23 +29,28 @@ public class ConstructorST extends RoutineST implements EntityST {
         return toReturn;
     }
     public void generateCode() throws CodeGenerationException {
-        System.out.println("About to generate code for constructor of class "+this.getOwnerClass().getClassName());
         CodeGenerator.getInstance().addLine(".CODE");
         CodeGenerator.getInstance().addLine("");
         if (blockAST == null) {
             generateDefaultConstructorCode();
         } else {
+            begginingCode();
             blockAST.generateCode();
             CodeGenerator.getInstance().addLine("FMEM "+blockAST.getAmountOfVariables());
             CodeGenerator.getInstance().addLine("STOREFP");
+            CodeGenerator.getInstance().addLine("RET "+(getParameterTypeList().size()+1));
         }
         CodeGenerator.getInstance().addLine("");
     }
 
-    private void generateDefaultConstructorCode() throws CodeGenerationException {
+    private void begginingCode() throws CodeGenerationException {
         CodeGenerator.getInstance().addLine(CodeGenerator.generateLabelForConstructor(this)+": "+"LOADFP ");
         CodeGenerator.getInstance().addLine("LOADSP");
         CodeGenerator.getInstance().addLine("STOREFP");
+    }
+
+    private void generateDefaultConstructorCode() throws CodeGenerationException {
+        begginingCode();
         CodeGenerator.getInstance().addLine("FMEM 0");
         CodeGenerator.getInstance().addLine("STOREFP");
         CodeGenerator.getInstance().addLine("RET 1");

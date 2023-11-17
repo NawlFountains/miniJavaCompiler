@@ -28,7 +28,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         if (isAttribute) {
             assignable = true;
             //Search in parameters
-            found = isAccessingParameter(methodOrVarToken.getLexeme());
+            found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
             if (found) {
                 returnType = routineEnvironment.getParameterType(methodOrVarToken.getLexeme());
             }
@@ -111,18 +111,24 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         }
         return toReturn;
     }
+    @Override
     public void generateCodeForAssignment() throws CodeGenerationException {
         //We asume only assignment will ask this
         String variableName = methodOrVarToken.getLexeme();
-        if (isAccessingParameter(variableName)) {
-            CodeGenerator.getInstance().addLine("STORE "+searchParameterOffset(variableName));
-        } else if (isAccessingAttribute(variableName)) {
-            CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
-            CodeGenerator.getInstance().addLine("SWAP");
-            CodeGenerator.getInstance().addLine("STOREREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
+        if (chainedNode == null) {
+
+            if (isAccessingParameter(variableName)) {
+                CodeGenerator.getInstance().addLine("STORE "+searchParameterOffset(variableName));
+            } else if (isAccessingAttribute(variableName)) {
+                CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+                CodeGenerator.getInstance().addLine("SWAP");
+                CodeGenerator.getInstance().addLine("STOREREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
+            } else {
+                //If it's not an attribute nor a parameter then its a local variable
+                CodeGenerator.getInstance().addLine("STORE "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
+            }
         } else {
-            //If it's not an attribute nor a parameter then its a local variable
-            CodeGenerator.getInstance().addLine("STORE "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
+            chainedNode.generateCodeForAssignment();
         }
     }
 

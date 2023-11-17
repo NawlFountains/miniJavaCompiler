@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import ast.nodes.access.NodeAccess;
 import ast.nodes.access.NodeAccessMetVar;
 import filemanager.CodeGenerationException;
 import lexical.SemanticException;
@@ -46,6 +47,6 @@ public class NodeAssignment extends NodeCompoundExpression implements Node{
     public void generateCode() throws CodeGenerationException {
         rightSide.generateCode();
         //In this context assignable leftSide is an access capture by NodeAccesMetVar , otherwise it should have failed previously
-        ((NodeAccessMetVar)leftSide).generateCodeForAssignment();
+        ((NodeAccess)leftSide).generateCodeForAssignment();
     }
 }

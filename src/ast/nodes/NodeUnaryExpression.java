@@ -48,10 +48,13 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
     public void generateCode() throws CodeGenerationException {
         operand.generateCode();
         if (unaryOperand != null) {
-            if (unaryOperand.equals("opAdd")) {
-            } else if (unaryOperand.equals("opSub")) {
+            if (unaryOperand.operandToken.getId().equals("opAdd")) {
+            } else if (unaryOperand.operandToken.getId().equals("opSub")) {
                 CodeGenerator.getInstance().addLine("NEG");
-            } else {
+            } else if (unaryOperand.operandToken.getId().equals("opNot")) {
+                CodeGenerator.getInstance().addLine("NOT");
+            }
+            else {
                 operand.generateCode();
             }
         }

@@ -126,7 +126,6 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         boolean found = false;
         for (AttributeST a : routineEnvironment.getOwnerClass().getAttributes()) {
             if (variableName.equals(a.getAttributeName())) {
-                System.out.println("Is true "+variableName+" and "+a.getAttributeName());
                 found = true;
                 returnType = a.getAttributeType();
                 break;
@@ -142,9 +141,8 @@ public abstract class NodeAccess extends NodeOperand implements Node {
 
     protected MethodST searchMethod() {
         MethodST methodToReturn = null;
-        System.out.println("searchMethod:start");
+        RoutineST routineEnvironment = getRootBlock().getRoutineEnvironment();
         for (MethodST m: routineEnvironment.getOwnerClass().getMethods()) {
-            System.out.println("searchMethod:"+m);
             if (operandToken.getLexeme().equals(m.getName())) {
                 if (argumentList.size() == m.getParameterTypeList().size()) {
                     if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
@@ -160,16 +158,14 @@ public abstract class NodeAccess extends NodeOperand implements Node {
         return chainedNode != null;
     }
     public void generateCode() throws CodeGenerationException {
-        System.out.println("generateCode:NodeAccessMetVar:"+operandToken.getLexeme());
         if (!isAttribute) {
             if (chainedNode == null) {
-                for (NodeCompoundExpression n: argumentList)
-                    n.generateCode();
-                System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):start");
                 MethodST currentMethod = searchMethod();
-                System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):method:"+currentMethod);
                 if (!currentMethod.isStatic()) {
-                    System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):dynamic");
+                    for (NodeCompoundExpression n: argumentList) {
+                        n.generateCode();
+                        CodeGenerator.getInstance().addLine("SWAP");
+                    }
                     if (!currentMethod.getReturnType().toString().equals("void")) {
                         CodeGenerator.getInstance().addLine("RMEM 1 ; Reservamos una locacion de memoria para guardar el resultado de "+currentMethod.getName());
                         CodeGenerator.getInstance().addLine("SWAP");
@@ -179,7 +175,9 @@ public abstract class NodeAccess extends NodeOperand implements Node {
                     CodeGenerator.getInstance().addLine("LOADREF "+ currentMethod.getOffsetInVT() +"; Apilo offset del metodo "+operandToken.getLexeme()+" en la VT");
                     CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
                 } else {
-                    System.out.println("generateCode:NodeChained:"+operandToken.getLexeme()+":chainedNode(null):static");
+                    for (NodeCompoundExpression n: argumentList) {
+                        n.generateCode();
+                    }
                     CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForMethod(searchMethod())+" ; Apliamos el metodo");
                     CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
                 }
@@ -190,15 +188,12 @@ public abstract class NodeAccess extends NodeOperand implements Node {
 //            Search if Var is attribute, parameter o local
             String variableName = operandToken.getLexeme();
             if (isAccessingParameter(variableName)) {
-                System.out.println("Is accessing parameter");
                 CodeGenerator.getInstance().addLine("LOAD "+searchParameterOffset(variableName)+"; Apilo el valor en memoria del offset de "+variableName);
             } else if (isAccessingAttribute(variableName)) {
                 CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
                 CodeGenerator.getInstance().addLine("LOADREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
             } else {
                 //If it's not an attribute nor a parameter then its a local variable
-                System.out.println("isLocalVariable:"+variableName);
-                System.out.println("localVariableOffset:"+variableName+":"+searchLocalVariableOffset(variableName));
                 CodeGenerator.getInstance().addLine("LOAD "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
             }
             if (chainedNode != null)
@@ -207,5 +202,20 @@ public abstract class NodeAccess extends NodeOperand implements Node {
     }
     public Type getStandaloneReturnType() {
         return standaloneReturnType;
+    }
+
+    public void generateCodeForAssignment() throws CodeGenerationException {
+        //We asume only assignment will ask this
+        String variableName = operandToken.getLexeme();
+        if (isAccessingParameter(variableName)) {
+            CodeGenerator.getInstance().addLine("STORE "+searchParameterOffset(variableName));
+        } else if (isAccessingAttribute(variableName)) {
+            CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+            CodeGenerator.getInstance().addLine("SWAP");
+            CodeGenerator.getInstance().addLine("STOREREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
+        } else {
+            //If it's not an attribute nor a parameter then its a local variable
+            CodeGenerator.getInstance().addLine("STORE "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
+        }
     }
 }

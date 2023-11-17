@@ -4,10 +4,13 @@ import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.access.NodeAccess;
 import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.ReferenceType;
 import semantic.SymbolTable;
+import semantic.entities.AttributeST;
+import semantic.entities.RoutineST;
 
 public class NodeAccessThis extends NodeAccess implements Node {
     public NodeAccessThis(Token operandToken) {
@@ -37,5 +40,12 @@ public class NodeAccessThis extends NodeAccess implements Node {
             toReturn += "."+chainedNode.getStructure();
         }
         return toReturn;
+    }
+    @Override
+    public void generateCodeForAssignment() throws CodeGenerationException {
+        //We asume only assignment will ask this
+        CodeGenerator.getInstance().addLine("LOAD 3");
+        if (chainedNode != null)
+            chainedNode.generateCodeForAssignment();
     }
 }

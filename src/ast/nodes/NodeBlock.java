@@ -95,10 +95,8 @@ public class NodeBlock extends NodeSentence implements Node {
 
     @Override
     public void generateCode() throws CodeGenerationException {
-        System.out.println("generateCode:NodeBlock:"+this);
         for (NodeSentence ns: nodeSentenceList) {
             if (ns != null) {
-                System.out.println("generateCode:NodeBlock:Lopp:"+ns);
                 ns.generateCode();
                 // If the sentence starts with a call, that has a chained node, but its not an assignment then we could throw out the value
                 if (ns instanceof NodeAccessMetVar && ((NodeAccessMetVar) ns).hasChainedNode() && !((NodeAccessMetVar) ns).getReturnType().toString().equals("void")) {

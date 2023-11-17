@@ -96,22 +96,6 @@ public class NodeVariableLocal extends NodeCompoundExpression implements Node{
     @Override
     public void generateCode() throws CodeGenerationException {
         CodeGenerator.getInstance().addLine("RMEM 1 ; Reservamos lugar en memoria para almacenar el valor de la var local "+variableIdToken.getLexeme());
-        if (variableType instanceof ReferenceType) {
-            //Creation of CIRC
-            System.out.println("generateCode:NodeVariableLocal:ReferenceType:"+variableType);
-            CodeGenerator.getInstance().addLine("RMEM 1  ; Reservamos memoria para el resultado del malloc (la referencia al nuevo CIR de "+variableType.toString()+")");
-            CodeGenerator.getInstance().addLine("PUSH "+ (SymbolTable.getInstance().getClassWithName(variableType.toString()).getAttributes().size()+1) +"  ;  Apilo la cantidad de var de instancia del CIR de "+variableType.toString()+" +1 por VT");
-            CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.getLabelForMalloc()+"  ; La dirección de la rutina para alojar memoria en el heap");
-            CodeGenerator.getInstance().addLine("CALL ");
-            CodeGenerator.getInstance().addLine("DUP");
-            CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForVT(SymbolTable.getInstance().getClassWithName(variableType.toString())));
-            CodeGenerator.getInstance().addLine("STOREREF 0 ; Guardamos la referencia a la VT en el CIR recien creado");
-            CodeGenerator.getInstance().addLine("DUP");
-            System.out.println("generateCode:NodeVariableLocal:end");
-        } else {
-
-            System.out.println("generateCode:NodeVariableLocal:PrimitiveType:"+variableType);
-        }
         assignmentExpression.generateCode();
         CodeGenerator.getInstance().addLine("STORE "+parentBlock.getLocalVariablePosition(variableIdToken.getLexeme())+" ; Almaceno el valor de la expresion en la var local "+variableIdToken.getLexeme());
     }
