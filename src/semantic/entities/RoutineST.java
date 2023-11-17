@@ -18,6 +18,7 @@ public abstract class RoutineST {
     protected InterfaceST ownerInterface;
     protected NodeBlock blockAST;
     protected Type returnType;
+    private static final int OFFSET_TILL_PARAMETERS = 4;
 
     protected RoutineST(String routineName) {
         parameters = new HashMap<>();
@@ -38,6 +39,17 @@ public abstract class RoutineST {
         } else {
             throw new SemanticException(token.getLexeme(),token.getLineNumber(),"Ya existe un parametro en este constructor con el identificador "+token.getLexeme());
         }
+    }
+    public int getParameterPosition(String parameterName) {
+        int position = 0;
+        for (ParameterST p : parameters.values()) {
+            if (p.getParameterName().equals(parameterName)) {
+                break;
+            } else {
+                position++;
+            }
+        }
+        return OFFSET_TILL_PARAMETERS+position;
     }
     public void setOwnerClass(ClassST classST) {
         this.ownerClass = classST;

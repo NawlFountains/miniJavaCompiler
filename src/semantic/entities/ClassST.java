@@ -300,18 +300,17 @@ public class ClassST implements EntityST {
             m.generateCode();
         }
     }
-    private void createCIR() {
-        for (AttributeST a: attributes.values()) {
-            //TODO add atributes to CIR-D
-        }
-    }
     private void createVT() throws CodeGenerationException {
         CodeGenerator.getInstance().addLine(".DATA");
         String toInsert = CodeGenerator.generateLabelForVT(this)+": DW ";
+        int offsetInVT = 0;
         for (MethodST m: methods.values()) {
-            //TODO add methods to VT
-            if( !m.isStatic() )
+            if( !m.isStatic() ) {
+                //TODO preserve original offset inherited
                 toInsert += CodeGenerator.generateLabelForMethod(m)+",";
+                m.setOffsetInVT(offsetInVT);
+                offsetInVT++;
+            }
         }
 
         if (toInsert.endsWith("DW "))

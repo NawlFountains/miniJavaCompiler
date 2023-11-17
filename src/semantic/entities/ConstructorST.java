@@ -35,7 +35,9 @@ public class ConstructorST extends RoutineST implements EntityST {
         if (blockAST == null) {
             generateDefaultConstructorCode();
         } else {
-            //TODO actual constructor
+            blockAST.generateCode();
+            CodeGenerator.getInstance().addLine("FMEM "+blockAST.getAmountOfVariables());
+            CodeGenerator.getInstance().addLine("STOREFP");
         }
         CodeGenerator.getInstance().addLine("");
     }

@@ -1,8 +1,12 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.entities.RoutineST;
+
+import java.util.concurrent.locks.Condition;
 
 public class NodeWhile extends NodeSentence implements Node{
     protected NodeCompoundExpression conditionalExpression;
@@ -45,7 +49,18 @@ public class NodeWhile extends NodeSentence implements Node{
         return toReturn;
     }
     @Override
-    public void generateCode() {
-        //TODO add generate code for while
+    public void generateCode() throws CodeGenerationException {
+        String whileStartLabel = CodeGenerator.generateLabelForString("while_start");
+        String whileFinishLabel = CodeGenerator.generateLabelForString("while_out");
+
+        CodeGenerator.getInstance().addLine(whileFinishLabel+": NOP");
+        conditionalExpression.generateCode();
+
+        //We negate the condition, if its true then we should go into the while block
+        CodeGenerator.getInstance().addLine("BF :"+whileFinishLabel);
+        whileSentence.generateCode();
+        CodeGenerator.getInstance().addLine("JUMP :"+whileStartLabel);
+        CodeGenerator.getInstance().addLine(whileFinishLabel+": NOP");
+
     }
 }

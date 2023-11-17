@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 
 public class NodeBinaryExpression extends NodeCompoundExpression implements Node{
@@ -42,7 +43,9 @@ public class NodeBinaryExpression extends NodeCompoundExpression implements Node
         return toReturn;
     }
     @Override
-    public void generateCode() {
-        //TODO add generate code for binary expression
+    public void generateCode() throws CodeGenerationException {
+        leftSide.generateCode();
+        rightSide.generateCode();
+        operand.generateCode();
     }
 }

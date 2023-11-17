@@ -3,6 +3,7 @@ package ast.nodes.access;
 import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
 import ast.nodes.access.NodeAccess;
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.ReferenceType;

@@ -1,5 +1,6 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
 import lexical.SemanticException;
 
 public class NodeElse extends NodeSentence implements Node{
@@ -31,7 +32,7 @@ public class NodeElse extends NodeSentence implements Node{
         return toReturn;
     }
     @Override
-    public void generateCode() {
-        //TODO add generate code for else block
+    public void generateCode() throws CodeGenerationException {
+        elseSentence.generateCode();
     }
 }

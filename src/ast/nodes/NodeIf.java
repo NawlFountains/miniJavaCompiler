@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.entities.RoutineST;
@@ -60,7 +62,27 @@ public class NodeIf extends NodeSentence implements Node{
         return toReturn;
     }
     @Override
-    public void generateCode() {
-        //TODO add generate code for if block
+    public void generateCode() throws CodeGenerationException {
+        String outsideIfLabel = CodeGenerator.generateLabelForString("outIf");
+        conditionalExpression.generateCode();
+
+        if (nodeElse != null) {
+
+            String elseLabel = CodeGenerator.generateLabelForString("else");
+
+            //We negate the condition for "then" block , if its true then we should go into the else block
+            CodeGenerator.getInstance().addLine("BF: "+elseLabel);
+            thenSentence.generateCode();
+            CodeGenerator.getInstance().addLine("JUMP "+outsideIfLabel);
+            CodeGenerator.getInstance().addLine(elseLabel+": NOP");
+            nodeElse.generateCode();
+            CodeGenerator.getInstance().addLine(outsideIfLabel+": NOP");
+        } else {
+
+            //We negate the condition for "then" block , if its true then we shouldn't go into the then block
+            CodeGenerator.getInstance().addLine("BF: "+outsideIfLabel);
+            thenSentence.generateCode();
+            CodeGenerator.getInstance().addLine(outsideIfLabel+": NOP");
+        }
     }
 }

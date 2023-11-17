@@ -47,6 +47,14 @@ public class NodeLiteral extends NodeOperand implements Node{
 
     @Override
     public void generateCode() throws CodeGenerationException {
-        CodeGenerator.getInstance().addLine("PUSH "+operandToken.getLexeme()+" ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
+        if (returnType instanceof ReferenceType) {
+            //String type
+            String referenceLabel = CodeGenerator.generateLabelForString(returnType.toString());
+            CodeGenerator.getInstance().addLine(".DATA");
+            CodeGenerator.getInstance().addLine(referenceLabel+": DW "+operandToken.getLexeme()+",0 ");
+            CodeGenerator.getInstance().addLine(".CODE");
+            CodeGenerator.getInstance().addLine("PUSH "+referenceLabel);
+        } else
+            CodeGenerator.getInstance().addLine("PUSH "+operandToken.getLexeme()+" ; Apliamos el "+returnType.toString()+" "+operandToken.getLexeme());
     }
 }

@@ -234,7 +234,6 @@ public class SymbolTable implements EntityST {
         String heapRoutines = CodeGenerator.generateHeapRoutines();
         CodeGenerator.getInstance().addLine(heapRoutines);
         CodeGenerator.getInstance().addLine("");
-        //TODO propagate code generation
         for (ClassST c : classes.values())
             c.generateCode();
     }

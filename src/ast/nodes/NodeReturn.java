@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.entities.ConstructorST;
@@ -47,7 +49,11 @@ public class NodeReturn extends NodeSentence implements Node{
         return toReturn;
     }
     @Override
-    public void generateCode() {
-        //TODO add generate code for return
+    public void generateCode() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine("FMEM 0");
+        returnExpression.generateCode();
+        CodeGenerator.getInstance().addLine("STORE 4 ; Ponemos el resultado del tope de la pila en el retorno");
+        CodeGenerator.getInstance().addLine("STOREFP ; Actualizar el fp para qeu apunte al RA llamador");
+        CodeGenerator.getInstance().addLine("RET 1");
     }
 }

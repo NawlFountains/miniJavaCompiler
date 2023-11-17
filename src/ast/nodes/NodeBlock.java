@@ -1,6 +1,10 @@
 package ast.nodes;
 
+import ast.nodes.access.NodeAccess;
+import ast.nodes.access.NodeAccessMetVar;
+import ast.nodes.access.NodeChained;
 import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import semantic.Type;
 import semantic.entities.RoutineST;
@@ -16,6 +20,16 @@ public class NodeBlock extends NodeSentence implements Node {
         nodeSentenceList = new ArrayList<>();
         localVariables = new ArrayList<>();
         rootOfMethod = isRoot;
+    }
+    public int getLocalVariablePosition(String variableName) {
+        int position = -1;
+        for (int i = 0 ; i < localVariables.size(); i++) {
+            if ( localVariables.get(i).getName().equals(variableName)) {
+                position = i;
+                break;
+            }
+        }
+        return position;
     }
     public void insertLocalVariable(NodeVariableLocal nodeVariableLocal) {
         localVariables.add(nodeVariableLocal);
@@ -39,6 +53,9 @@ public class NodeBlock extends NodeSentence implements Node {
                 i++;
         }
         return found;
+    }
+    public int getAmountOfVariables() {
+        return localVariables.size();
     }
     public boolean isRoot() {
         return rootOfMethod;
@@ -79,11 +96,14 @@ public class NodeBlock extends NodeSentence implements Node {
     @Override
     public void generateCode() throws CodeGenerationException {
         System.out.println("generateCode:NodeBlock:"+this);
-        //TODO add code generation for Block
         for (NodeSentence ns: nodeSentenceList) {
             if (ns != null) {
                 System.out.println("generateCode:NodeBlock:Lopp:"+ns);
                 ns.generateCode();
+                // If the sentence starts with a call, that has a chained node, but its not an assignment then we could throw out the value
+                if (ns instanceof NodeAccessMetVar && ((NodeAccessMetVar) ns).hasChainedNode() && !((NodeAccessMetVar) ns).getReturnType().toString().equals("void")) {
+                    CodeGenerator.getInstance().addLine("POP");
+                }
             }
         }
     }

@@ -2,6 +2,8 @@ package ast.nodes.access;
 
 import ast.nodes.Node;
 import ast.nodes.NodeCompoundExpression;
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.ReferenceType;
@@ -47,5 +49,11 @@ public class NodeAccessConstructor extends NodeAccess implements Node {
             toReturn += ")";
         }
         return toReturn;
+    }
+
+    @Override
+    public void generateCode() throws CodeGenerationException {
+        CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForConstructor(SymbolTable.getInstance().getClassWithName(operandToken.getLexeme()).getConstructor()));
+        CodeGenerator.getInstance().addLine("CALL ; LLamo al constructor");
     }
 }

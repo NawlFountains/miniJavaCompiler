@@ -3,17 +3,18 @@ package ast.nodes.access;
 import ast.nodes.Node;
 import ast.nodes.NodeBlock;
 import ast.nodes.NodeCompoundExpression;
-import ast.nodes.NodeOperand;
 import filemanager.CodeGenerationException;
 import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
+import semantic.Type;
 import semantic.entities.AttributeST;
 import semantic.entities.MethodST;
 import semantic.entities.RoutineST;
 
 public class NodeAccessMetVar extends NodeAccess implements Node {
     protected Token methodOrVarToken;
+    protected Type standaloneReturnType;
     protected boolean assignable = false;
     public NodeAccessMetVar(Token methodOrVarToken) {
         //Assume is 'this"
@@ -28,7 +29,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         if (isAttribute) {
             assignable = true;
             //Search in parameters
-            found = routineEnvironment.existParameter(methodOrVarToken.getLexeme());
+            found = isAccessingParameter(methodOrVarToken.getLexeme());
             if (found) {
                 returnType = routineEnvironment.getParameterType(methodOrVarToken.getLexeme());
             }
@@ -84,6 +85,7 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             if (!found)
                 throw new SemanticException(methodOrVarToken.getLexeme(), methodOrVarToken.getLineNumber(),"No existe el metodo "+methodOrVarToken.getLexeme()+" en la clase "+ routineEnvironment.getOwnerClass().getClassName());
         }
+        standaloneReturnType = returnType;
         if (chainedNode != null) {
             chainedNode.check();
             returnType = chainedNode.getReturnType();
@@ -110,30 +112,22 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
         }
         return toReturn;
     }
-    @Override
-    public void generateCode() throws CodeGenerationException {
-        if (!isAttribute) {
-            for (NodeCompoundExpression n: argumentList)
-                n.generateCode();
-            CodeGenerator.getInstance().addLine("PUSH "+CodeGenerator.generateLabelForMethod(searchMethod())+" ; Apliamos el metodo");
-            CodeGenerator.getInstance().addLine("CALL ; Llama al metodo en el tope de la pila");
+    public Type getStandaloneReturnType() {
+            return standaloneReturnType;
+    }
+    public void generateCodeForAssignment() throws CodeGenerationException {
+        //We asume only assignment will ask this
+        String variableName = methodOrVarToken.getLexeme();
+        if (isAccessingParameter(variableName)) {
+            CodeGenerator.getInstance().addLine("STORE "+searchParameterOffset(variableName));
+        } else if (isAccessingAttribute(variableName)) {
+            CodeGenerator.getInstance().addLine("LOAD 3; Cargo this");
+            CodeGenerator.getInstance().addLine("SWAP");
+            CodeGenerator.getInstance().addLine("STOREREF "+searchAttributeOffset(variableName)+" ; Apilo offset de atributo "+variableName);
+        } else {
+            //If it's not an attribute nor a parameter then its a local variable
+            CodeGenerator.getInstance().addLine("STORE "+searchLocalVariableOffset(variableName)+" ; Apilo offset de variable local "+variableName);
         }
     }
 
-    private MethodST searchMethod() {
-        boolean found = false;
-        MethodST methodToReturn = null;
-        for (MethodST m: routineEnvironment.getOwnerClass().getMethods()) {
-            if (methodOrVarToken.getLexeme().equals(m.getName())) {
-                if (argumentList.size() == m.getParameterTypeList().size()) {
-                    if (sameParameterTypes(m.getParameterTypeList(),argumentTypeList)) {
-                        found = true;
-                        methodToReturn = m;
-                        break;
-                    }
-                }
-            }
-        }
-        return methodToReturn;
-    }
 }

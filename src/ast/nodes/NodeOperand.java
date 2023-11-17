@@ -1,6 +1,7 @@
 package ast.nodes;
 
 import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 import semantic.PrimitiveType;
@@ -45,6 +46,50 @@ public class NodeOperand extends NodeCompoundExpression implements Node{
 
     @Override
     public void generateCode() throws CodeGenerationException {
-        //TODO generate code for operand
+        switch (operandToken.getId()){
+            case "opLess":
+                CodeGenerator.getInstance().addLine("LT");
+                break;
+            case "opLessEq":
+                CodeGenerator.getInstance().addLine("LE");
+                break;
+            case "opEq":
+                CodeGenerator.getInstance().addLine("EQ");
+                break;
+            case "opGreater":
+                CodeGenerator.getInstance().addLine("GT");
+                break;
+            case "opGreaterEq":
+                CodeGenerator.getInstance().addLine("GE");
+                break;
+            case "opAnd":
+                CodeGenerator.getInstance().addLine("AND");
+                break;
+            case "opOr":
+                CodeGenerator.getInstance().addLine("OR");
+                break;
+            case "opNot":
+                CodeGenerator.getInstance().addLine("NOT");
+                break;
+            case "opNotEq":
+                CodeGenerator.getInstance().addLine("NOT");
+                CodeGenerator.getInstance().addLine("EQ");
+                break;
+            case "opAdd":
+                CodeGenerator.getInstance().addLine("ADD");
+                break;
+            case "opMul":
+                CodeGenerator.getInstance().addLine("MUL");
+                break;
+            case "opSub":
+                CodeGenerator.getInstance().addLine("SUB");
+                break;
+            case "opDiv":
+                CodeGenerator.getInstance().addLine("DIV");
+                break;
+            case "opIntDiv":
+                CodeGenerator.getInstance().addLine("MOD");
+                break;
+        }
     }
 }

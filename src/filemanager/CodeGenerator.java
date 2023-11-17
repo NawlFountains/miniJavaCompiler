@@ -18,6 +18,7 @@ public class CodeGenerator {
     protected static final String labelPrefixVT = labelPrefix+"VT";
     protected static final String heapLabel = "simple_heap_init";
     protected static final String mallocLabel = "simple_malloc";
+    private static int counter = 0;
     protected File outputFile;
     protected FileWriter fileWriter;
 
@@ -66,7 +67,6 @@ public class CodeGenerator {
     public static String generateHeapRoutines() {
         return "simple_heap_init: " +
                 "RET 0\t; Retorna inmediatamente\n" +
-                "\n" +
                 "simple_malloc: " +
                 "LOADFP\t; Inicialización unidad\t\n" +
                 "LOADSP\n" +
@@ -76,7 +76,7 @@ public class CodeGenerator {
                 "PUSH 1\t; 1\n" +
                 "ADD\t; hl+1\n" +
                 "STORE 4 ; Guarda el resultado (un puntero a la primer celda de la región de memoria)\n" +
-                " LOAD 3\t; Carga la cantidad de celdas a alojar (parámetro que debe ser positivo)\n" +
+                "LOAD 3\t; Carga la cantidad de celdas a alojar (parámetro que debe ser positivo)\n" +
                 "ADD\n" +
                 "STOREHL ; Mueve el heap limit (hl). Expande el heap\n" +
                 "STOREFP\n" +
@@ -87,6 +87,10 @@ public class CodeGenerator {
     }
     public static String getLabelForMalloc() {
         return mallocLabel;
+    }
+    public static String generateLabelForString(String string) {
+        counter++;
+        return string.toLowerCase()+counter;
     }
     public void closeFile() throws CodeGenerationException {
         try {

@@ -1,5 +1,7 @@
 package ast.nodes;
 
+import filemanager.CodeGenerationException;
+import filemanager.CodeGenerator;
 import lexical.SemanticException;
 import lexical.Token;
 
@@ -43,7 +45,15 @@ public class NodeUnaryExpression extends NodeCompoundExpression implements Node{
     }
 
     @Override
-    public void generateCode() {
-        //TODO add generate code for unary expression
+    public void generateCode() throws CodeGenerationException {
+        operand.generateCode();
+        if (unaryOperand != null) {
+            if (unaryOperand.equals("opAdd")) {
+            } else if (unaryOperand.equals("opSub")) {
+                CodeGenerator.getInstance().addLine("NEG");
+            } else {
+                operand.generateCode();
+            }
+        }
     }
 }

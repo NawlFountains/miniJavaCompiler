@@ -9,11 +9,18 @@ import semantic.SymbolTable;
 
 public class MethodST extends RoutineST implements EntityST {
     protected Token declarationToken;
+    protected int offsetInVT;
     protected boolean isStatic;
     public MethodST(Token declarationToken,String methodName) {
         super(methodName);
         this.declarationToken = declarationToken;
         this.routineName = methodName;
+    }
+    public void setOffsetInVT(int offset) {
+        offsetInVT = offset;
+    }
+    public int getOffsetInVT() {
+        return offsetInVT;
     }
     public Token getDeclarationToken() {
         return declarationToken;
@@ -60,14 +67,13 @@ public class MethodST extends RoutineST implements EntityST {
         return super.equals(method) && returnType.equals(method.getReturnType()) && (isStatic == method.isStatic);
     }
     public void generateCode() throws CodeGenerationException {
-        //TODO RA for each method
         //Check if its not a predefined method
         beginningCode();
         if (blockAST == null) //That mean its a predefined class
             generateCodeForPredefinedMethods();
         else {
             blockAST.generateCode();
-            CodeGenerator.getInstance().addLine("FMEM 0");
+            CodeGenerator.getInstance().addLine("FMEM "+blockAST.getAmountOfVariables());
             CodeGenerator.getInstance().addLine("STOREFP");
             if (SymbolTable.getInstance().getMainMethod().equals(this))
              CodeGenerator.getInstance().addLine("RET "+0);
@@ -78,7 +84,6 @@ public class MethodST extends RoutineST implements EntityST {
     }
 
     private void generateCodeForPredefinedMethods() throws CodeGenerationException {
-        //TODO generate code for predefined methods like printS and debugprint
         String predefinedCodeToInsert = "";
         switch (routineName) {
             case "debugPrint":
