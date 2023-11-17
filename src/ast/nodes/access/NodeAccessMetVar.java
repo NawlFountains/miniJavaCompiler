@@ -14,7 +14,6 @@ import semantic.entities.RoutineST;
 
 public class NodeAccessMetVar extends NodeAccess implements Node {
     protected Token methodOrVarToken;
-    protected Type standaloneReturnType;
     protected boolean assignable = false;
     public NodeAccessMetVar(Token methodOrVarToken) {
         //Assume is 'this"
@@ -111,9 +110,6 @@ public class NodeAccessMetVar extends NodeAccess implements Node {
             toReturn += "."+chainedNode.getStructure();
         }
         return toReturn;
-    }
-    public Type getStandaloneReturnType() {
-            return standaloneReturnType;
     }
     public void generateCodeForAssignment() throws CodeGenerationException {
         //We asume only assignment will ask this

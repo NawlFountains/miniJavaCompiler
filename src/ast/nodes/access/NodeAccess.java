@@ -18,6 +18,7 @@ public abstract class NodeAccess extends NodeOperand implements Node {
     protected List<NodeCompoundExpression> argumentList;
     protected List<Type> argumentTypeList;
     protected NodeChained chainedNode;
+    protected Type standaloneReturnType;
     protected boolean isAttribute = true;
     public NodeAccess(Token callerToken) {
         super(callerToken);
@@ -203,5 +204,8 @@ public abstract class NodeAccess extends NodeOperand implements Node {
             if (chainedNode != null)
                 chainedNode.generateCode();
         }
+    }
+    public Type getStandaloneReturnType() {
+        return standaloneReturnType;
     }
 }

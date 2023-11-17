@@ -27,8 +27,13 @@ public class CodeGenerator {
             instance = new CodeGenerator();
         return instance;
     }
+    public static void resetInstance() {
+        instance = null;
+    }
     public void setFileName(String fileName) throws CodeGenerationException {
-        outputFile = new File(fileName+FORMAT);
+        String fileNameFormated = "["+fileName.substring(fileName.lastIndexOf('/')+1,fileName.length())+"]"+FORMAT;
+        System.out.println("Filename is "+fileNameFormated);
+        outputFile = new File(fileNameFormated);
         try {
             if (!outputFile.exists()) {
                 outputFile.createNewFile();
@@ -37,7 +42,7 @@ public class CodeGenerator {
                 outputFile.createNewFile();
             }
         } catch (IOException e) {
-            throw new CodeGenerationException("No se pudo crear el archivo de salida");
+            throw new CodeGenerationException("No se pudo crear el archivo de salida "+e.getMessage());
         }
         try {
             fileWriter = new FileWriter(outputFile);

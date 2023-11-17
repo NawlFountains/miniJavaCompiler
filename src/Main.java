@@ -35,11 +35,12 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-//            String filePath = args[0];
-            String filePath = "D:/Users/nahue/UNS/Cursando/Compiladores/Practica/Proyecto/miniJavaCompiler/resources/codeGenerationTests/gen-04.java";
+            String filePath = args[0];
+//            String filePath = "D:/Users/nahue/UNS/Cursando/Compiladores/Practica/Proyecto/miniJavaCompiler/resources/codeGenerationTests/thisTest.java";
             manager = new ImpFileManager();
             manager.openFile(filePath);
             SymbolTable.getInstance().resetTable();
+            CodeGenerator.getInstance().resetInstance();
             LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(manager);
             SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
             syntaxAnalyzer.startAnalysis();
@@ -49,7 +50,7 @@ public class Main {
             System.out.println("Compilacion Exitosa");
             System.out.println("\n" + successfulExecutionMsg);
             System.out.println("Generacion de codigo");
-            CodeGenerator.getInstance().setFileName(filePath.substring(0,filePath.length()-5));
+            CodeGenerator.getInstance().setFileName(filePath);
             SymbolTable.getInstance().generateCode();
             CodeGenerator.getInstance().closeFile();
             manager.closeCurrentFile();

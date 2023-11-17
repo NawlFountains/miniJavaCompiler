@@ -189,8 +189,8 @@ public class NodeChained extends NodeAccess implements Node {
                 }
             }
         } else {
-            System.out.println("searchMethod:nodeChained:start:"+((NodeAccessMetVar)previousNodeAccess).getStandaloneReturnType());
-            ClassST classToSearchIn = SymbolTable.getInstance().getClassWithName(((NodeAccessMetVar)previousNodeAccess).getStandaloneReturnType().toString());
+            System.out.println("searchMethod:nodeChained:start:"+previousNodeAccess.getStandaloneReturnType());
+            ClassST classToSearchIn = SymbolTable.getInstance().getClassWithName(previousNodeAccess.getStandaloneReturnType().toString());
             System.out.println("searchMethod:nodeChained:class"+classToSearchIn);
             for (MethodST m: classToSearchIn.getMethods()) {
                 System.out.println("searchMethod:nodeChained:"+m);

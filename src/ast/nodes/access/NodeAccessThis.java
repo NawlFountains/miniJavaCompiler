@@ -17,6 +17,7 @@ public class NodeAccessThis extends NodeAccess implements Node {
     @Override
     public void check() throws SemanticException {
         returnType = new ReferenceType(getRootBlock().getRoutineEnvironment().getOwnerClass().getClassName());
+        standaloneReturnType = returnType;
         if (chainedNode != null) {
             chainedNode.check();
             returnType = chainedNode.getReturnType();
