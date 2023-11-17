@@ -1,13 +1,14 @@
-///94&exitosamente
+///IterationIterationIteration&exitosamente
 
 class A {
 	int a;
 
 	void m1() {
-		this.a = 94;
-	}
-	int get() {
-		return a;
+		a = 0;
+		while (a < 3) {
+			System.printS("Iteration");
+			a = a + 1;
+		}
 	}
 }
 class Init{
@@ -15,7 +16,6 @@ class Init{
     { 
 	    var a = new A();
 	    a.m1();
-	    debugPrint(a.get());
     }
 }
 
